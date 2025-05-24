@@ -1,4 +1,5 @@
 
+import 'package:codex_pcs/screens/login/pages/get_started_screen.dart';
 import 'package:codex_pcs/screens/menu/dashboard.dart';
 import 'package:codex_pcs/utils/common_utils.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +9,12 @@ import '../../../core/dimensions.dart';
 import '../../../core/global.dart';
 import '../../../core/media_query.dart';
 import '../../../theme/app_color.dart';
+import '../../../utils/role_util.dart';
 import '../../../widgets/buttons.dart';
+import '../../../widgets/snackbar.dart';
 import '../../onboarding.dart';
 import '../model/login_response_model.dart';
+import 'forgot_password.dart';
 
 
 class SignInScreen extends StatefulWidget {
@@ -176,6 +180,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               ),
                               ButtonWidgets.buildRoundedGradientButton(text: "LOGIN", press: (){
                                 if (formKeyForMail.currentState!.validate()){
+                                  Utils.hideKeyboard(context);
                                   getUserAuthenticationDetails();
                                 }
 
@@ -188,26 +193,39 @@ class _SignInScreenState extends State<SignInScreen> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.arrow_back_ios_rounded,color: AppColors.textColorPrimary,),
-                                      Text(
-                                        "Back",
-                                        style:  TextStyle(
-                                            color: AppColors.primary,
-                                            letterSpacing: 0.8,
-                                            fontSize: ScreenDimension.textSize * AppDimensions.titleText,
-                                            fontWeight: FontWeight.w700)),
+                                  GestureDetector(
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.arrow_back_ios_rounded,color: AppColors.textColorPrimary,),
+                                        Text(
+                                          "Back",
+                                          style:  TextStyle(
+                                              color: AppColors.primary,
+                                              letterSpacing: 0.8,
+                                              fontSize: ScreenDimension.textSize * AppDimensions.titleText,
+                                              fontWeight: FontWeight.w700)),
 
-                                    ],
+                                      ],
+                                    ),
+                                    onTap: (){
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(builder: (_) => const GetStartedScreen()),
+                                      );
+                                    },
                                   ),
-                                  Text(
-                                    "Recover Forgot Password",
-                                    style: TextStyle(
-                                        color: AppColors.primary,
-                                        letterSpacing: 0.8,
-                                        fontSize: ScreenDimension.textSize * AppDimensions.titleText,
-                                        fontWeight: FontWeight.w700)),
+                                  GestureDetector(
+                                    child: Text(
+                                      "Forgot Password",
+                                      style: TextStyle(
+                                          color: AppColors.primary,
+                                          letterSpacing: 0.8,
+                                          fontSize: ScreenDimension.textSize * AppDimensions.titleText,
+                                          fontWeight: FontWeight.w700)),
+                                    onTap: (){
+                                      Navigator.push(context, MaterialPageRoute(builder: (_)=>const ForgotPassword()));
+                                    },
+                                  ),
 
                                 ],
                               ),
@@ -290,6 +308,7 @@ class _SignInScreenState extends State<SignInScreen> {
       final response = await ApiService().request(
         endpoint: "/api_pcs1/Login/GetUserAuthenticationDetails",
         method: "POST",
+        includeToken: false,
         body: {
           "Loginid": usernameController.text.trim(),
           "Password": passwordController.text.trim(),
@@ -300,9 +319,11 @@ class _SignInScreenState extends State<SignInScreen> {
       if (response is Map<String, dynamic> && response["StatusCode"] == 200) {
         loginDetailsMaster=LoginDetails.fromJson(response["data"]);
         Utils.prints("Login firstname:", loginDetailsMaster.firstName);
+        OrganizationService.setUserData(loginDetailsMaster);
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const Dashboard()),(route) => false,);
       }
       else {
+        CustomSnackBar.show(context, message: "Invalid Login Details",backgroundColor: Colors.red);
         Utils.prints("Login failed:", "${response["StatusMessage"]}");
       }
     } catch (e) {

@@ -45,7 +45,7 @@ class NavigationCard extends StatelessWidget {
       ),
       margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 6),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(

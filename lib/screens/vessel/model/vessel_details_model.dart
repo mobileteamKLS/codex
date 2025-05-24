@@ -118,6 +118,7 @@ class VesselDetailsModel {
   int? otherVslTypeId;
   dynamic otherVslTypeValue;
   int? hullTypeId;
+  String? hullTypeValue;
   int? vslWithGearId;
   int? ownerCountryId;
   int? ownerStateId;
@@ -136,8 +137,10 @@ class VesselDetailsModel {
   dynamic isVesselSharing;
   String? vesselIdOman;
   int? imoCount;
-  dynamic docFileFolder;
+  String? docFileFolder;
   List<DocumentList>? documentList;
+  List<VesselRegistrationPiDetails>? pAndIList;
+  String? marineBranchValue;
 
   VesselDetailsModel({
      this.orgId,
@@ -258,6 +261,7 @@ class VesselDetailsModel {
      this.otherVslTypeId,
      this.otherVslTypeValue,
      this.hullTypeId,
+     this.hullTypeValue,
      this.vslWithGearId,
      this.ownerCountryId,
      this.ownerStateId,
@@ -278,6 +282,8 @@ class VesselDetailsModel {
      this.imoCount,
      this.docFileFolder,
      this.documentList,
+     this.pAndIList,
+    this.marineBranchValue
   });
 
   factory VesselDetailsModel.fromJson(Map<String?, dynamic> json) => VesselDetailsModel(
@@ -370,7 +376,7 @@ class VesselDetailsModel {
     psaCode: json["PSACode"],
     psaName: json["PSAName"],
     depth: json["Depth"],
-    positionofBridge: json["PositionofBridge"],
+    positionofBridge: json["PositionofBridge_Value"],
     areaOperation: json["AreaOperation"],
     areaOperationValue: json["AreaOperation_Value"],
     standardDraught: json["StandardDraught"],
@@ -395,10 +401,11 @@ class VesselDetailsModel {
     sumDeadWeightUnit: json["SumDeadWeightUnit"],
     displacementUnit: json["DisplacementUnit"],
     teuUnit: json["TEUUnit"],
-    vesselCapUnit: json["VesselCapUnit"],
+    vesselCapUnit: json["VesselCapUnit_Value"],
     otherVslTypeId: json["OtherVSLTypeID"],
     otherVslTypeValue: json["OtherVSLType_Value"],
     hullTypeId: json["HullTypeID"],
+    hullTypeValue: json["HullType_Value"],
     vslWithGearId: json["VSLWithGearID"],
     ownerCountryId: json["OwnerCountryID"],
     ownerStateId: json["OwnerStateID"],
@@ -418,7 +425,9 @@ class VesselDetailsModel {
     vesselIdOman: json["VesselIDOman"],
     imoCount: json["ImoCount"],
     docFileFolder: json["DocFileFolder"],
+    marineBranchValue:json["MarineBranch_Value"],
     documentList: List<DocumentList>.from(json["DocumentList"].map((x) => DocumentList.fromJson(x))),
+    pAndIList: List<VesselRegistrationPiDetails>.from(json["vesselRegistrationPI_DETAILs"].map((x) => VesselRegistrationPiDetails.fromJson(x))),
   );
 
   Map<String?, dynamic> toJson() => {
@@ -540,6 +549,7 @@ class VesselDetailsModel {
     "OtherVSLTypeID": otherVslTypeId,
     "OtherVSLType_Value": otherVslTypeValue,
     "HullTypeID": hullTypeId,
+    "HullType_Value": hullTypeValue,
     "VSLWithGearID": vslWithGearId,
     "OwnerCountryID": ownerCountryId,
     "OwnerStateID": ownerStateId,
@@ -560,6 +570,7 @@ class VesselDetailsModel {
     "ImoCount": imoCount,
     "DocFileFolder": docFileFolder,
     "DocumentList": null,
+    "vesselRegistrationPI_DETAILs": null,
   };
 }
 
@@ -600,5 +611,65 @@ class DocumentList {
     "DocTitle": docTitle,
     "DocExpiry": docExpiry,
     "IssuingAuthority": issuingAuthority,
+  };
+}
+
+class VesselRegistrationPiDetails {
+  int operationType;
+  int piId;
+  int pvrId;
+  String piName;
+  String piValidityUpto;
+  String localCorrespondent;
+  dynamic isDeleted;
+  int orgId;
+  int createdBy;
+  String createdOn;
+  dynamic updatedBy;
+  dynamic updatedOn;
+
+  VesselRegistrationPiDetails({
+    required this.operationType,
+    required this.piId,
+    required this.pvrId,
+    required this.piName,
+    required this.piValidityUpto,
+    required this.localCorrespondent,
+    required this.isDeleted,
+    required this.orgId,
+    required this.createdBy,
+    required this.createdOn,
+    required this.updatedBy,
+    required this.updatedOn,
+  });
+
+  factory VesselRegistrationPiDetails.fromJson(Map<String, dynamic> json) => VesselRegistrationPiDetails(
+    operationType: json["OperationType"],
+    piId: json["PI_ID"],
+    pvrId: json["PVR_ID"],
+    piName: json["PI_NAME"],
+    piValidityUpto: json["PI_VALIDITY_UPTO"],
+    localCorrespondent: json["LOCAL_CORRESPONDENT"],
+    isDeleted: json["IS_DELETED"],
+    orgId: json["ORG_ID"],
+    createdBy: json["CREATED_BY"],
+    createdOn: json["CREATED_ON"],
+    updatedBy: json["UPDATED_BY"],
+    updatedOn: json["UPDATED_ON"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "OperationType": operationType,
+    "PI_ID": piId,
+    "PVR_ID": pvrId,
+    "PI_NAME": piName,
+    "PI_VALIDITY_UPTO": piValidityUpto,
+    "LOCAL_CORRESPONDENT": localCorrespondent,
+    "IS_DELETED": isDeleted,
+    "ORG_ID": orgId,
+    "CREATED_BY": createdBy,
+    "CREATED_ON": createdOn,
+    "UPDATED_BY": updatedBy,
+    "UPDATED_ON": updatedOn,
   };
 }

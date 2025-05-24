@@ -5,8 +5,10 @@ import '../../core/dimensions.dart';
 import '../../core/img_assets.dart';
 import '../../core/media_query.dart';
 import '../../theme/app_color.dart';
+import '../../widgets/appdrawer.dart';
 import '../../widgets/header.dart';
-import '../vessel/page/VesselListing.dart';
+import '../scn/page/scn_listing.dart';
+import '../vessel/page/vessel_list.dart';
 import 'model/menumodel.dart';
 
 class MswSubmenu extends StatefulWidget {
@@ -25,6 +27,7 @@ class _MswSubmenuState extends State<MswSubmenu> {
           'Dashboard',
           style: TextStyle(color: Colors.white),
         ),
+
         iconTheme: const IconThemeData(color: Colors.white, size: 32),
         toolbarHeight: 60,
         flexibleSpace: Container(
@@ -40,15 +43,9 @@ class _MswSubmenuState extends State<MswSubmenu> {
           ),
         ),
         actions: [
-          SvgPicture.asset(
-            userSettings,
-            height: 25,
-          ),
-          const SizedBox(
-            width: 10,
-          ),
         ],
       ),
+      drawer: Appdrawer(),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -82,23 +79,23 @@ class _MswSubmenuState extends State<MswSubmenu> {
             const NavigationCard(
               icon: ticket,
               title: 'Ship Call Number (SCN)',
-              targetPage: VesselListing(),
+              targetPage: Scnlisting(),
             ),
-            const NavigationCard(
-              icon: locationCheck,
-              title: 'Pre-Arrival Notification (PAN)',
-              targetPage: VesselListing(),
-            ),
-            const NavigationCard(
-              icon: anchorCheck,
-              title: 'Arrival Clearance',
-              targetPage: VesselListing(),
-            ),
-            const NavigationCard(
-              icon: doubleCheck,
-              title: 'Departure Clearance',
-              targetPage: VesselListing(),
-            ),
+            // const NavigationCard(
+            //   icon: locationCheck,
+            //   title: 'Pre-Arrival Notification (PAN)',
+            //   targetPage: VesselListing(),
+            // ),
+            // const NavigationCard(
+            //   icon: anchorCheck,
+            //   title: 'Arrival Clearance',
+            //   targetPage: VesselListing(),
+            // ),
+            // const NavigationCard(
+            //   icon: doubleCheck,
+            //   title: 'Departure Clearance',
+            //   targetPage: VesselListing(),
+            // ),
 
           ],
         ),

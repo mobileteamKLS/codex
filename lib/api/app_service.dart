@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'package:codex_pcs/utils/common_utils.dart';
 import 'package:http/http.dart' as http;
+
+import '../core/global.dart';
 
 class ApiService {
   static final ApiService instance = ApiService.internal();
@@ -8,16 +11,18 @@ class ApiService {
 
   ApiService.internal();
 
-  final String baseUrl = "https://pcs.kalelogistics.com/mswapi";
+   String baseUrl = mobileBaseURL;
 
   Future<dynamic> request({
     required String endpoint,
     required String method,
     Map<String, String>? headers,
     dynamic body,
+    bool includeApiKey = true,
+    bool includeToken = true,
     Map<String, String>? queryParams,
   }) async {
-    Uri uri = Uri.parse("$baseUrl$endpoint");
+    Uri uri = Uri.parse("$mobileBaseURL$endpoint");
 
     if (queryParams != null) {
       uri = uri.replace(queryParameters: queryParams);
@@ -29,9 +34,16 @@ class ApiService {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     };
+    if (includeApiKey) {
+      defaultHeaders['API-Key'] = configMaster.clientRequestID;
+    }
+    if (includeToken) {
+      defaultHeaders['Authorization'] ="Bearer ${loginDetailsMaster.token}";
+    }
 
     final mergedHeaders = {...defaultHeaders, ...?headers};
-
+    Utils.prints(endpoint, mobileBaseURL);
+    Utils.prints("BODY", json.encode(body));
     try {
       switch (method.toUpperCase()) {
         case 'GET':

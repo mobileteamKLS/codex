@@ -5,6 +5,7 @@ import '../../core/dimensions.dart';
 import '../../core/img_assets.dart';
 import '../../core/media_query.dart';
 import '../../theme/app_color.dart';
+import '../../widgets/appdrawer.dart';
 import '../../widgets/menucard.dart';
 import 'model/menumodel.dart';
 import 'msw_submenu.dart';
@@ -19,23 +20,23 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   List<RoundedIconButtonModel> mainMenuMaster = [
     RoundedIconButtonModel(
-      icon: search,
+      icon: ship,
       text: "Maritime\n Single Window",
       targetPage: const MswSubmenu(),
       containerColor: AppColors.lightOrange2 ,
     ),
-    RoundedIconButtonModel(
-      icon: search,
-      text: "Maritime\n Single Window",
-      targetPage: const MswSubmenu(),
-      containerColor: AppColors.lightPurple,
-    ),
-    RoundedIconButtonModel(
-      icon: search,
-      text: "Maritime\n Single Window",
-      targetPage: const MswSubmenu(),
-      containerColor: AppColors.lightPurple,
-    ),
+    // RoundedIconButtonModel(
+    //   icon: search,
+    //   text: "Maritime\n Single Window",
+    //   targetPage: const MswSubmenu(),
+    //   containerColor: AppColors.lightPurple,
+    // ),
+    // RoundedIconButtonModel(
+    //   icon: search,
+    //   text: "Maritime\n Single Window",
+    //   targetPage: const MswSubmenu(),
+    //   containerColor: AppColors.lightPurple,
+    // ),
   ];
 
   @override
@@ -77,6 +78,7 @@ class _DashboardState extends State<Dashboard> {
           ),
         ],
       ),
+      drawer: Appdrawer(),
       body: Container(
         width: double.infinity,
         height: double.infinity,

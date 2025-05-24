@@ -1,11 +1,15 @@
 import 'package:codex_pcs/screens/login/pages/login.dart';
 import 'package:flutter/material.dart';
 
+import '../../../api/app_service.dart';
 import '../../../core/dimensions.dart';
+import '../../../core/global.dart';
 import '../../../core/img_assets.dart';
 import '../../../core/media_query.dart';
 import '../../../theme/app_color.dart';
+import '../../../utils/common_utils.dart';
 import '../../../widgets/buttons.dart';
+import '../../../widgets/dropdown.dart';
 
 class GetStartedScreen extends StatefulWidget {
   const GetStartedScreen({super.key});
@@ -15,6 +19,27 @@ class GetStartedScreen extends StatefulWidget {
 }
 
 class _GetStartedScreenState extends State<GetStartedScreen> {
+  bool isLoading=false;
+  late Future<List<ConfigurationData>> _countriesFuture;
+  ConfigurationData? _selectedCountry;
+
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCountries();
+  }
+  @override
+  void didChangeDependencies() {
+    precacheImage(const AssetImage(loginBgImage), context);
+    super.didChangeDependencies();
+  }
+
+
+  void _loadCountries() {
+    _countriesFuture = getAllRegions();
+  }
+
   @override
   Widget build(BuildContext context) {
     ScreenDimension().init(context);
@@ -82,31 +107,66 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                                   AppDimensions.cardBorderRadiusCurve)),
                       child: Column(
                         children: [
-                          // SizedBox(
-                          //   height: ScreenDimension.onePercentOfScreenHight*3,
-                          // ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.language_outlined,
-                                color: AppColors.primary,
-                              ),
-                              Text(" LANG(EN)",
-                                  style: TextStyle(
-                                      color: AppColors.textColorPrimary,
-                                      letterSpacing: 0.8,
-                                      fontSize: ScreenDimension.textSize *
-                                          AppDimensions.titleText,
-                                      fontWeight: FontWeight.w700)),
-                            ],
+                          FutureBuilder<List<ConfigurationData>>(
+                            future: _countriesFuture,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return const Center(child: CircularProgressIndicator());
+                              } else if (snapshot.hasError) {
+                                return Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                                      const SizedBox(height: 16),
+                                      const Text(
+                                        'Error loading Regions',
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          textStyle: const TextStyle(color: Colors.white
+                                          )
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            getAllRegions();
+                                          });
+                                        },
+                                        child: const Text('Retry'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                return const Center(child: Text('No countries available'));
+                              } else {
+                                return CountryDropdown(
+                                  countries: snapshot.data!,
+                                  onChanged: (ConfigurationData? country) {
+                                    setState(() {
+                                      _selectedCountry = country;
+                                      configMaster=country!;
+                                      mobileBaseURL=country.mobileAppURL;
+                                    });
+                                    print('Selected country: ${country?.countryCode}');
+                                    if (country != null) {
+                                      print('Community Code: ${country.communityCode}');
+                                      print('Mobile App URL: ${country.mobileAppURL}');
+                                      print('Mobile App URL--: $mobileBaseURL');
+                                    }
+                                  },
+                                );
+                              }
+                            },
                           ),
                           SizedBox(
                             height: ScreenDimension.onePercentOfScreenHight,
                           ),
                           ButtonWidgets.buildRoundedGradientButton(
                               text: "Continue",
-                              press: () {
+                              press:_selectedCountry==null?null: () {
                                 Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
@@ -153,5 +213,41 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
         ),
       ),
     );
+  }
+
+  Future<List<ConfigurationData>> getAllRegions() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await ApiService().request(
+        endpoint: "/api_pcs1/MobileApp/GetMobileAppConfiguration",
+        method: "GET",
+        body: {
+        },
+        includeApiKey: false,
+        includeToken: false,
+      );
+
+      if (response is Map<String, dynamic> && response["StatusCode"] == 200) {
+        final List<dynamic> countriesJson = response['data'];
+        setState(() {
+          isLoading = false;
+        });
+        return countriesJson.map((json) => ConfigurationData.fromJson(json)).toList();
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        throw Exception('Failed to load countries');
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print("API Call Failed: $e");
+      throw Exception('Error fetching countries: $e');
+    }
   }
 }

@@ -1,20 +1,23 @@
 import 'package:codex_pcs/screens/vessel/page/vessel_details.dart';
+import 'package:codex_pcs/utils/color_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 
 import '../../../api/app_service.dart';
 import '../../../core/dimensions.dart';
+import '../../../core/global.dart';
 import '../../../core/img_assets.dart';
 import '../../../core/media_query.dart';
 import '../../../theme/app_color.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/common_utils.dart';
+import '../../../widgets/appdrawer.dart';
 import '../../../widgets/buttons.dart';
 import '../../../widgets/snackbar.dart';
 import '../../../widgets/text_field.dart';
-import '../model/vessel_details.dart';
-import '../model/vessel_list.dart';
+import '../model/vessel_details_model.dart';
+import '../model/vessel_list_model.dart';
 
 class VesselListing extends StatefulWidget {
 
@@ -27,26 +30,185 @@ class VesselListing extends StatefulWidget {
 class _VesselListingState extends State<VesselListing> {
   bool isLoading = false;
   bool hasNoRecord = false;
+  int currentPage = 1;
+  final int pageSize = 10;
+  bool hasMoreData = true;
+  ScrollController _scrollController = ScrollController();
   bool isFilterApplied = false;
   DateTime? selectedDate;
   String slotFilterDate = "Slot Date";
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  List<VesselListDetails> vesselDetailsList = [];
+  List<VesselListModel> vesselDetailsList = [];
   List<bool> _isExpandedList = [];
   List<String> selectedFilters = [];
-  List<VesselListDetails> filteredList = [];
-  late TextEditingController fromDateController;
-  late TextEditingController toDateController;
-  TextEditingController bookingNoController = TextEditingController();
-  TextEditingController chaController = TextEditingController();
-  TextEditingController importerController = TextEditingController();
+  String? selectedFilter ;
+  List<VesselListModel> filteredList = [];
+  TextEditingController vesselIdController = TextEditingController();
+  TextEditingController imoNumberController = TextEditingController();
+  TextEditingController vesselNameController = TextEditingController();
+  List<String> statusList=["Created","Submitted","Approved","Rejected","Inactive","Blacklisted","Cancelled"];
 
+// Your existing parameters
+  String vesselId = "";
+  String imoName = "";
+  String vesselName = "";
+
+  // Add these to prevent scroll jumping
+  bool _isLoadingMore = false;
+  double _lastScrollPosition = 0.0;
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_scrollListener);
     getAllVessels();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  // SOLUTION 1: Better scroll detection with threshold
+  void _scrollListener() {
+    final currentPosition = _scrollController.position.pixels;
+    final maxExtent = _scrollController.position.maxScrollExtent;
+
+    // Use a threshold instead of exact match (helps with fast scrolling)
+    const threshold = 200.0; // Load when 200 pixels from bottom
+
+    if (currentPosition >= (maxExtent - threshold)) {
+      if (!isLoading && !_isLoadingMore && hasMoreData) {
+        print("Loading more data... Current page: $currentPage");
+        _loadMoreData();
+      }
+    }
+  }
+
+  // SOLUTION 2: Separate method for loading more data
+  void _loadMoreData() async {
+    if (_isLoadingMore) return;
+
+    setState(() {
+      _isLoadingMore = true;
+    });
+
+    // Store current scroll position
+    _lastScrollPosition = _scrollController.position.pixels;
+
+    currentPage++;
+    await getAllVessels();
+
+    // Restore scroll position after a brief delay
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _lastScrollPosition,
+          duration: Duration(milliseconds: 100),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+
+    setState(() {
+      _isLoadingMore = false;
+    });
+  }
+
+  // SOLUTION 3: Modified getAllVessels with better state management
+  Future<void> getAllVessels({String vesselId = "", String imoName = "", String vesselName = "",String status = ""}) async {
+    // Prevent multiple simultaneous calls
+    if (isLoading && !_isLoadingMore) return;
+
+    // Only show main loading for initial load
+    if (currentPage == 1) {
+      setState(() {
+        isLoading = true;
+      });
+    }
+    print(status);
+    try {
+      final response = await ApiService().request(
+        endpoint: "/api_pcs1/Vessel/GetAllVesselRegistration",
+        method: "POST",
+        body: {
+          "Client": loginDetailsMaster.userAccountTypeId,
+          "OrgId": loginDetailsMaster.organizationId,
+          "OperationType": 2,
+          "OrgType": loginDetailsMaster.orgTypeName,
+          "ServiceName": null,
+          "VesselId": vesselId,
+          "ImoNo": imoName,
+          "VesselName": vesselName,
+          "AgentName": null,
+          "VesselType": null,
+          "VesselStatus": status,
+          "Nationality": null,
+          "CurrentPortEntity": -1,
+          "PlaceOfRegistry": 0,
+          "PageIndex": currentPage,
+          "PageSize": pageSize
+        },
+      );
+
+      if (response is Map<String, dynamic> && response["StatusCode"] == 200) {
+        if (response["data"] == null) {
+          setState(() {
+            hasMoreData = false;
+            if (currentPage == 1) isLoading = false;
+          });
+          return;
+        }
+
+        List<dynamic> jsonData = response["data"];
+
+       if(response["Status"]=="05"){
+         hasNoRecord=true;
+       }else{
+         hasNoRecord=false;
+       }
+        List<VesselListModel> newVessels = jsonData
+            .map((json) => VesselListModel.fromJson(json))
+            .toList();
+
+        setState(() {
+
+          if (currentPage == 1) {
+            vesselDetailsList = newVessels;
+            isLoading = false;
+          } else {
+            vesselDetailsList.addAll(newVessels);
+          }
+
+          hasMoreData = jsonData.length == pageSize;
+
+          print("Page $currentPage loaded. Total vessels: ${vesselDetailsList.length}");
+        });
+
+      } else {
+        Utils.prints("API failed:", "${response["StatusMessage"]}");
+        setState(() {
+          if (currentPage == 1) isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("API Call Failed: $e");
+      setState(() {
+        if (currentPage == 1) isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _refreshData() async {
+    setState(() {
+      currentPage = 1;
+      hasMoreData = true;
+      vesselDetailsList.clear();
+      _isLoadingMore = false;
+    });
+    await getAllVessels();
   }
 
   @override
@@ -72,22 +234,20 @@ class _VesselListingState extends State<VesselListing> {
             ),
           ),
           actions: [
-            GestureDetector(
-              child: SvgPicture.asset(
-                dropdown,
-                height: 25,
-                colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
-              ),
-              onTap: () {
-              },
-            ),
-            const SizedBox(
-              width: 14,
-            ),
+            // GestureDetector(
+            //   child: SvgPicture.asset(
+            //     dropdown,
+            //     height: 25,
+            //     colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
+            //   ),
+            //   onTap: () {
+            //   },
+            // ),
+            // const SizedBox(
+            //   width: 14,
+            // ),
           ]),
-      // drawer: AppDrawer(onDrawerCloseIcon: (){
-      //   _scaffoldKey.currentState?.closeDrawer();
-      // }, menuItems: menuItems,),
+      drawer: const Appdrawer(),
       body: Stack(
         children: [
           Container(
@@ -107,13 +267,17 @@ class _VesselListingState extends State<VesselListing> {
                     children: [
                       Row(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(right: 6.0),
-                            child: SvgPicture.asset(
-                              menu,
-                              height: ScreenDimension.onePercentOfScreenHight *
-                                  AppDimensions.defaultIconSize,
+                          InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Icon(
+                              Icons.keyboard_arrow_left_sharp,
+                              color: AppColors.primary,
                             ),
+                          ),
+                          const SizedBox(
+                            width: 5,
                           ),
                           Text(
                             'Vessel Listing',
@@ -168,6 +332,7 @@ class _VesselListingState extends State<VesselListing> {
                         child: CircularProgressIndicator(color: AppColors.primary,)))
                     : Expanded(
                   child: SingleChildScrollView(
+                    controller: _scrollController,
                     child: Padding(
                       padding: const EdgeInsets.only(
                           top: 8.0, left: 0.0, bottom: 80),
@@ -179,24 +344,25 @@ class _VesselListingState extends State<VesselListing> {
                           child: const Center(
                             child: Text("No Data Found"),
                           ),
-                        )
-                            : selectedFilters.isNotEmpty ||
-                            selectedDate != null
-                            ? ListView.builder(
-                          physics:
-                          const NeverScrollableScrollPhysics(),
-                          itemBuilder: (BuildContext, index) {
-                            VesselListDetails
-                            shipmentDetails =
-                            filteredList.elementAt(index);
-                            return buildVesselCard(
-                                vesselDetails: shipmentDetails,index:  index);
-                          },
-                          itemCount: filteredList.length,
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.all(2),
-                        )
-                            : ListView.builder(
+                        ):
+                        //     : selectedFilter!=null                            ? ListView.builder(
+                        //
+                        //   physics:
+                        //   const NeverScrollableScrollPhysics(),
+                        //   itemBuilder: (BuildContext, index) {
+                        //     VesselListModel
+                        //     shipmentDetails =
+                        //     filteredList.elementAt(index);
+                        //     return buildVesselCard(
+                        //         vesselDetails: shipmentDetails,index:  index);
+                        //   },
+                        //   itemCount: filteredList.length,
+                        //   shrinkWrap: true,
+                        //   padding: const EdgeInsets.all(2),
+                        // )
+                        //     :
+                        ListView.builder(
+
                           physics:
                           const NeverScrollableScrollPhysics(),
                           itemBuilder: (BuildContext, index) {
@@ -204,7 +370,7 @@ class _VesselListingState extends State<VesselListing> {
                             //     getFilteredShipmentDetails(
                             //         listShipmentDetails,
                             //         selectedFilters);
-                            VesselListDetails
+                            VesselListModel
                             shipmentDetails =
                             vesselDetailsList
                                 .elementAt(index);
@@ -240,59 +406,62 @@ class _VesselListingState extends State<VesselListing> {
     );
   }
 
-  void getAllVessels() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    try {
-      final response = await ApiService().request(
-        endpoint: "/api_pcs1/Vessel/GetAllVesselRegistration",
-        method: "POST",
-        body: {
-          "Client": 1,
-          "OrgId": 2024,
-          "OperationType": 2,
-          "OrgType": "MLO-ShippingAgent",
-          "ServiceName": null,
-          "VesselId": null,
-          "ImoNo": null,
-          "VesselName": null,
-          "AgentName": null,
-          "VesselType": null,
-          "VesselStatus": null,
-          "Nationality": null,
-          "CurrentPortEntity": -1,
-          "PlaceOfRegistry": 0,
-          "PageIndex": 1,
-          "PageSize": 10
-        },
-      );
-
-      if (response is Map<String, dynamic> && response["StatusCode"] == 200) {
-        if(response["data"]==null){
-          return;
-        }
-        List<dynamic> jsonData= response["data"];
-        setState(() {
-          vesselDetailsList = jsonData
-              .map((json) => VesselListDetails.fromJson(json))
-              .toList();
-          print("length--  = ${vesselDetailsList.length}");
-          isLoading = false;
-        });
-      }
-      else {
-        Utils.prints("Login failed:", "${response["StatusMessage"]}");
-      }
-    } catch (e) {
-      print("API Call Failed: $e");
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
+  // void getAllVessels({String vesselId="", String imoName="",String vesselName="",}) async {
+  //   setState(() {
+  //     isLoading = true;
+  //   });
+  //
+  //   try {
+  //     final response = await ApiService().request(
+  //       endpoint: "/api_pcs1/Vessel/GetAllVesselRegistration",
+  //       method: "POST",
+  //       body: {
+  //         "Client": loginDetailsMaster.userAccountTypeId,
+  //         "OrgId": loginDetailsMaster.organizationId,
+  //         "OperationType": 2,
+  //         "OrgType": loginDetailsMaster.orgTypeName,
+  //         "ServiceName": null,
+  //         "VesselId": vesselId,
+  //         "ImoNo": imoName,
+  //         "VesselName": vesselName,
+  //         "AgentName": null,
+  //         "VesselType": null,
+  //         "VesselStatus": null,
+  //         "Nationality": null,
+  //         "CurrentPortEntity": -1,
+  //         "PlaceOfRegistry": 0,
+  //         "PageIndex": currentPage,
+  //         "PageSize": 10
+  //       },
+  //     );
+  //
+  //     if (response is Map<String, dynamic> && response["StatusCode"] == 200) {
+  //       if(response["data"]==null){
+  //         return;
+  //       }
+  //       List<dynamic> jsonData= response["data"];
+  //       setState(() {
+  //         if (currentPage == 1) {
+  //           vesselDetailsList = jsonData.map((json) => VesselListModel.fromJson(json)).toList();
+  //         } else {
+  //           vesselDetailsList.addAll(jsonData.map((json) => VesselListModel.fromJson(json)).toList());
+  //         }
+  //         hasMoreData = jsonData.length == pageSize;
+  //         print("length--  = ${vesselDetailsList.length}");
+  //         isLoading = false;
+  //       });
+  //     }
+  //     else {
+  //       Utils.prints("Login failed:", "${response["StatusMessage"]}");
+  //     }
+  //   } catch (e) {
+  //     print("API Call Failed: $e");
+  //   } finally {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
 
   void showVesselSearchBottomSheet(BuildContext context) {
     showModalBottomSheet(
@@ -302,10 +471,10 @@ class _VesselListingState extends State<VesselListing> {
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (BuildContext context) {
         void search() async {
-          String bookingNo = bookingNoController.text.trim();
-          String cha = chaController.text.trim();
-          String importer = importerController.text.trim();
-
+          vesselId = vesselIdController.text.trim();
+           imoName = imoNumberController.text.trim();
+           vesselName = vesselNameController.text.trim();
+          getAllVessels(vesselId: vesselId,imoName: imoName,vesselName: vesselName);
 
           Navigator.pop(context);
         }
@@ -412,12 +581,9 @@ class _VesselListingState extends State<VesselListing> {
                                 ],
                               ),
                               onTap: (){
-                                bookingNoController.clear();
-                                chaController.clear();
-                                importerController.clear();
-                                fromDateController.text = Utils.formatDate(DateTime.now()
-                                    .subtract(const Duration(days: 2)));
-                                toDateController.text = Utils.formatDate(DateTime.now());
+                                vesselIdController.clear();
+                                imoNumberController.clear();
+                                vesselNameController.clear();
                               },
                             ),
                           ],
@@ -428,19 +594,19 @@ class _VesselListingState extends State<VesselListing> {
                         child: Column(
                           children: [
                             CustomTextField(
-                              controller: bookingNoController,
+                              controller: vesselIdController,
                               labelText: "Vessel ID",
                               isValidationRequired: false,
                             ),
                             SizedBox( height: ScreenDimension.onePercentOfScreenHight*1.5),
                             CustomTextField(
-                              controller: chaController,
-                              labelText: "IMO Name",
+                              controller: imoNumberController,
+                              labelText: "IMO No.",
                               isValidationRequired: false,
                             ),
                             SizedBox( height: ScreenDimension.onePercentOfScreenHight*1.5),
                             CustomTextField(
-                              controller: importerController,
+                              controller: vesselNameController,
                               labelText: "Vessel Name",
                               isValidationRequired: false,
                             ),
@@ -468,12 +634,9 @@ class _VesselListingState extends State<VesselListing> {
                                 textColor: AppColors.primary,
                                 verticalPadding: 10,
                                 press: () {
-                                  bookingNoController.clear();
-                                  chaController.clear();
-                                  importerController.clear();
-                                  fromDateController.text = Utils.formatDate(DateTime.now()
-                                      .subtract(const Duration(days: 2)));
-                                  toDateController.text = Utils.formatDate(DateTime.now());
+                                  vesselIdController.clear();
+                                  imoNumberController.clear();
+                                  vesselNameController.clear();
                                   Navigator.pop(context);
                                 },
                               ),
@@ -551,7 +714,11 @@ class _VesselListingState extends State<VesselListing> {
                               ],
                             ),
                             onTap: () {
-                              Navigator.pop(context);
+                              setState(() {
+                                selectedFilter="";
+                                isFilterApplied = false;
+                              });
+                              // Navigator.pop(context);
                             },
                           ),
                         ],
@@ -580,19 +747,23 @@ class _VesselListingState extends State<VesselListing> {
                       padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 8.0),
                       child: Wrap(
                         spacing: 8.0,
-                        children: [
-                          FilterChip(
-                            label: const Text(
-                              'Draft',
-                              style: TextStyle(color: AppColors.primary),
+                        children: statusList.map((status) {
+                          bool isSelected = (selectedFilter == status);
+
+                          return FilterChip(
+                            label: Text(
+                              status,
+                              style: const TextStyle(color: AppColors.primary),
                             ),
-                            selected: selectedFilters.contains('DRAFT'),
+                            selected: isSelected,
                             showCheckmark: false,
                             onSelected: (bool selected) {
                               setState(() {
-                                selected
-                                    ? selectedFilters.add('DRAFT')
-                                    : selectedFilters.remove('DRAFT');
+                                if (selected) {
+                                  selectedFilter = status;
+                                } else {
+                                  selectedFilter = null;
+                                }
                               });
                             },
                             selectedColor: AppColors.primary.withOpacity(0.1),
@@ -600,96 +771,13 @@ class _VesselListingState extends State<VesselListing> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20.0),
                               side: BorderSide(
-                                color: selectedFilters.contains('DRAFT')
-                                    ? AppColors.primary
-                                    : Colors.transparent,
+                                color: isSelected ? AppColors.primary : Colors.transparent,
                               ),
                             ),
-                            checkmarkColor: AppColors.primary,
-                          ),
-                          FilterChip(
-                            label: const Text(
-                              'Gated-in',
-                              style: TextStyle(color: AppColors.primary),
-                            ),
-                            selected: selectedFilters.contains('GATED-IN'),
-                            showCheckmark: false,
-                            onSelected: (bool selected) {
-                              setState(() {
-                                selected
-                                    ? selectedFilters.add('GATED-IN')
-                                    : selectedFilters.remove('GATED-IN');
-                              });
-                            },
-                            selectedColor: AppColors.primary.withOpacity(0.1),
-                            backgroundColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                              side: BorderSide(
-                                color: selectedFilters.contains('GATED-IN')
-                                    ? AppColors.primary
-                                    : Colors.transparent,
-                              ),
-                            ),
-                          ),
-                          FilterChip(
-                            label: const Text(
-                              'Gate-in Pending',
-                              style: TextStyle(color: AppColors.primary),
-                            ),
-                            selected:
-                            selectedFilters.contains('PENDING FOR GATE-IN'),
-                            showCheckmark: false,
-                            onSelected: (bool selected) {
-                              setState(() {
-                                selected
-                                    ? selectedFilters.add('PENDING FOR GATE-IN')
-                                    : selectedFilters
-                                    .remove('PENDING FOR GATE-IN');
-                              });
-                            },
-                            selectedColor: AppColors.primary.withOpacity(0.1),
-                            backgroundColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                              side: BorderSide(
-                                color: selectedFilters
-                                    .contains('PENDING FOR GATE-IN')
-                                    ? AppColors.primary
-                                    : Colors.transparent,
-                              ),
-                            ),
-                          ),
-                          FilterChip(
-                            label: const Text(
-                              'Gate-in Rejected',
-                              style: TextStyle(color: AppColors.primary),
-                            ),
-                            selected:
-                            selectedFilters.contains('REJECT FOR GATE-IN'),
-                            showCheckmark: false,
-                            onSelected: (bool selected) {
-                              setState(() {
-                                selected
-                                    ? selectedFilters.add('REJECT FOR GATE-IN')
-                                    : selectedFilters
-                                    .remove('REJECT FOR GATE-IN');
-                              });
-                            },
-                            selectedColor: AppColors.primary.withOpacity(0.1),
-                            backgroundColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                              side: BorderSide(
-                                color: selectedFilters
-                                    .contains('REJECT FOR GATE-IN')
-                                    ? AppColors.primary
-                                    : Colors.transparent,
-                              ),
-                            ),
-                          ),
-                        ],
+                          );
+                        }).toList(),
                       ),
+
                     ),
 
                     Utils.customDivider(
@@ -710,13 +798,12 @@ class _VesselListingState extends State<VesselListing> {
                               verticalPadding: 10,
                               press: () {
                                 setState(() {
-                                  selectedFilters.clear();
-                                  isFilterApplied = false;
-                                  selectedDate = null;
-                                  slotFilterDate = "Slot Date";
+                                  selectedFilter="";
+                                  //isFilterApplied = false;
                                 });
+                                getAllVessels();
                                 Navigator.pop(context);
-                                filterShipments();
+
                               },
                             ),
                           ),
@@ -728,10 +815,15 @@ class _VesselListingState extends State<VesselListing> {
                               text: 'Apply',
                               press: () {
                                 Navigator.pop(context);
-                                filterShipments();
-                                setState(() {
-                                  isFilterApplied = true;
-                                });
+                                // filterShipments();
+                                if(selectedFilter!=null){
+                                getAllVessels(status: selectedFilter!);
+                                }else{
+                                  getAllVessels();
+                                }
+                                // setState(() {
+                                //   isFilterApplied = true;
+                                // });
                               },
                             ),
                           ),
@@ -754,18 +846,18 @@ class _VesselListingState extends State<VesselListing> {
     });
   }
 
-  List<VesselListDetails> getFilteredShipmentDetails(
-      List<VesselListDetails> listShipmentDetails, List<String> selectedFilters) {
+  List<VesselListModel> getFilteredShipmentDetails(
+      List<VesselListModel> listShipmentDetails, List<String> selectedFilters) {
     return listShipmentDetails.where((shipment) {
       bool matchFound = selectedFilters.any((filter) {
-        return shipment.status.toUpperCase() == filter;
+        return shipment.status.toUpperCase() == filter.toUpperCase();
       });
       return matchFound;
     }).toList();
   }
 
   Widget buildVesselCard({
-    required VesselListDetails vesselDetails,
+    required VesselListModel vesselDetails,
     required int index
   }) {
     return Container(
@@ -801,7 +893,7 @@ class _VesselListingState extends State<VesselListing> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFDDF3F6),
+                    color: ColorUtils.getStatusColor(vesselDetails.status),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -809,38 +901,47 @@ class _VesselListingState extends State<VesselListing> {
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF00A1B7),
+                      color: AppColors.textColorPrimary,
                     ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 8),
-
-            // Details
             buildLabelValue('IMO No.', vesselDetails.imoNo),
             buildLabelValue('Vessel Name', vesselDetails.vslName),
             buildLabelValue('Call Sign', vesselDetails.callsign),
-            buildLabelValue('Port of Registry', "=="),
+            buildLabelValue('Shipping Line/Agent', ""),
 
-            const SizedBox(height: 8),
-
+            const SizedBox(height: 4),
+            Utils.customDivider(
+              space: 0,
+              color: Colors.black,
+              hasColor: true,
+              thickness: 1,
+            ),
+            const SizedBox(height: 4),
             InkWell(
               onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>VesselDetails()));
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>VesselDetails(refNo:vesselDetails.refNo, pvrId: vesselDetails.pvrId, marineBranchId: vesselDetails.marineBranchId, isSubmit: (vesselDetails.status=="Submitted") ,)));
               },
 
-              child: const Row(
+              child:  Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     'Show More Details',
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF2A7DE1),
+                      color: AppColors.primary,
                     ),
                   ),
-                  SizedBox(width: 6),
-                  Icon(Icons.arrow_forward_ios, size: 14, color: Color(0xFF2A7DE1)),
+                  const SizedBox(width: 6),
+                  Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: AppColors.gradient1,),
+                      child: const Icon(Icons.keyboard_arrow_right_outlined, color: AppColors.primary)),
                 ],
               ),
             ),

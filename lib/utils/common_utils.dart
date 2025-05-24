@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:codex_pcs/core/global.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -63,4 +64,131 @@ class Utils {
   static String formatDate(DateTime date) {
     return DateFormat('d MMM yyyy').format(date);
   }
+  static String formatStringDate(String? dateString,
+      {bool showTime = false, bool onlyTime = false}) {
+    if (dateString == null || dateString.isEmpty) {
+      return '-';
+    }
+    try {
+      DateTime date = DateTime.parse(dateString);
+      if (onlyTime) {
+        return DateFormat('HH:mm').format(date);
+      }
+      if (showTime) {
+        return DateFormat('dd MMM yyyy, HH:mm').format(date);
+      }
+      return DateFormat('dd MMM yyyy').format(date);
+    } catch (e) {
+      try {
+        DateTime date = DateFormat('yyyy-MM-dd').parse(dateString);
+
+        if (onlyTime) {
+          return DateFormat('HH:mm').format(date);
+        }
+
+        if (showTime) {
+          return DateFormat('dd MMM yyyy, HH:mm').format(date);
+        }
+
+        return DateFormat('dd MMM yyyy').format(date);
+      } catch (e) {
+        debugPrint('Error formatting date: $e');
+        return dateString;
+      }
+    }
+  }
+
+  static void hideKeyboard(context) {
+    FocusScope.of(context).requestFocus(FocusNode());
+  }
+
+  static Future<bool?> confirmationDialog(
+      BuildContext context,
+      String msg,
+      String buttonText
+      ) {
+    return showDialog<bool>(
+      barrierColor: AppColors.textColorPrimary.withOpacity(0.5),
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: AppColors.white,
+          title: const Row(
+            children: [
+              Icon(
+                Icons.info_outline_rounded,
+                color: AppColors.textColorPrimary,
+              ),
+              Text(
+                "  Confirmation",
+                style: TextStyle(
+                    fontSize: 18,
+                    color: AppColors.textColorPrimary,
+                    fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+          content:  Text(
+            "$msg",
+            style: TextStyle(
+                fontSize: 16,
+                color: AppColors.textColorPrimary,
+                fontWeight: FontWeight.w400),
+          ),
+          actions: <Widget>[
+            InkWell(
+              onTap: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text(
+                "Cancel",
+                style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w600),
+              ),
+            ),
+            SizedBox(
+              width: MediaQuery.sizeOf(context).width / 100 * 1.8,
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.of(context).pop(true);
+              },
+              child: Container(
+                padding:
+                const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: AppColors.primary),
+                child:  Text(
+                  "$buttonText",
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.white,
+                      fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  bool isVisibleForCurrentRole(String roleId) {
+    final org = loginDetailsMaster.orgTypeName;
+    switch (org) {
+      case 'Marine Department':
+        return roleId == 'marineCard' || roleId == 'sharedCard';
+      case 'Port Authority':
+        return roleId == 'portCard';
+      case 'Logistics':
+        return roleId == 'logisticsCard' || roleId == 'sharedCard';
+      default:
+        return false;
+    }
+  }
+
 }
