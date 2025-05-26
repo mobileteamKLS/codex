@@ -16,8 +16,9 @@ class SCNDetails extends StatefulWidget {
   final String refNo;
   final String port;
   final String scn;
+  final String vslName;
   final int voyageId;
-  const SCNDetails({super.key, required this.refNo, required this.voyageId, required this.port, required this.scn});
+  const SCNDetails({super.key, required this.refNo, required this.voyageId, required this.port, required this.scn, required this.vslName});
 
   @override
   State<SCNDetails> createState() => _SCNDetailsState();
@@ -101,14 +102,7 @@ class _SCNDetailsState extends State<SCNDetails> {
               ),
             ),
           ),
-          actions: [
-            // SvgPicture.asset(
-            //   userSettings,
-            //   height: 25,
-            // ),
-            // const SizedBox(
-            //   width: 10,
-            // ),
+          actions: const [
           ],
         ),
         drawer: Appdrawer(),
@@ -116,13 +110,12 @@ class _SCNDetailsState extends State<SCNDetails> {
           children: [
             Container(
               constraints: const BoxConstraints.expand(),
-              margin: (OrganizationService.isMarineDepartment)?const EdgeInsets.only(bottom: 100):const EdgeInsets.only(bottom: 0),
-              padding: EdgeInsets.only(
-                left: ScreenDimension.onePercentOfScreenWidth *
+              padding: EdgeInsets.symmetric(
+                horizontal: ScreenDimension.onePercentOfScreenWidth *
                     AppDimensions.defaultPageHorizontalPadding,
-                right: ScreenDimension.onePercentOfScreenWidth *
-                    AppDimensions.defaultPageHorizontalPadding,
-                bottom:(OrganizationService.isMarineDepartment)?0:20,
+                vertical: ScreenDimension.onePercentOfScreenHight *
+                    AppDimensions.defaultPageVerticalPadding,
+
               ),
               color: AppColors.background,
               child: SingleChildScrollView(
@@ -184,7 +177,7 @@ class _SCNDetailsState extends State<SCNDetails> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Approving Authority",style: AppStyle.sideDescText,),
+                          Text("Port Name",style: AppStyle.sideDescText,),
                           Text(widget.port??"",style: AppStyle.defaultTitle,),
                         ],
                       ),
@@ -302,16 +295,16 @@ class _SCNDetailsState extends State<SCNDetails> {
         infoBlock("Vessel ID", vesselDetailsModel.vesselId??""),
         infoBlock("IMO No.", vesselDetailsModel.imoNo??""),
         infoBlock("Vessel Nationality Type",vesselDetailsModel.vesselNationalityType??""),
-        infoBlock("Vessel Name", vesselDetailsModel.vslName??""),
+        infoBlock("Vessel Name", widget.vslName??""),
         infoBlock("Vessel Flag", vesselDetailsModel.vesselFlag??""),
-        infoBlock("Vessel Type", vesselDetailsModel.vslType??""),
-        infoBlock("Vessel Class", vesselDetailsModel.vesselClass??""),
+        infoBlock("Vessel Type", vesselDetailsModel.vslTypeText??""),
+        infoBlock("Vessel Class", vesselDetailsModel.vesselClassText??""),
         infoBlock("Call Sign", vesselDetailsModel.callSign??""),
         infoBlock("Inbound Voyage", vesselDetailsModel.voyageNo??""),
         infoBlock("Outbound Voyage", vesselDetailsModel.voyageOut??""),
         infoBlock("Purpose of Call",vesselDetailsModel.visitPurpose??""),
-        infoBlock("Last Port of Call",""),
-        infoBlock("Next Port of Call",""),
+        infoBlock("Last Port of Call","${vesselDetailsModel.lastPortCallCode ?? ""} - ${vesselDetailsModel.lastPortCallName ?? ""}"),
+        infoBlock("Next Port of Call","${vesselDetailsModel.callingPortCode ?? ""} - ${vesselDetailsModel.callingPortName ?? ""}"),
         infoBlock("ETA",vesselDetailsModel.eta != null ? Utils.formatStringDate(vesselDetailsModel.eta,showTime: true) ?? "" : ""),
         infoBlock("ETD",vesselDetailsModel.etd != null ? Utils.formatStringDate(vesselDetailsModel.etd,showTime: true) ?? "" : ""),
         infoBlock("Outbound Handling",vesselDetailsModel.isOutboundAgent??""),

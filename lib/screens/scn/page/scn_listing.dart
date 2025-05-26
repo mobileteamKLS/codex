@@ -38,25 +38,30 @@ class _ScnlistingState extends State<Scnlisting> {
   String slotFilterDate = "Slot Date";
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  List<ScnListDetailsModel> vesselDetailsList = [];
+  List<ScnListDetailsModel> scnDetailsList = [];
   List<bool> _isExpandedList = [];
   List<String> selectedFilters = [];
   String? selectedFilter;
+  int? selectedStatusValue;
 
   List<ScnListDetailsModel> filteredList = [];
   TextEditingController vesselIdController = TextEditingController();
   TextEditingController imoNumberController = TextEditingController();
   TextEditingController vesselNameController = TextEditingController();
   TextEditingController scnController = TextEditingController();
-  List<String> statusList = ["Submitted", "Approved", "Cancelled", "Closed"];
+  final List<Map<String, dynamic>> statusList = [
+    {"label": "Created", "value": 0},
+    {"label": "Submitted", "value": 1},
+    {"label": "SCN Approved", "value": 2},
+    {"label": "SCN Cancelled", "value": 5},
+    {"label": "SCN Closed", "value": 4},
+  ];
 
-// Your existing parameters
   String vesselId = "";
   String imoName = "";
   String vesselName = "";
   String scn = "";
 
-  // Add these to prevent scroll jumping
   bool _isLoadingMore = false;
   double _lastScrollPosition = 0.0;
 
@@ -64,7 +69,7 @@ class _ScnlistingState extends State<Scnlisting> {
   void initState() {
     super.initState();
     _scrollController.addListener(_scrollListener);
-    getAllVessels();
+    getAllVoyages();
   }
 
   @override
@@ -73,13 +78,11 @@ class _ScnlistingState extends State<Scnlisting> {
     super.dispose();
   }
 
-  // SOLUTION 1: Better scroll detection with threshold
   void _scrollListener() {
     final currentPosition = _scrollController.position.pixels;
     final maxExtent = _scrollController.position.maxScrollExtent;
 
-    // Use a threshold instead of exact match (helps with fast scrolling)
-    const threshold = 200.0; // Load when 200 pixels from bottom
+    const threshold = 200.0;
 
     if (currentPosition >= (maxExtent - threshold)) {
       if (!isLoading && !_isLoadingMore && hasMoreData) {
@@ -89,7 +92,6 @@ class _ScnlistingState extends State<Scnlisting> {
     }
   }
 
-  // SOLUTION 2: Separate method for loading more data
   void _loadMoreData() async {
     if (_isLoadingMore) return;
 
@@ -97,13 +99,11 @@ class _ScnlistingState extends State<Scnlisting> {
       _isLoadingMore = true;
     });
 
-    // Store current scroll position
     _lastScrollPosition = _scrollController.position.pixels;
 
     currentPage++;
-    await getAllVessels();
+    await getAllVoyages(status: selectedStatusValue,vesselName: vesselName,vesselId: vesselId,imoName: imoName);
 
-    // Restore scroll position after a brief delay
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
@@ -119,17 +119,14 @@ class _ScnlistingState extends State<Scnlisting> {
     });
   }
 
-  // SOLUTION 3: Modified getAllVessels with better state management
-  Future<void> getAllVessels(
-      {String vesselId = "",
-      String imoName = "",
-      String vesselName = "",
-      String status = "",
+  Future<void> getAllVoyages(
+      {String? vesselId,
+      String? imoName,
+      String? vesselName,
+      int? status,
       String scn = ""}) async {
-    // Prevent multiple simultaneous calls
     if (isLoading && !_isLoadingMore) return;
 
-    // Only show main loading for initial load
     if (currentPage == 1) {
       setState(() {
         isLoading = true;
@@ -195,16 +192,16 @@ class _ScnlistingState extends State<Scnlisting> {
 
         setState(() {
           if (currentPage == 1) {
-            vesselDetailsList = newVessels;
+            scnDetailsList = newVessels;
             isLoading = false;
           } else {
-            vesselDetailsList.addAll(newVessels);
+            scnDetailsList.addAll(newVessels);
           }
 
           hasMoreData = jsonData.length == pageSize;
 
           print(
-              "Page $currentPage loaded. Total vessels: ${vesselDetailsList.length}");
+              "Page $currentPage loaded. Total vessels: ${scnDetailsList.length}");
         });
       } else {
         Utils.prints("API failed:", "${response["StatusMessage"]}");
@@ -224,10 +221,10 @@ class _ScnlistingState extends State<Scnlisting> {
     setState(() {
       currentPage = 1;
       hasMoreData = true;
-      vesselDetailsList.clear();
+      scnDetailsList.clear();
       _isLoadingMore = false;
     });
-    await getAllVessels();
+    await getAllVoyages();
   }
 
   @override
@@ -252,20 +249,7 @@ class _ScnlistingState extends State<Scnlisting> {
               ),
             ),
           ),
-          actions: [
-            // GestureDetector(
-            //   child: SvgPicture.asset(
-            //     dropdown,
-            //     height: 25,
-            //     colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
-            //   ),
-            //   onTap: () {
-            //   },
-            // ),
-            // const SizedBox(
-            //   width: 14,
-            // ),
-          ]),
+          actions: []),
       drawer: const Appdrawer(),
       body: Stack(
         children: [
@@ -361,44 +345,23 @@ class _ScnlistingState extends State<Scnlisting> {
                             child: SizedBox(
                               width: MediaQuery.of(context).size.width / 1.01,
                               child: (hasNoRecord)
-                                  ? Container(
+                                  ? const SizedBox(
                                       height: 400,
-                                      child: const Center(
+                                      child: Center(
                                         child: Text("No Data Found"),
                                       ),
                                     )
-                                  :
-                                  // selectedFilter!=null                            ? ListView.builder(
-                                  //
-                                  //   physics:
-                                  //   const NeverScrollableScrollPhysics(),
-                                  //   itemBuilder: (BuildContext, index) {
-                                  //     ScnListDetailsModel
-                                  //     shipmentDetails =
-                                  //     filteredList.elementAt(index);
-                                  //     return buildVesselCard(
-                                  //         vesselDetails: shipmentDetails,index:  index);
-                                  //   },
-                                  //   itemCount: filteredList.length,
-                                  //   shrinkWrap: true,
-                                  //   padding: const EdgeInsets.all(2),
-                                  // )
-                                  //     :
-                                  ListView.builder(
+                                  : ListView.builder(
                                       physics:
                                           const NeverScrollableScrollPhysics(),
                                       itemBuilder: (BuildContext, index) {
-                                        // List<ShipmentDetails> filteredList =
-                                        //     getFilteredShipmentDetails(
-                                        //         listShipmentDetails,
-                                        //         selectedFilters);
                                         ScnListDetailsModel shipmentDetails =
-                                            vesselDetailsList.elementAt(index);
+                                            scnDetailsList.elementAt(index);
                                         return buildVesselCard(
                                             vesselDetails: shipmentDetails,
                                             index: index);
                                       },
-                                      itemCount: vesselDetailsList.length,
+                                      itemCount: scnDetailsList.length,
                                       shrinkWrap: true,
                                       padding: const EdgeInsets.all(2),
                                     ),
@@ -415,8 +378,7 @@ class _ScnlistingState extends State<Scnlisting> {
             right: 0,
             child: IgnorePointer(
               child: CustomPaint(
-                size: Size(MediaQuery.of(context).size.width,
-                    100), // Adjust the height as needed
+                size: Size(MediaQuery.of(context).size.width, 100),
                 painter: AppBarPainterGradient(),
               ),
             ),
@@ -426,63 +388,6 @@ class _ScnlistingState extends State<Scnlisting> {
       extendBody: true,
     );
   }
-
-  // void getAllVessels({String vesselId="", String imoName="",String vesselName="",}) async {
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-  //
-  //   try {
-  //     final response = await ApiService().request(
-  //       endpoint: "/api_pcs1/Vessel/GetAllVesselRegistration",
-  //       method: "POST",
-  //       body: {
-  //         "Client": loginDetailsMaster.userAccountTypeId,
-  //         "OrgId": loginDetailsMaster.organizationId,
-  //         "OperationType": 2,
-  //         "OrgType": loginDetailsMaster.orgTypeName,
-  //         "ServiceName": null,
-  //         "VesselId": vesselId,
-  //         "ImoNo": imoName,
-  //         "VesselName": vesselName,
-  //         "AgentName": null,
-  //         "VesselType": null,
-  //         "VesselStatus": null,
-  //         "Nationality": null,
-  //         "CurrentPortEntity": -1,
-  //         "PlaceOfRegistry": 0,
-  //         "PageIndex": currentPage,
-  //         "PageSize": 10
-  //       },
-  //     );
-  //
-  //     if (response is Map<String, dynamic> && response["StatusCode"] == 200) {
-  //       if(response["data"]==null){
-  //         return;
-  //       }
-  //       List<dynamic> jsonData= response["data"];
-  //       setState(() {
-  //         if (currentPage == 1) {
-  //           vesselDetailsList = jsonData.map((json) => ScnListDetailsModel.fromJson(json)).toList();
-  //         } else {
-  //           vesselDetailsList.addAll(jsonData.map((json) => ScnListDetailsModel.fromJson(json)).toList());
-  //         }
-  //         hasMoreData = jsonData.length == pageSize;
-  //         print("length--  = ${vesselDetailsList.length}");
-  //         isLoading = false;
-  //       });
-  //     }
-  //     else {
-  //       Utils.prints("Login failed:", "${response["StatusMessage"]}");
-  //     }
-  //   } catch (e) {
-  //     print("API Call Failed: $e");
-  //   } finally {
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //   }
-  // }
 
   void showVesselSearchBottomSheet(BuildContext context) {
     showModalBottomSheet(
@@ -496,7 +401,7 @@ class _ScnlistingState extends State<Scnlisting> {
           imoName = imoNumberController.text.trim();
           vesselName = vesselNameController.text.trim();
           scn = scnController.text.trim();
-          getAllVessels(
+          getAllVoyages(
               vesselId: vesselId,
               imoName: imoName,
               vesselName: vesselName,
@@ -761,9 +666,9 @@ class _ScnlistingState extends State<Scnlisting> {
                             onTap: () {
                               setState(() {
                                 selectedFilter = "";
+                                selectedStatusValue = null;
                                 isFilterApplied = false;
                               });
-                              // Navigator.pop(context);
                             },
                           ),
                         ],
@@ -794,11 +699,12 @@ class _ScnlistingState extends State<Scnlisting> {
                       child: Wrap(
                         spacing: 8.0,
                         children: statusList.map((status) {
-                          bool isSelected = (selectedFilter == status);
+                          bool isSelected =
+                              (selectedStatusValue == status["value"]);
 
                           return FilterChip(
                             label: Text(
-                              status,
+                              status["label"],
                               style: const TextStyle(color: AppColors.primary),
                             ),
                             selected: isSelected,
@@ -806,10 +712,12 @@ class _ScnlistingState extends State<Scnlisting> {
                             onSelected: (bool selected) {
                               setState(() {
                                 if (selected) {
-                                  selectedFilter = status;
+                                  selectedStatusValue = status["value"] as int;
                                 } else {
-                                  selectedFilter = null;
+                                  selectedStatusValue = null;
                                 }
+                                print(
+                                    "Selected status value: $selectedStatusValue");
                               });
                             },
                             selectedColor: AppColors.primary.withOpacity(0.1),
@@ -845,9 +753,9 @@ class _ScnlistingState extends State<Scnlisting> {
                               press: () {
                                 setState(() {
                                   selectedFilter = "";
-                                  //isFilterApplied = false;
+                                  selectedStatusValue = null;
                                 });
-                                getAllVessels();
+                                _refreshData();
                                 Navigator.pop(context);
                               },
                             ),
@@ -860,15 +768,12 @@ class _ScnlistingState extends State<Scnlisting> {
                               text: 'Apply',
                               press: () {
                                 Navigator.pop(context);
-                                // filterShipments();
-                                if (selectedFilter != null) {
-                                  getAllVessels(status: selectedFilter!);
+
+                                if (selectedStatusValue != null) {
+                                  getAllVoyages(status: selectedStatusValue);
                                 } else {
-                                  getAllVessels();
+                                  _refreshData();
                                 }
-                                // setState(() {
-                                //   isFilterApplied = true;
-                                // });
                               },
                             ),
                           ),
@@ -888,7 +793,7 @@ class _ScnlistingState extends State<Scnlisting> {
   void filterShipments() {
     setState(() {
       filteredList =
-          getFilteredShipmentDetails(vesselDetailsList, selectedFilters);
+          getFilteredShipmentDetails(scnDetailsList, selectedFilters);
     });
   }
 
@@ -924,7 +829,6 @@ class _ScnlistingState extends State<Scnlisting> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // VSR Number and Status
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -958,7 +862,6 @@ class _ScnlistingState extends State<Scnlisting> {
             buildLabelValue('Vessel Name', vesselDetails.vslName),
             buildLabelValue('SCN', vesselDetails.vcnNo),
             buildLabelValue('Shipping Line/Agent', ""),
-
             const SizedBox(height: 4),
             Utils.customDivider(
               space: 0,
@@ -977,6 +880,7 @@ class _ScnlistingState extends State<Scnlisting> {
                               voyageId: vesselDetails.voyId,
                               port: vesselDetails.poToPjLinked,
                               scn: vesselDetails.vcnNo,
+                              vslName: vesselDetails.vslName,
                             )));
               },
               child: Row(

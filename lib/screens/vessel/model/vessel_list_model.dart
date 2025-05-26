@@ -38,7 +38,7 @@ class VesselListModel {
         submittedon: json["Submittedon"]??"",
         imoNo: json["IMO_NO"]??"",
         callsign: json["CALLSIGN"]??"",
-        vslName: json["VSL_Name"]??"",
+        vslName: json["VSL_NAME"]??"",
         vslType: json["VSLType"]??"",
         nationalityType: json["NATIONALITYType"]??"",
         vFlag: json["VFlag"]??0,
