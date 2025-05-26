@@ -130,11 +130,9 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                                           )
                                         ),
                                         onPressed: () {
-                                          setState(() {
-                                            getAllRegions();
-                                          });
+                                          _loadCountries();
                                         },
-                                        child: const Text('Retry'),
+                                        child: const Text('Retry',style: TextStyle(color: Colors.white),),
                                       ),
                                     ],
                                   ),
