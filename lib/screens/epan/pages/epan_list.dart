@@ -17,16 +17,17 @@ import '../../../widgets/appdrawer.dart';
 import '../../../widgets/buttons.dart';
 import '../../../widgets/snackbar.dart';
 import '../../../widgets/text_field.dart';
-import '../model/scn_list_model.dart';
+import '../model/epan_list_model.dart';
 
-class Scnlisting extends StatefulWidget {
-  const Scnlisting({super.key});
+
+class EpanListing extends StatefulWidget {
+  const EpanListing({super.key});
 
   @override
-  State<Scnlisting> createState() => _ScnlistingState();
+  State<EpanListing> createState() => _EpanListingState();
 }
 
-class _ScnlistingState extends State<Scnlisting> {
+class _EpanListingState extends State<EpanListing> {
   bool isLoading = false;
   bool hasNoRecord = false;
   int currentPage = 1;
@@ -34,17 +35,13 @@ class _ScnlistingState extends State<Scnlisting> {
   bool hasMoreData = true;
   ScrollController _scrollController = ScrollController();
   bool isFilterApplied = false;
-  DateTime? selectedDate;
-  String slotFilterDate = "Slot Date";
-  final _formKey = GlobalKey<FormState>();
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  List<ScnListDetailsModel> scnDetailsList = [];
+  List<EpanListModel> scnDetailsList = [];
   List<bool> _isExpandedList = [];
   List<String> selectedFilters = [];
   String? selectedFilter;
   int? selectedStatusValue;
 
-  List<ScnListDetailsModel> filteredList = [];
+  List<EpanListModel> filteredList = [];
   TextEditingController vesselIdController = TextEditingController();
   TextEditingController imoNumberController = TextEditingController();
   TextEditingController vesselNameController = TextEditingController();
@@ -69,7 +66,7 @@ class _ScnlistingState extends State<Scnlisting> {
   void initState() {
     super.initState();
     _scrollController.addListener(_scrollListener);
-    getAllVoyages();
+    getAllEpans();
   }
 
   @override
@@ -102,7 +99,7 @@ class _ScnlistingState extends State<Scnlisting> {
     _lastScrollPosition = _scrollController.position.pixels;
 
     currentPage++;
-    await getAllVoyages(status: selectedStatusValue,vesselName: vesselName,vesselId: vesselId,imoName: imoName);
+    await getAllEpans(status: selectedStatusValue,vesselName: vesselName,vesselId: vesselId,imoName: imoName);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
@@ -119,12 +116,12 @@ class _ScnlistingState extends State<Scnlisting> {
     });
   }
 
-  Future<void> getAllVoyages(
+  Future<void> getAllEpans(
       {String? vesselId,
-      String? imoName,
-      String? vesselName,
-      int? status,
-      String scn = ""}) async {
+        String? imoName,
+        String? vesselName,
+        int? status,
+        String scn = ""}) async {
     if (isLoading && !_isLoadingMore) return;
 
     if (currentPage == 1) {
@@ -135,39 +132,31 @@ class _ScnlistingState extends State<Scnlisting> {
     print(status);
     try {
       final response = await ApiService().request(
-        endpoint: "/api_pcs1/Voyage/GetAll",
+        endpoint: "/api_pcs1/epan/GetAll",
         method: "POST",
-        body: {
-          "OperationType1": 4,
+        body:{
+          "OperationType": 2,
+          "IsMY":int.parse(configMaster.clientID),
+          "OrgId": loginDetailsMaster.organizationId,
+          "CreatedBy": loginDetailsMaster.userId,
+          "CurrentPortEntity": null,
+          "OrgType": loginDetailsMaster.orgTypeName,
           "OrgBranchId": loginDetailsMaster.organizationBranchId,
           "CountryID": configMaster.countryId,
-          "CurrentPortEntity": null,
-          "PageIndex": currentPage,
+          "pageIndex": currentPage,
           "pagesize": pageSize,
-          "OrgType":  loginDetailsMaster.orgTypeName,
-          "CREATED_BY": null,
-          "ORG_ID": loginDetailsMaster.organizationId,
-          "VOYAGE_NO": null,
-          "VesselID": vesselId,
-          "VCN_No": scn,
-          "IMO_NO": imoName,
-          "VSL_TYPE": null,
+          "SCN_ID": scn,
+          "VesselId": vesselId,
+          "IMONO": imoName,
+          "VesselName": vesselName,
+          "VesselType": null,
+          "ShippingAgent": null,
           "Status": status,
-          "VSL_NAME": vesselName,
-          "SHPPING_AGENT_CODE": null,
-          "Search_TugId": null,
-          "Search_TugSCN": null,
-          "Search_TugAllocation": null,
-          "Search_TugPioltRequired": null,
-          "Search_FilterDate": null,
-          "Search_AtaAtdDetails": null,
-          "Search_FromLocation": null,
-          "Search_ToLocation": null,
-          "Mode": null,
-          "Client": int.parse(configMaster.clientID),
-          "ClientName": null,
-          "Search_FromDate": null,
-          "Search_ToDate": null
+          "VESSELCountryFLAG": null,
+          "DateFilter": null,
+          "CallSign": null,
+          "ETA": null,
+          "ETD": null
         },
       );
 
@@ -181,14 +170,14 @@ class _ScnlistingState extends State<Scnlisting> {
         }
 
         List<dynamic> jsonData = response["data"];
-
+        print(jsonData);
         if (response["Status"] == "05") {
           hasNoRecord = true;
         } else {
           hasNoRecord = false;
         }
-        List<ScnListDetailsModel> newVessels =
-            jsonData.map((json) => ScnListDetailsModel.fromJson(json)).toList();
+        List<EpanListModel> newVessels =
+        jsonData.map((json) => EpanListModel.fromJson(json)).toList();
 
         setState(() {
           if (currentPage == 1) {
@@ -224,7 +213,7 @@ class _ScnlistingState extends State<Scnlisting> {
       scnDetailsList.clear();
       _isLoadingMore = false;
     });
-    await getAllVoyages();
+    await getAllEpans();
   }
 
   @override
@@ -232,7 +221,7 @@ class _ScnlistingState extends State<Scnlisting> {
     return Scaffold(
       appBar: AppBar(
           title: const Text(
-            'SCN',
+            'PAN',
             style: TextStyle(color: Colors.white),
           ),
           iconTheme: const IconThemeData(color: Colors.white, size: 32),
@@ -283,7 +272,7 @@ class _ScnlistingState extends State<Scnlisting> {
                             width: 5,
                           ),
                           Text(
-                            'SCN Listing',
+                            'PAN Listing',
                             style: AppStyle.defaultHeading,
                           ),
                         ],
@@ -298,8 +287,8 @@ class _ScnlistingState extends State<Scnlisting> {
                                 colorFilter: const ColorFilter.mode(
                                     AppColors.primary, BlendMode.srcIn),
                                 height:
-                                    ScreenDimension.onePercentOfScreenHight *
-                                        AppDimensions.defaultIconSize,
+                                ScreenDimension.onePercentOfScreenHight *
+                                    AppDimensions.defaultIconSize,
                               ),
                             ),
                             onTap: () {
@@ -308,7 +297,7 @@ class _ScnlistingState extends State<Scnlisting> {
                           ),
                           SizedBox(
                               width:
-                                  ScreenDimension.onePercentOfScreenWidth * 4),
+                              ScreenDimension.onePercentOfScreenWidth * 4),
                           InkWell(
                             onTap: () {
                               showVesselFilterBottomSheet(context);
@@ -318,8 +307,8 @@ class _ScnlistingState extends State<Scnlisting> {
                               child: SvgPicture.asset(
                                 filter,
                                 height:
-                                    ScreenDimension.onePercentOfScreenHight *
-                                        AppDimensions.defaultIconSize1,
+                                ScreenDimension.onePercentOfScreenHight *
+                                    AppDimensions.defaultIconSize1,
                               ),
                             ),
                           ),
@@ -330,45 +319,45 @@ class _ScnlistingState extends State<Scnlisting> {
                 ),
                 isLoading
                     ? const Center(
-                        child: SizedBox(
-                            height: 100,
-                            width: 100,
-                            child: CircularProgressIndicator(
-                              color: AppColors.primary,
-                            )))
+                    child: SizedBox(
+                        height: 100,
+                        width: 100,
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        )))
                     : Expanded(
-                        child: SingleChildScrollView(
-                          controller: _scrollController,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                top: 8.0, left: 0.0, bottom: 80),
-                            child: SizedBox(
-                              width: MediaQuery.of(context).size.width / 1.01,
-                              child: (hasNoRecord)
-                                  ? const SizedBox(
-                                      height: 400,
-                                      child: Center(
-                                        child: Text("No Data Found"),
-                                      ),
-                                    )
-                                  : ListView.builder(
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      itemBuilder: (BuildContext, index) {
-                                        ScnListDetailsModel shipmentDetails =
-                                            scnDetailsList.elementAt(index);
-                                        return buildVesselCard(
-                                            vesselDetails: shipmentDetails,
-                                            index: index);
-                                      },
-                                      itemCount: scnDetailsList.length,
-                                      shrinkWrap: true,
-                                      padding: const EdgeInsets.all(2),
-                                    ),
-                            ),
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          top: 8.0, left: 0.0, bottom: 80),
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width / 1.01,
+                        child: (hasNoRecord)
+                            ? const SizedBox(
+                          height: 400,
+                          child: Center(
+                            child: Text("No Data Found"),
                           ),
+                        )
+                            : ListView.builder(
+                          physics:
+                          const NeverScrollableScrollPhysics(),
+                          itemBuilder: (BuildContext, index) {
+                            EpanListModel shipmentDetails =
+                            scnDetailsList.elementAt(index);
+                            return buildVesselCard(
+                                vesselDetails: shipmentDetails,
+                                index: index);
+                          },
+                          itemCount: scnDetailsList.length,
+                          shrinkWrap: true,
+                          padding: const EdgeInsets.all(2),
                         ),
                       ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -401,10 +390,7 @@ class _ScnlistingState extends State<Scnlisting> {
           imoName = imoNumberController.text.trim();
           vesselName = vesselNameController.text.trim();
           scn = scnController.text.trim();
-          setState(() {
-            currentPage = 1;
-          });
-          getAllVoyages(
+          getAllEpans(
               vesselId: vesselId,
               imoName: imoName,
               vesselName: vesselName,
@@ -438,7 +424,7 @@ class _ScnlistingState extends State<Scnlisting> {
                                   child: SvgPicture.asset(
                                     searchBlack,
                                     height: ScreenDimension
-                                            .onePercentOfScreenHight *
+                                        .onePercentOfScreenHight *
                                         AppDimensions.defaultIconSize,
                                   ),
                                 ),
@@ -457,7 +443,7 @@ class _ScnlistingState extends State<Scnlisting> {
                                     child: SvgPicture.asset(
                                       cancel,
                                       height: ScreenDimension
-                                              .onePercentOfScreenHight *
+                                          .onePercentOfScreenHight *
                                           AppDimensions.defaultIconSize,
                                     ),
                                   ),
@@ -499,7 +485,7 @@ class _ScnlistingState extends State<Scnlisting> {
                                     child: SvgPicture.asset(
                                       clear,
                                       height: ScreenDimension
-                                              .onePercentOfScreenHight *
+                                          .onePercentOfScreenHight *
                                           AppDimensions.cardIconsSize2,
                                     ),
                                   ),
@@ -533,8 +519,8 @@ class _ScnlistingState extends State<Scnlisting> {
                             ),
                             SizedBox(
                                 height:
-                                    ScreenDimension.onePercentOfScreenHight *
-                                        1.5),
+                                ScreenDimension.onePercentOfScreenHight *
+                                    1.5),
                             CustomTextField(
                               controller: vesselIdController,
                               labelText: "Vessel ID",
@@ -542,8 +528,8 @@ class _ScnlistingState extends State<Scnlisting> {
                             ),
                             SizedBox(
                                 height:
-                                    ScreenDimension.onePercentOfScreenHight *
-                                        1.5),
+                                ScreenDimension.onePercentOfScreenHight *
+                                    1.5),
                             CustomTextField(
                               controller: imoNumberController,
                               labelText: "IMO No.",
@@ -551,8 +537,8 @@ class _ScnlistingState extends State<Scnlisting> {
                             ),
                             SizedBox(
                                 height:
-                                    ScreenDimension.onePercentOfScreenHight *
-                                        1.5),
+                                ScreenDimension.onePercentOfScreenHight *
+                                    1.5),
                             CustomTextField(
                               controller: vesselNameController,
                               labelText: "Vessel Name",
@@ -560,8 +546,8 @@ class _ScnlistingState extends State<Scnlisting> {
                             ),
                             SizedBox(
                                 height:
-                                    ScreenDimension.onePercentOfScreenHight *
-                                        1.5),
+                                ScreenDimension.onePercentOfScreenHight *
+                                    1.5),
                           ],
                         ),
                       ),
@@ -653,7 +639,7 @@ class _ScnlistingState extends State<Scnlisting> {
                                   child: SvgPicture.asset(
                                     clear,
                                     height: ScreenDimension
-                                            .onePercentOfScreenHight *
+                                        .onePercentOfScreenHight *
                                         AppDimensions.cardIconsSize,
                                   ),
                                 ),
@@ -703,7 +689,7 @@ class _ScnlistingState extends State<Scnlisting> {
                         spacing: 8.0,
                         children: statusList.map((status) {
                           bool isSelected =
-                              (selectedStatusValue == status["value"]);
+                          (selectedStatusValue == status["value"]);
 
                           return FilterChip(
                             label: Text(
@@ -773,7 +759,7 @@ class _ScnlistingState extends State<Scnlisting> {
                                 Navigator.pop(context);
 
                                 if (selectedStatusValue != null) {
-                                  getAllVoyages(status: selectedStatusValue);
+                                  getAllEpans(status: selectedStatusValue);
                                 } else {
                                   _refreshData();
                                 }
@@ -800,8 +786,8 @@ class _ScnlistingState extends State<Scnlisting> {
     });
   }
 
-  List<ScnListDetailsModel> getFilteredShipmentDetails(
-      List<ScnListDetailsModel> listShipmentDetails,
+  List<EpanListModel> getFilteredShipmentDetails(
+      List<EpanListModel> listShipmentDetails,
       List<String> selectedFilters) {
     return listShipmentDetails.where((shipment) {
       bool matchFound = selectedFilters.any((filter) {
@@ -812,7 +798,7 @@ class _ScnlistingState extends State<Scnlisting> {
   }
 
   Widget buildVesselCard(
-      {required ScnListDetailsModel vesselDetails, required int index}) {
+      {required EpanListModel vesselDetails, required int index}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
       decoration: BoxDecoration(
@@ -836,7 +822,7 @@ class _ScnlistingState extends State<Scnlisting> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  vesselDetails.refNo,
+                  vesselDetails.referenceNo,
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
@@ -844,7 +830,7 @@ class _ScnlistingState extends State<Scnlisting> {
                 ),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: ColorUtils.getStatusColor(vesselDetails.status),
                     borderRadius: BorderRadius.circular(20),
@@ -862,8 +848,8 @@ class _ScnlistingState extends State<Scnlisting> {
             ),
             const SizedBox(height: 8),
             buildLabelValue('IMO No.', vesselDetails.imoNo),
-            buildLabelValue('Vessel Name', vesselDetails.vslName),
-            buildLabelValue('SCN', vesselDetails.vcnNo),
+            buildLabelValue('Vessel Name', vesselDetails.vesselName),
+            buildLabelValue('SCN', vesselDetails.scnId),
             buildLabelValue('Shipping Line/Agent', ""),
             const SizedBox(height: 4),
             Utils.customDivider(
@@ -875,16 +861,16 @@ class _ScnlistingState extends State<Scnlisting> {
             const SizedBox(height: 4),
             InkWell(
               onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => SCNDetails(
-                              refNo: vesselDetails.refNo,
-                              voyageId: vesselDetails.voyId,
-                              port: vesselDetails.poToPjLinked,
-                              scn: vesselDetails.vcnNo,
-                              vslName: vesselDetails.vslName,
-                            )));
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (context) => SCNDetails(
+                //           refNo: vesselDetails.refNo,
+                //           voyageId: vesselDetails.voyId,
+                //           port: vesselDetails.poToPjLinked,
+                //           scn: vesselDetails.vcnNo,
+                //           vslName: vesselDetails.vslName,
+                //         )));
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

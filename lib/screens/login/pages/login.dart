@@ -323,7 +323,7 @@ class _SignInScreenState extends State<SignInScreen> {
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const Dashboard()),(route) => false,);
       }
       else {
-        CustomSnackBar.show(context, message: "Invalid Login Details",backgroundColor: Colors.red);
+        CustomSnackBar.show(context, message: "${response["StatusMessage"]}",backgroundColor: Colors.red);
         Utils.prints("Login failed:", "${response["StatusMessage"]}");
       }
     } catch (e) {

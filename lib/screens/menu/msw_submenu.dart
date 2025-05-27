@@ -7,6 +7,7 @@ import '../../core/media_query.dart';
 import '../../theme/app_color.dart';
 import '../../widgets/appdrawer.dart';
 import '../../widgets/header.dart';
+import '../epan/pages/epan_list.dart';
 import '../scn/page/scn_listing.dart';
 import '../vessel/page/vessel_list.dart';
 import 'model/menumodel.dart';
@@ -84,7 +85,7 @@ class _MswSubmenuState extends State<MswSubmenu> {
             // const NavigationCard(
             //   icon: locationCheck,
             //   title: 'Pre-Arrival Notification (PAN)',
-            //   targetPage: VesselListing(),
+            //   targetPage: EpanListing(),
             // ),
             // const NavigationCard(
             //   icon: anchorCheck,
