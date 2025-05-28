@@ -2,7 +2,7 @@ class EpanListModel {
   int naId;
   String isPass;
   String parentType;
-  dynamic marineBranchId;
+  String marineBranchId;
   String portauthotityorgid;
   String vesselType;
   String remarksCount;
@@ -65,8 +65,8 @@ class EpanListModel {
     naId: json["NA_ID"],
     isPass: json["IsPass"],
     parentType: json["ParentType"],
-    marineBranchId: json["MarineBranchID"],
-    portauthotityorgid: json["PORTAUTHOTITYORGID"],
+    marineBranchId: json["MarineBranchID"]??"",
+    portauthotityorgid: json["PORTAUTHOTITYORGID"]??"",
     vesselType: json["VesselType"],
     remarksCount: json["RemarksCount"],
     referenceNo: json["ReferenceNo"],

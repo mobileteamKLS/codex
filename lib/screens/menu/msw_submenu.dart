@@ -82,11 +82,11 @@ class _MswSubmenuState extends State<MswSubmenu> {
               title: 'Ship Call Number (SCN)',
               targetPage: Scnlisting(),
             ),
-            // const NavigationCard(
-            //   icon: locationCheck,
-            //   title: 'Pre-Arrival Notification (PAN)',
-            //   targetPage: EpanListing(),
-            // ),
+            const NavigationCard(
+              icon: locationCheck,
+              title: 'Pre-Arrival Notification (PAN)',
+              targetPage: EpanListing(),
+            ),
             // const NavigationCard(
             //   icon: anchorCheck,
             //   title: 'Arrival Clearance',

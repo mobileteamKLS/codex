@@ -1,3 +1,4 @@
+import 'package:codex_pcs/screens/epan/pages/epan_details.dart';
 import 'package:codex_pcs/screens/scn/page/scn_details.dart';
 import 'package:codex_pcs/screens/vessel/page/vessel_details.dart';
 import 'package:codex_pcs/utils/color_utils.dart';
@@ -132,14 +133,14 @@ class _EpanListingState extends State<EpanListing> {
     print(status);
     try {
       final response = await ApiService().request(
-        endpoint: "/api_pcs1/epan/GetAll",
+        endpoint: "/api_pcs1/Epan/GetAll",
         method: "POST",
         body:{
           "OperationType": 2,
           "IsMY":int.parse(configMaster.clientID),
           "OrgId": loginDetailsMaster.organizationId,
           "CreatedBy": loginDetailsMaster.userId,
-          "CurrentPortEntity": null,
+          "CurrentPortEntity": 0,
           "OrgType": loginDetailsMaster.orgTypeName,
           "OrgBranchId": loginDetailsMaster.organizationBranchId,
           "CountryID": configMaster.countryId,
@@ -861,16 +862,12 @@ class _EpanListingState extends State<EpanListing> {
             const SizedBox(height: 4),
             InkWell(
               onTap: () {
-                // Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) => SCNDetails(
-                //           refNo: vesselDetails.refNo,
-                //           voyageId: vesselDetails.voyId,
-                //           port: vesselDetails.poToPjLinked,
-                //           scn: vesselDetails.vcnNo,
-                //           vslName: vesselDetails.vslName,
-                //         )));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>  EpanDetails(refNo: vesselDetails.referenceNo, pvrId: vesselDetails.naId, marineBranchId: int.parse(vesselDetails.marineBranchId), isSubmit: true, vesselId: vesselDetails.vesselid,
+
+                        )));
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
