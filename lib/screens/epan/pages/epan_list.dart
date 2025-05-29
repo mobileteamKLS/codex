@@ -48,11 +48,12 @@ class _EpanListingState extends State<EpanListing> {
   TextEditingController vesselNameController = TextEditingController();
   TextEditingController scnController = TextEditingController();
   final List<Map<String, dynamic>> statusList = [
-    {"label": "Created", "value": 0},
-    {"label": "Submitted", "value": 1},
-    {"label": "SCN Approved", "value": 2},
-    {"label": "SCN Cancelled", "value": 5},
-    {"label": "SCN Closed", "value": 4},
+    {"label": "Created", "value": 1},
+    {"label": "Submitted", "value": 2},
+    {"label": "Approved", "value": 3},
+    {"label": "Rejected", "value": 4},
+    {"label": "Cancelled", "value": 5},
+    {"label": "Closed", "value": 6},
   ];
 
   String vesselId = "";
@@ -865,7 +866,7 @@ class _EpanListingState extends State<EpanListing> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>  EpanDetails(refNo: vesselDetails.referenceNo, pvrId: vesselDetails.naId, marineBranchId: int.parse(vesselDetails.marineBranchId), isSubmit: true, vesselId: vesselDetails.vesselid,
+                        builder: (context) =>  EpanDetails(refNo: vesselDetails.referenceNo, pvrId: vesselDetails.naId, marineBranchId: int.parse(vesselDetails.marineBranchId??"0"), isSubmit: (vesselDetails.status == "Submitted"), vesselId: vesselDetails.vesselid,
 
                         )));
               },

@@ -726,8 +726,7 @@ class _VesselDetailsState extends State<VesselDetails> {
     String initialComment = '',
     required Function(String) onSubmit,
   }) {
-
-
+    String? errorText;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -735,77 +734,97 @@ class _VesselDetailsState extends State<VesselDetails> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return StatefulBuilder(
+          builder: (context ,setState){
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            commentController.clear();
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Comment*',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(context),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: commentController,
+                      decoration: InputDecoration(
+                        hintText: commentHint,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 16,
+                        ),
+                        errorText: errorText,
+                      ),
+                      minLines: 3,
+                      maxLines: 5,
+                      onChanged: (value) {
+                        if (errorText != null) {
+                          setState(() {
+                            errorText = null;
+                          });
+                        }
+                      },
                     ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ButtonWidgets.buildRoundedGradientButton(
+                          press: () {
+                            final comment = commentController.text;
+                            if (comment.isEmpty) {
+                              setState(() {
+                                errorText = 'Comment cannot be empty';
+                              });
+                              return;
+                            }
+                            if (comment.isNotEmpty) {
+                              onSubmit(comment);
+                              commentController.clear();
+                              Navigator.pop(context);
+                            }
+                          },
+                          text: "Submit"),
+                    ),
+                    const SizedBox(height: 16),
                   ],
                 ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Comment',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: commentController,
-                  decoration: InputDecoration(
-                    hintText: commentHint,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 16,
-                    ),
-                  ),
-                  minLines: 3,
-                  maxLines: 5,
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ButtonWidgets.buildRoundedGradientButton(
-                    press: () {
-                      final comment = commentController.text;
-                      if (comment.isNotEmpty) {
-                        onSubmit(comment);
-                        commentController.clear();
-                        Navigator.pop(context);
-                      }
-                    },
-                    text: "Submit"
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );

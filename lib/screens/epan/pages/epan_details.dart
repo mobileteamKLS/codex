@@ -103,19 +103,17 @@ class _EpanDetailsState extends State<EpanDetails> {
 
     try {
       final response = await ApiService().request(
-        endpoint: "/api_pcs1/Vessel/SetApproval",
+        endpoint: "/api_pcs1/Epan/SetApproval",
         method: "POST",
         body: {
-          "Client": 1,
           "OrgId": loginDetailsMaster.organizationId,
-          "OperationType": opType,
-          "OrgType": "Marine Department",
-          "OrgTypeName": loginDetailsMaster.orgTypeName,
-          "CreatedBy": "150",
+          "OperationType": 7,
+          "CreatedBy": loginDetailsMaster.userId,
+          "UpdatedBy": loginDetailsMaster.userId,
           "BranchId": loginDetailsMaster.organizationBranchId,
-          "PVR_ID": widget.pvrId,
-          "IPAddress": "",
-          "Comments": comment
+          "Status" : opType,
+          "NAId": widget.pvrId,
+          "Remark": comment
         },
       );
 
@@ -155,7 +153,7 @@ class _EpanDetailsState extends State<EpanDetails> {
       Scaffold(
         appBar: AppBar(
           title: const Text(
-            'Vessel Registration',
+            'PAN',
             style: TextStyle(color: Colors.white),
           ),
           iconTheme: const IconThemeData(color: Colors.white, size: 32),
@@ -241,32 +239,6 @@ class _EpanDetailsState extends State<EpanDetails> {
                           ],
                         )),
                     Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.only(
-                          top: 12, left: 10, bottom: 12, right: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: const [
-                          BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 6,
-                              offset: Offset(0, 2)),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Approving Authority",
-                            style: AppStyle.sideDescText,
-                          ),
-                          // Text(vesselDetailsModel.marineBranchValue??"",style: AppStyle.defaultTitle,),
-                        ],
-                      ),
-                    ),
-                    Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
@@ -340,7 +312,7 @@ class _EpanDetailsState extends State<EpanDetails> {
                             showRejectWithCommentsBottomSheet(
                               context: context,
                               onSubmit: (comment) {
-                                approveReject(comment, 2);
+                                approveReject(comment, 4);
                               },
                             );
                           },
@@ -356,7 +328,7 @@ class _EpanDetailsState extends State<EpanDetails> {
                                 "Are you sure you want to Approve ?",
                                 "Approve");
                             if (isTrue!) {
-                              approveReject("", 1);
+                              approveReject("", 3);
                             }
                           },
                         ),
@@ -615,9 +587,33 @@ class _EpanDetailsState extends State<EpanDetails> {
           ),
           SizedBox(height: 4),
           Text(
-            (vesselDetailsModel.specialoradditionalsecurity ?? 0) == 1 ? "Yes" : "No",
+            (vesselDetailsModel.specialoradditionalsecurity ?? 0) == 1
+                ? "Yes"
+                : "No",
             style: AppStyle.defaultTitle,
           ),
+          SizedBox(
+              height:
+                  ((vesselDetailsModel.specialoradditionalsecurity ?? 0) == 1)
+                      ? 6
+                      : 0),
+          ((vesselDetailsModel.specialoradditionalsecurity ?? 0) == 1)
+              ? Text(
+                  "If yes, please specify",
+                  style: AppStyle.sideDescText,
+                )
+              : const SizedBox(),
+          SizedBox(
+              height:
+                  ((vesselDetailsModel.specialoradditionalsecurity ?? 0) == 1)
+                      ? 4
+                      : 0),
+          ((vesselDetailsModel.specialoradditionalsecurity ?? 0) == 1)
+              ? Text(
+                  vesselDetailsModel.specialoradditionalsecurityYes ?? "",
+                  style: AppStyle.defaultTitle,
+                )
+              : const SizedBox(),
         ],
       ),
     );
@@ -637,8 +633,67 @@ class _EpanDetailsState extends State<EpanDetails> {
             (vesselDetailsModel.weaponsOnBoard ?? 0) == 1 ? "Yes" : "No",
             style: AppStyle.defaultTitle,
           ),
+          SizedBox(
+              height:
+              ((vesselDetailsModel.weaponsOnBoard ?? 0) == 1)
+                  ? 6
+                  : 0),
+          ((vesselDetailsModel.weaponsOnBoard ?? 0) == 1)
+              ? Text(
+            "If yes, please refer",
+            style: AppStyle.sideDescText,
+          )
+              : const SizedBox(),
+          SizedBox(
+              height:
+              ((vesselDetailsModel.weaponsOnBoard ?? 0) == 1)
+                  ? 4
+                  : 0),
+          ((vesselDetailsModel.weaponsOnBoard ?? 0) == 1)
+              ? Container(
+            width: double.infinity,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Weapons Import & Export License",
+                      style: AppStyle.defaultTitle,
+                    ),
+                    GestureDetector(
+                      child: SvgPicture.asset(
+                        download,
+                        colorFilter: const ColorFilter.mode(
+                            AppColors.primary, BlendMode.srcIn),
+                        height: ScreenDimension.onePercentOfScreenHight *
+                            AppDimensions.defaultIconSize,
+                      ),
+                      onTap: () {
+                        _downloadDocument(vesselDetailsModel.weaponsOnBoardFileName!,vesselDetailsModel.weaponsOnBoardSaverFileName!,vesselDetailsModel.docFileFolder!);
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          )
+              : const SizedBox(),
         ],
       ),
+    );
+  }
+
+  Widget attachedDocumentPanContent(){
+    return Column(
+      children:(vesselDetailsModel.crewUplPanRandomFile!=null||vesselDetailsModel.passengerUplPanRandomFile!=null||vesselDetailsModel.dgCargoUplPanRandomFile!=null)?[
+        if(vesselDetailsModel.crewUplPanRandomFile!=null)documentRow("Crew List","-",vesselDetailsModel.crewUplPanActualFile!,vesselDetailsModel.crewUplPanRandomFile!,isExpiry: true),
+        if(vesselDetailsModel.passengerUplPanRandomFile!=null)documentRow("Passenger List","-",vesselDetailsModel.passengerUplPanActualFile!,vesselDetailsModel.passengerUplPanRandomFile!,isExpiry: true),
+        if(vesselDetailsModel.dgCargoUplPanRandomFile!=null)documentRow("DG Cargo","-",vesselDetailsModel.dgCargoUplPanActualFile!,vesselDetailsModel.dgCargoUplPanRandomFile!,isExpiry: true),
+      ]: [
+        documentRow("No documents available", "","","")
+    ],
     );
   }
 
@@ -679,6 +734,8 @@ class _EpanDetailsState extends State<EpanDetails> {
           ispsSecurityCertificateContent()));
     }
     sections.add(buildSection(index++, "Last 10 Port of Calls - In chronological order (most recent call first)", tenPortContent()));
+    sections.add(buildSection(index++, "Attached Documents PAN", attachedDocumentPanContent()));
+    sections.add(buildSection(index++, "Attached Documents", attachedDocumentsContent()));
     return sections;
   }
 
@@ -741,7 +798,8 @@ class _EpanDetailsState extends State<EpanDetails> {
   }
 
   Widget documentRow(
-          String title, String expiry, String fileName, String savedName) =>
+          String title, String expiry, String fileName, String savedName,{bool isExpiry=false
+          }) =>
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
@@ -753,7 +811,7 @@ class _EpanDetailsState extends State<EpanDetails> {
                     Text(title, style: AppStyle.defaultTitle),
                     SizedBox(height: 2),
                     Text(
-                      "Expires on $expiry",
+                      isExpiry?"$expiry": "Expires on $expiry",
                       style: AppStyle.sideDescText,
                     ),
                   ]),
@@ -1013,22 +1071,24 @@ class _EpanDetailsState extends State<EpanDetails> {
         infoBlock("Call Sign", vesselDetailsModel.callSign ?? ""),
         infoBlock("Vessel Flag", vesselDetailsModel.nationality ?? ""),
         infoBlock("Vessel Type", vesselDetailsModel.vesselTypeValue ?? ""),
-        infoBlock("Purpose of Call", vesselDetailsModel.agentCode ?? ""),
+        infoBlock("Purpose of Call", vesselDetailsModel.purposeofCall ?? ""),
         infoBlock(
           "Port Of Registry",
           "${vesselDetailsModel.portOfRegistryCode ?? ""} - ${vesselDetailsModel.portOfRegistryName ?? ""}",
         ),
-        infoBlock("Outbound Handling", "=="),
+        infoBlock("Outbound Handling", (vesselDetailsModel.isOutboundAgentCode ?? 0) == 1 ? "Yes" : "No",),
         infoBlock("Estimated Date and Time of Arrival",
-            vesselDetailsModel.agentCode ?? ""),
+            vesselDetailsModel.eta ?? ""),
         infoBlock("Estimated Date and Time of Departure",
-            vesselDetailsModel.agentCode ?? ""),
+            vesselDetailsModel.etd ?? ""),
         infoBlock(
-            "Shipping Line / Operator", vesselDetailsModel.agentCode ?? ""),
-        infoBlock("Last Port of Call", vesselDetailsModel.agentCode ?? ""),
-        infoBlock("Next Port of Call", vesselDetailsModel.agentCode ?? ""),
-        infoBlock("Year of Build", vesselDetailsModel.agentCode ?? ""),
-        infoBlock("Berth No", vesselDetailsModel.agentCode ?? ""),
+            "Shipping Line / Operator", vesselDetailsModel.shippingagentValue ?? ""),
+        infoBlock("Last Port of Call", "${vesselDetailsModel.lastPortofCallCode ?? ""} - ${vesselDetailsModel.lastPortofCallName ?? ""}"),
+        infoBlock("Next Port of Call","${vesselDetailsModel.nextPortofCallCode ?? ""} - ${vesselDetailsModel.nextPortofCallName ?? ""}"),
+        infoBlock("Year of Built", vesselDetailsModel.yearBuilt != null
+            ? "${vesselDetailsModel.yearBuilt!}"
+            : ""),
+        infoBlock("Berth No", vesselDetailsModel.berthNo ?? ""),
         infoBlock("Port Name", vesselDetailsModel.agentCode ?? ""),
       ],
     );
@@ -1038,9 +1098,9 @@ class _EpanDetailsState extends State<EpanDetails> {
         infoBlock("Agent Code", vesselDetailsModel.agentCode ?? ""),
         infoBlock("Ship Agent Name", vesselDetailsModel.agentName ?? ""),
         infoBlock("Ship Agent Address", vesselDetailsModel.agentAddress ?? ""),
-        infoBlock("Ship Agent Country", "=="),
-        infoBlock("Ship Agent State", "=="),
-        infoBlock("Ship Agent City", "=="),
+        infoBlock("Ship Agent Country", vesselDetailsModel.countryName ?? ""),
+        infoBlock("Ship Agent State", vesselDetailsModel.statename ?? ""),
+        infoBlock("Ship Agent City", vesselDetailsModel.cityname ?? ""),
         infoBlock(
             "Ship Agent Postcode", "${vesselDetailsModel.agentPinCode ?? ""}"),
         infoBlock("Ship Agent Email", vesselDetailsModel.agentEmail ?? ""),
@@ -1064,16 +1124,16 @@ class _EpanDetailsState extends State<EpanDetails> {
 
   Widget cargoPassengerContent() =>
       Wrap(spacing: 16, runSpacing: 12, children: [
-        infoBlock("Cargo Type", "=="),
-        infoBlock("Dangerous Cargo On Board", "=="),
-        infoBlock("Cargo To Discharge ", "=="),
-        infoBlock("Dangerous Good", "=="),
+        infoBlock("Cargo Type",vesselDetailsModel.cargoTypeValue ?? ""),
+        infoBlock("Dangerous Cargo On Board", (vesselDetailsModel.dangerousCargoonBoard ?? 0) == 1 ? "Yes" : "No",),
+        infoBlock("Cargo To Discharge ", vesselDetailsModel.cargotoDischarge ?? ""),
+        infoBlock("Dangerous Good",(vesselDetailsModel.dangeroudGoods ?? 0) == 1 ? "Yes" : "No",),
         infoBlock(
             "Prohibited Goods Under UN Security Council / Resolution On Board?",
-            "=="),
-        infoBlock("Name of Master", "=="),
-        infoBlock("Number of Crew(S)", "=="),
-        infoBlock("Number of Passenger(S)", "=="),
+          (vesselDetailsModel.prohibitedgoodsUn ?? 0) == 1 ? "Yes" : "No",),
+        infoBlock("Name of Master", vesselDetailsModel.nameofMaster ?? ""),
+        infoBlock("Number of Crew(S)", vesselDetailsModel.totalNoofCrew != null ? "${vesselDetailsModel.totalNoofCrew!}": ""),
+        infoBlock("Number of Passenger(S)",vesselDetailsModel.totalNoofPassenger != null ? "${vesselDetailsModel.totalNoofPassenger!}": ""),
       ]);
 
   Widget ispsDetailsContent() {
@@ -1089,7 +1149,7 @@ class _EpanDetailsState extends State<EpanDetails> {
                 "Valid ISSC Certification",
                 style: AppStyle.sideDescText,
               ),
-              SizedBox(height: 2),
+              const SizedBox(height: 2),
               Text(
                 (vesselDetailsModel.validIssc ?? 0) == 1 ? "Yes" : "No",
                 style: AppStyle.defaultTitle,
@@ -1097,7 +1157,7 @@ class _EpanDetailsState extends State<EpanDetails> {
             ],
           ),
         ),
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
 
         // Second row - certificate with download icon
         if (vesselDetailsModel.validIssc == 1)
@@ -1195,22 +1255,22 @@ class _EpanDetailsState extends State<EpanDetails> {
   //     ],
   //   );
   // }
-  // Widget attachedDocumentsContent() {
-  //   return Column(
-  //     children: vesselDetailsModel.documentList != null
-  //         ? vesselDetailsModel.documentList!.map((document) {
-  //       return documentRow(
-  //           document.docTitle ?? "Untitled Document",
-  //           document.docExpiry ?? "No expiry date",
-  //           document.fileName!,
-  //           document.saveFileName!
-  //       );
-  //     }).toList()
-  //         : [
-  //       documentRow("No documents available", "","","")
-  //     ],
-  //   );
-  // }
+  Widget attachedDocumentsContent() {
+    return Column(
+      children: vesselDetailsModel.listofPaymentSlip != null
+          ? vesselDetailsModel.listofPaymentSlip!.map((document) {
+        return documentRow(
+            document.docTitle ?? "Untitled Document",
+            document.docExpiry ?? "No expiry date",
+            document.fileName!,
+            document.saveFileName!
+        );
+      }).toList()
+          : [
+        documentRow("No documents available", "","","")
+      ],
+    );
+  }
 
   void showRejectWithCommentsBottomSheet({
     required BuildContext context,
@@ -1220,6 +1280,7 @@ class _EpanDetailsState extends State<EpanDetails> {
     String initialComment = '',
     required Function(String) onSubmit,
   }) {
+    String? errorText;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1227,76 +1288,97 @@ class _EpanDetailsState extends State<EpanDetails> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Comment',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: commentController,
-                  decoration: InputDecoration(
-                    hintText: commentHint,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 16,
-                    ),
-                  ),
-                  minLines: 3,
-                  maxLines: 5,
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ButtonWidgets.buildRoundedGradientButton(
-                      press: () {
-                        final comment = commentController.text;
-                        if (comment.isNotEmpty) {
-                          onSubmit(comment);
-                          commentController.clear();
-                          Navigator.pop(context);
-                        }
-                      },
-                      text: "Submit"),
-                ),
-                const SizedBox(height: 16),
-              ],
-            ),
-          ),
+        return StatefulBuilder(
+         builder: (context ,setState){
+           return Padding(
+             padding: EdgeInsets.only(
+               bottom: MediaQuery.of(context).viewInsets.bottom,
+             ),
+             child: Container(
+               padding: const EdgeInsets.all(16),
+               child: Column(
+                 mainAxisSize: MainAxisSize.min,
+                 crossAxisAlignment: CrossAxisAlignment.start,
+                 children: [
+                   Row(
+                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                     children: [
+                       Text(
+                         title,
+                         style: const TextStyle(
+                           fontSize: 18,
+                           fontWeight: FontWeight.w500,
+                         ),
+                       ),
+                       IconButton(
+                         icon: const Icon(Icons.close),
+                         onPressed: () {
+                           commentController.clear();
+                           Navigator.pop(context);
+                         },
+                       ),
+                     ],
+                   ),
+                   const SizedBox(height: 16),
+                   const Text(
+                     'Comment*',
+                     style: TextStyle(
+                       fontSize: 14,
+                       color: Colors.grey,
+                     ),
+                   ),
+                   const SizedBox(height: 8),
+                   TextField(
+                     controller: commentController,
+                     decoration: InputDecoration(
+                       hintText: commentHint,
+                       border: OutlineInputBorder(
+                         borderRadius: BorderRadius.circular(8),
+                         borderSide: BorderSide(color: Colors.grey.shade300),
+                       ),
+                       contentPadding: const EdgeInsets.symmetric(
+                         horizontal: 12,
+                         vertical: 16,
+                       ),
+                       errorText: errorText,
+                     ),
+                     minLines: 3,
+                     maxLines: 5,
+                     onChanged: (value) {
+                       if (errorText != null) {
+                         setState(() {
+                           errorText = null;
+                         });
+                       }
+                     },
+                   ),
+                   const SizedBox(height: 24),
+                   SizedBox(
+                     width: double.infinity,
+                     height: 48,
+                     child: ButtonWidgets.buildRoundedGradientButton(
+                         press: () {
+                           final comment = commentController.text;
+                           if (comment.isEmpty) {
+                             setState(() {
+                               errorText = 'Comment cannot be empty';
+                             });
+                             return;
+                           }
+                           if (comment.isNotEmpty) {
+                             onSubmit(comment);
+                             commentController.clear();
+                             Navigator.pop(context);
+                           }
+                         },
+                         text: "Submit"),
+                   ),
+                   const SizedBox(height: 16),
+                 ],
+               ),
+             ),
+           );
+         },
         );
       },
     );

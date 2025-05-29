@@ -65,7 +65,7 @@ class EpanListModel {
     naId: json["NA_ID"],
     isPass: json["IsPass"],
     parentType: json["ParentType"],
-    marineBranchId: json["MarineBranchID"]??"",
+    marineBranchId: json["MarineBranchID"]??"0",
     portauthotityorgid: json["PORTAUTHOTITYORGID"]??"",
     vesselType: json["VesselType"],
     remarksCount: json["RemarksCount"],
