@@ -15,6 +15,7 @@ class AppColors{
   static const gateInYellow= Color(0xfffcdd9f);
   static const gatedIn= Color(0xffb4d9b5);
   static const gradient1= Color(0xffF2F7FD);
+  static const cardBg= Color(0xffF2F4F8);
   static const gradient2= Color(0xffCCDFFA);
   static const cardTextColor= Color(0xff184565);
   static const textColorPrimary= Color(0xff1F2933);

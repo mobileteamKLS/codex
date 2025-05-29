@@ -5,6 +5,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:open_file/open_file.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -372,8 +373,6 @@ class _EpanDetailsState extends State<EpanDetails> {
     ]);
   }
 
-
-
   Widget ispsMeasuresComplaintsContent() {
     return Column(
       children: [
@@ -481,6 +480,169 @@ class _EpanDetailsState extends State<EpanDetails> {
     );
   }
 
+  Widget tenPortContent(){
+    return Column(
+      children: [
+        Container(color: AppColors.cardBg,
+            padding: EdgeInsets.all(8),
+            child: portCallsContent()),
+        SizedBox(height: 16),
+        additionalSecurityReasonSection(),
+        SizedBox(height: 16),
+        weaponReasonSection(),
+      ],
+    );
+  }
+
+  Widget portCallsContent() {
+    return Column(
+      children: vesselDetailsModel.listofLastTenPortofCall?.asMap().entries.map((entry) {
+        int index = entry.key;
+        var portCall = entry.value;
+        bool isLast = index == vesselDetailsModel.listofLastTenPortofCall!.length - 1;
+
+        return Column(
+          children: [
+            portCallItem(portCall),
+            if (!isLast) ...[
+              const SizedBox(height: 12),
+              Divider(
+                color: Colors.grey[300],
+                thickness: 0.5,
+                height: 1,
+              ),
+              const SizedBox(height: 12),
+            ],
+          ],
+        );
+      }).toList() ?? [],
+    );
+
+  }
+
+  Widget portCallItem(ListofLastTenPortofCall portCall) {
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Port label and name
+          Text(
+            "Port",
+            style: AppStyle.sideDescText,
+          ),
+          SizedBox(height: 2),
+          Text(
+            portCall.portName??"",
+            style: AppStyle.defaultTitle.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(height: 12),
+
+          // Three column layout for dates and security level
+          Row(
+            children: [
+              // Arrival column
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Arrival",
+                      style: AppStyle.sideDescText,
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                        portCall.arrival != null ? Utils.formatStringDate(portCall.arrival,) ?? "" : "",
+                      style: AppStyle.defaultTitle,
+                    ),
+                  ],
+                ),
+              ),
+
+              // Departure column
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Departure",
+                      style: AppStyle.sideDescText,
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      portCall.departure != null ? Utils.formatStringDate(portCall.departure,) ?? "" : "",
+                      style: AppStyle.defaultTitle,
+                    ),
+                  ],
+                ),
+              ),
+
+              // Security Level column
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Security Level",
+                      style: AppStyle.sideDescText,
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      portCall.secutityLevel??"",
+                      style: AppStyle.defaultTitle,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget additionalSecurityReasonSection() {
+    return Container(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Were there any special or additional security measures taken during any ship/port interface or ship-to-ship activity at the ports mentioned in the last 10 ports of call?",
+            style: AppStyle.sideDescText,
+          ),
+          SizedBox(height: 4),
+          Text(
+            (vesselDetailsModel.specialoradditionalsecurity ?? 0) == 1 ? "Yes" : "No",
+            style: AppStyle.defaultTitle,
+          ),
+        ],
+      ),
+    );
+  }
+  Widget weaponReasonSection() {
+    return Container(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Are there any Weapons On Board?",
+            style: AppStyle.sideDescText,
+          ),
+          SizedBox(height: 4),
+          Text(
+            (vesselDetailsModel.weaponsOnBoard ?? 0) == 1 ? "Yes" : "No",
+            style: AppStyle.defaultTitle,
+          ),
+        ],
+      ),
+    );
+  }
+
+
   List<Widget> buildAllSections() {
     List<Widget> sections = [];
     int index = 0;
@@ -516,6 +678,7 @@ class _EpanDetailsState extends State<EpanDetails> {
           "Measures to be taken for a convention ship that do not carry the International Ship Security Certificate on board.",
           ispsSecurityCertificateContent()));
     }
+    sections.add(buildSection(index++, "Last 10 Port of Calls - In chronological order (most recent call first)", tenPortContent()));
     return sections;
   }
 
@@ -938,6 +1101,7 @@ class _EpanDetailsState extends State<EpanDetails> {
 
         // Second row - certificate with download icon
         if (vesselDetailsModel.validIssc == 1)
+
           Container(
             width: double.infinity,
             child: Column(
@@ -952,27 +1116,20 @@ class _EpanDetailsState extends State<EpanDetails> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Expires on ${vesselDetailsModel.ispsDocExpityDate != null ? Utils.formatStringDate(vesselDetailsModel.eta, showTime: true) ?? "" : ""}",
+                      "Expires on ${vesselDetailsModel.ispsDocExpityDate != null ? Utils.formatStringDate(vesselDetailsModel.ispsDocExpityDate, showTime: true) ?? "" : ""}",
                       style: AppStyle.defaultTitle,
                     ),
-                    Container(
-                      padding: EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.blue[50],
-                        borderRadius: BorderRadius.circular(4),
+                    GestureDetector(
+                      child: SvgPicture.asset(
+                        download,
+                        colorFilter: const ColorFilter.mode(
+                            AppColors.primary, BlendMode.srcIn),
+                        height: ScreenDimension.onePercentOfScreenHight *
+                            AppDimensions.defaultIconSize,
                       ),
-                      child: GestureDetector(
-                        child: SvgPicture.asset(
-                          download,
-                          colorFilter: const ColorFilter.mode(
-                              AppColors.primary, BlendMode.srcIn),
-                          height: ScreenDimension.onePercentOfScreenHight *
-                              AppDimensions.defaultIconSize,
-                        ),
-                        onTap: () {
-                          // _downloadDocument(fileName,savedName,vesselDetailsModel.docFileFolder!);
-                        },
-                      ),
+                      onTap: () {
+                        // _downloadDocument(fileName,savedName,vesselDetailsModel.docFileFolder!);
+                      },
                     ),
                   ],
                 ),

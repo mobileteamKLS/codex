@@ -1473,14 +1473,14 @@ class ListofLastTenPortofCall {
   int? id;
   int? epanId;
   int? portId;
-  DateTime? arrival;
-  DateTime? departure;
+  String? arrival;
+  String? departure;
   String? secutityLevel;
   bool? isDelete;
   int? createBy;
-  DateTime? createDate;
+  String? createDate;
   int? updateBy;
-  DateTime? updateDate;
+  String? updateDate;
   String? portcode;
   String? portName;
 
@@ -1506,14 +1506,14 @@ class ListofLastTenPortofCall {
     id: json["Id"],
     epanId: json["Epan_Id"],
     portId: json["PortId"],
-    arrival: json["Arrival"] == null ? null : DateTime.parse(json["Arrival"]),
-    departure: json["Departure"] == null ? null : DateTime.parse(json["Departure"]),
+    arrival: json["Arrival"] ,
+    departure: json["Departure"] ,
     secutityLevel: json["SecutityLevel"],
     isDelete: json["IsDelete"],
     createBy: json["CreateBy"],
-    createDate: json["CreateDate"] == null ? null : DateTime.parse(json["CreateDate"]),
+    createDate: json["CreateDate"],
     updateBy: json["UpdateBy"],
-    updateDate: json["UpdateDate"] == null ? null : DateTime.parse(json["UpdateDate"]),
+    updateDate: json["UpdateDate"],
     portcode: json["portcode"],
     portName: json["portName"],
   );
@@ -1523,14 +1523,14 @@ class ListofLastTenPortofCall {
     "Id": id,
     "Epan_Id": epanId,
     "PortId": portId,
-    "Arrival": arrival?.toIso8601String(),
-    "Departure": departure?.toIso8601String(),
+    "Arrival": arrival,
+    "Departure": departure,
     "SecutityLevel": secutityLevel,
     "IsDelete": isDelete,
     "CreateBy": createBy,
-    "CreateDate": createDate?.toIso8601String(),
+    "CreateDate": createDate,
     "UpdateBy": updateBy,
-    "UpdateDate": updateDate?.toIso8601String(),
+    "UpdateDate": updateDate,
     "portcode": portcode,
     "portName": portName,
   };
