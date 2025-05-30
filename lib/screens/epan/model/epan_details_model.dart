@@ -7,7 +7,7 @@ class EpanDetailsModel {
   dynamic exCallsign;
   int? modeTransport;
   int? vslType;
-  int? imoNo;
+  String? imoNo;
   dynamic vslBldgPlace;
   dynamic permShpRegDt;
   dynamic shpRegValDt;
@@ -87,7 +87,7 @@ class EpanDetailsModel {
   int? chartererPincode;
   String? mode;
   dynamic portOfSubmsn;
-  int? imono;
+  String? imono;
   String? shppingAgentCode;
   dynamic lineMloCode;
   int? callingPort;

@@ -740,7 +740,6 @@ class _EpanDetailsState extends State<EpanDetails> {
   }
 
   Widget buildSection(int index, String title, Widget content) {
-    Utils.prints(title, index.toString());
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1078,9 +1077,9 @@ class _EpanDetailsState extends State<EpanDetails> {
         ),
         infoBlock("Outbound Handling", (vesselDetailsModel.isOutboundAgentCode ?? 0) == 1 ? "Yes" : "No",),
         infoBlock("Estimated Date and Time of Arrival",
-            vesselDetailsModel.eta ?? ""),
+           vesselDetailsModel.eta != null ? Utils.formatStringDate(vesselDetailsModel.eta, showTime: true):""),
         infoBlock("Estimated Date and Time of Departure",
-            vesselDetailsModel.etd ?? ""),
+            vesselDetailsModel.etd != null ? Utils.formatStringDate(vesselDetailsModel.etd, showTime: true): ""),
         infoBlock(
             "Shipping Line / Operator", vesselDetailsModel.shippingagentValue ?? ""),
         infoBlock("Last Port of Call", "${vesselDetailsModel.lastPortofCallCode ?? ""} - ${vesselDetailsModel.lastPortofCallName ?? ""}"),
@@ -1089,7 +1088,7 @@ class _EpanDetailsState extends State<EpanDetails> {
             ? "${vesselDetailsModel.yearBuilt!}"
             : ""),
         infoBlock("Berth No", vesselDetailsModel.berthNo ?? ""),
-        infoBlock("Port Name", vesselDetailsModel.agentCode ?? ""),
+        infoBlock("Port Name", "=="),
       ],
     );
   }
