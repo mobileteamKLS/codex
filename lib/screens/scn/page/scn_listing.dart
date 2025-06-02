@@ -2,6 +2,7 @@ import 'package:codex_pcs/screens/scn/page/scn_details.dart';
 import 'package:codex_pcs/screens/vessel/page/vessel_details.dart';
 import 'package:codex_pcs/utils/color_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 
@@ -30,7 +31,7 @@ class _ScnlistingState extends State<Scnlisting> {
   bool isLoading = false;
   bool hasNoRecord = false;
   int currentPage = 1;
-  final int pageSize = 10;
+  final int pageSize = 200;
   bool hasMoreData = true;
   ScrollController _scrollController = ScrollController();
   bool isFilterApplied = false;
@@ -548,6 +549,7 @@ class _ScnlistingState extends State<Scnlisting> {
                               controller: imoNumberController,
                               labelText: "IMO No.",
                               isValidationRequired: false,
+                              inputFormatters: [ FilteringTextInputFormatter.digitsOnly,LengthLimitingTextInputFormatter(7)],
                             ),
                             SizedBox(
                                 height:
@@ -773,7 +775,7 @@ class _ScnlistingState extends State<Scnlisting> {
                                 Navigator.pop(context);
 
                                 if (selectedStatusValue != null) {
-                                  getAllVoyages(status: selectedStatusValue);
+                                  getAllVoyages(status: selectedStatusValue,vesselName: vesselName,vesselId: vesselId,imoName: imoName);
                                 } else {
                                   _refreshData();
                                 }
@@ -811,43 +813,170 @@ class _ScnlistingState extends State<Scnlisting> {
     }).toList();
   }
 
+  // Widget buildVesselCard(
+  //     {required ScnListDetailsModel vesselDetails, required int index}) {
+  //   return Container(
+  //     margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+  //     decoration: BoxDecoration(
+  //       borderRadius: BorderRadius.circular(8.0),
+  //       color: AppColors.white,
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.black.withOpacity(0.1),
+  //           spreadRadius: 2,
+  //           blurRadius: 2,
+  //           offset: const Offset(0, 3),
+  //         ),
+  //       ],
+  //     ),
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(12),
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Row(
+  //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //             children: [
+  //               Text(
+  //                 vesselDetails.refNo,
+  //                 style: const TextStyle(
+  //                   fontWeight: FontWeight.w600,
+  //                   fontSize: 14,
+  //                 ),
+  //               ),
+  //               Container(
+  //                 padding:
+  //                     const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+  //                 decoration: BoxDecoration(
+  //                   color: ColorUtils.getStatusColor(vesselDetails.status),
+  //                   borderRadius: BorderRadius.circular(20),
+  //                 ),
+  //                 child: Text(
+  //                   vesselDetails.status,
+  //                   style: const TextStyle(
+  //                     fontSize: 12,
+  //                     fontWeight: FontWeight.w500,
+  //                     color: AppColors.textColorPrimary,
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //           const SizedBox(height: 8),
+  //           buildLabelValue('IMO No.', vesselDetails.imoNo),
+  //           buildLabelValue('Vessel Name', vesselDetails.vslName),
+  //           buildLabelValue('SCN', vesselDetails.vcnNo),
+  //           buildLabelValue('Shipping Line/Agent', ""),
+  //           const SizedBox(height: 4),
+  //           Utils.customDivider(
+  //             space: 0,
+  //             color: Colors.black,
+  //             hasColor: true,
+  //             thickness: 1,
+  //           ),
+  //           const SizedBox(height: 4),
+  //           InkWell(
+  //             onTap: () {
+  //               Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(
+  //                       builder: (context) => SCNDetails(
+  //                             refNo: vesselDetails.refNo,
+  //                             voyageId: vesselDetails.voyId,
+  //                             port: vesselDetails.poToPjLinked,
+  //                             scn: vesselDetails.vcnNo,
+  //                             vslName: vesselDetails.vslName,
+  //                           )));
+  //             },
+  //             child: Row(
+  //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //               children: [
+  //                 const Text(
+  //                   'Show More Details',
+  //                   style: TextStyle(
+  //                     fontWeight: FontWeight.w500,
+  //                     color: AppColors.primary,
+  //                   ),
+  //                 ),
+  //                 const SizedBox(width: 6),
+  //                 Container(
+  //                     decoration: BoxDecoration(
+  //                       borderRadius: BorderRadius.circular(5),
+  //                       color: AppColors.gradient1,
+  //                     ),
+  //                     child: const Icon(Icons.keyboard_arrow_right_outlined,
+  //                         color: AppColors.primary)),
+  //               ],
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  Widget buildLabelValue(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 130,
+            child: Text(
+              '$label:',
+              style: AppStyle.sideDescText,
+            ),
+          ),
+          Expanded(
+            child: Text(value, style: AppStyle.defaultTitle),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget buildVesselCard(
       {required ScnListDetailsModel vesselDetails, required int index}) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(12.0),
         color: AppColors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            spreadRadius: 2,
-            blurRadius: 2,
-            offset: const Offset(0, 3),
+            color: Colors.black.withOpacity(0.08),
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header with vessel name and status
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  vesselDetails.refNo,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
+                Expanded(
+                  child: Text(
+                    vesselDetails.refNo,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
                   ),
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: ColorUtils.getStatusColor(vesselDetails.status),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
                     vesselDetails.status,
@@ -860,18 +989,51 @@ class _ScnlistingState extends State<Scnlisting> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            buildLabelValue('IMO No.', vesselDetails.imoNo),
-            buildLabelValue('Vessel Name', vesselDetails.vslName),
-            buildLabelValue('SCN', vesselDetails.vcnNo),
-            buildLabelValue('Shipping Line/Agent', ""),
-            const SizedBox(height: 4),
-            Utils.customDivider(
-              space: 0,
-              color: Colors.black,
-              hasColor: true,
-              thickness: 1,
+
+            const SizedBox(height: 12),
+
+            // Vessel details in two columns
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Left column
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      buildCompactLabelValue('IMO No.', vesselDetails.imoNo),
+
+                      buildCompactLabelValue('Vessel Name', vesselDetails.vslName),
+
+                      buildCompactLabelValue('SCN', vesselDetails.vcnNo), // Assuming callsign maps to SCN// You may need to add this field to your model
+                    ],
+                  ),
+                ),
+
+                const SizedBox(width: 16),
+
+                // Right column
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      buildCompactLabelValue('ETA', Utils.formatStringDate(vesselDetails.eta,showTime: true)), // You may need to add this field
+                      buildCompactLabelValue('ETD', Utils.formatStringDate(vesselDetails.etd,showTime: true)),
+                      buildCompactLabelValue('Vessel Id', vesselDetails.vesselId),
+                      // You may need to add this field
+                    ],
+                  ),
+                ),
+              ],
             ),
+
+            const SizedBox(height: 4),
+                      Utils.customDivider(
+                        space: 0,
+                        color: Colors.black,
+                        hasColor: true,
+                        thickness: 1,
+                      ),
             const SizedBox(height: 4),
             InkWell(
               onTap: () {
@@ -879,12 +1041,12 @@ class _ScnlistingState extends State<Scnlisting> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => SCNDetails(
-                              refNo: vesselDetails.refNo,
-                              voyageId: vesselDetails.voyId,
-                              port: vesselDetails.poToPjLinked,
-                              scn: vesselDetails.vcnNo,
-                              vslName: vesselDetails.vslName,
-                            )));
+                          refNo: vesselDetails.refNo,
+                          voyageId: vesselDetails.voyId,
+                          port: vesselDetails.poToPjLinked,
+                          scn: vesselDetails.vcnNo,
+                          vslName: vesselDetails.vslName,
+                        )));
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -913,21 +1075,28 @@ class _ScnlistingState extends State<Scnlisting> {
     );
   }
 
-  Widget buildLabelValue(String label, String value) {
+  Widget buildCompactLabelValue(String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 130,
-            child: Text(
-              '$label:',
-              style: AppStyle.sideDescText,
+          Text(
+            '$label:',
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey,
             ),
           ),
-          Expanded(
-            child: Text(value, style: AppStyle.defaultTitle),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
           ),
         ],
       ),

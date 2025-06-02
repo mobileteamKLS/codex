@@ -12,6 +12,7 @@ class VesselListModel {
   String placeOfRegistyName;
   String nationality;
   String status;
+  String agentName;
   int pvrId;
 
   VesselListModel({
@@ -28,6 +29,7 @@ class VesselListModel {
     required this.placeOfRegistyName,
     required this.nationality,
     required this.status,
+    required this.agentName,
     required this.pvrId,
   });
 
@@ -46,6 +48,7 @@ class VesselListModel {
         placeOfRegistyName: json["PlaceOfRegistyName"]??"",
         nationality: json["NATIONALITY"]??"",
         status: json["status"]??"",
+        agentName:json["agentname"]??"",
         pvrId: json["PVR_ID"]??0,
       );
 

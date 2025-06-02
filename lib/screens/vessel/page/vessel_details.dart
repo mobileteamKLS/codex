@@ -804,7 +804,7 @@ class _VesselDetailsState extends State<VesselDetails> {
                       height: 48,
                       child: ButtonWidgets.buildRoundedGradientButton(
                           press: () {
-                            final comment = commentController.text;
+                            final comment = commentController.text.trim();
                             if (comment.isEmpty) {
                               setState(() {
                                 errorText = 'Comment cannot be empty';

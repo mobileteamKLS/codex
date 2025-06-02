@@ -1,12 +1,11 @@
 
-
 class EpanDetailsModel {
-  dynamic shpPrefix;
+  String? shpPrefix;
   String? vslName;
-  dynamic exVslName;
-  dynamic exCallsign;
-  int? modeTransport;
-  int? vslType;
+  String? exVslName;
+  String? exCallsign;
+  String? modeTransport;
+  String? vslType;
   String? imoNo;
   dynamic vslBldgPlace;
   dynamic permShpRegDt;
@@ -14,27 +13,27 @@ class EpanDetailsModel {
   double? shpRegCertNo;
   String? isSafetyManagCert;
   dynamic safetyManagCertValDt;
-  dynamic safetyManagCertNo;
-  dynamic isps;
-  dynamic isCapiiCert;
+  String? safetyManagCertNo;
+  String? isps;
+  String? isCapiiCert;
   String? agency;
   String? agencyCode;
   double? vslHeight;
-  int? beam;
-  int? lbp;
-  dynamic maxDraft;
-  dynamic parallelBody;
+  double? beam;
+  double? lbp;
+  double? maxDraft;
+  double? parallelBody;
   double? bowMainfold;
   double? grt;
   double? nrt;
   double? dwt;
   double? isSbt;
-  dynamic reducedGrt;
+  double? reducedGrt;
   double? summerDeadWeight;
   double? teuCapacity;
-  double? freeBoard;
-  dynamic classSociety;
-  dynamic hullInsurCompany;
+  String? freeBoard;
+  String? classSociety;
+  String? hullInsurCompany;
   dynamic hullInsurValDt;
   String? vslStatus;
   String? ownerName;
@@ -43,19 +42,19 @@ class EpanDetailsModel {
   dynamic placeOfRegistartion;
   int? placeOfRegisty;
   int? builtYear;
-  int? positionofBridge;
-  int? areaOperation;
+  String? positionofBridge;
+  String? areaOperation;
   int? standardDraught;
-  int? vesselCapacity;
+  double? vesselCapacity;
   String? nationalityType;
   String? ownerCode;
   String? ownerAddress;
-  dynamic ownerMob;
-  int? chartererCode;
+  String? ownerMob;
+  String? chartererCode;
   String? chartererName;
   String? chartererAddress;
   String? chartererEmail;
-  dynamic chartererMob;
+  String? chartererMob;
   int? portEntId;
   int? aprroveEntId;
   String? vslHeightUnit;
@@ -71,8 +70,8 @@ class EpanDetailsModel {
   String? draughtUnit;
   String? freeBoardUnit;
   String? displacementUnit;
-  int? teuUnit;
-  int? vesselCapUnit;
+  String? teuUnit;
+  String? vesselCapUnit;
   double? displacement;
   int? otherVslTypeId;
   int? hullTypeId;
@@ -80,16 +79,16 @@ class EpanDetailsModel {
   int? ownerCountryId;
   int? ownerStateId;
   int? ownerCityId;
-  int? ownerPincode;
-  int? chartererCountryId;
-  int? chartererStateId;
-  int? chartererCityId;
-  int? chartererPincode;
+  String? ownerPincode;
+  dynamic chartererCountryId;
+  dynamic chartererStateId;
+  dynamic chartererCityId;
+  String? chartererPincode;
   String? mode;
   dynamic portOfSubmsn;
   String? imono;
   String? shppingAgentCode;
-  dynamic lineMloCode;
+  String? lineMloCode;
   int? callingPort;
   String? eta;
   dynamic etahh;
@@ -97,7 +96,7 @@ class EpanDetailsModel {
   String? etd;
   dynamic etdhh;
   dynamic etdmm;
-  dynamic serviceName;
+  String? serviceName;
   int? lastPortCall;
   dynamic expDraft;
   dynamic imp20Cont;
@@ -108,25 +107,25 @@ class EpanDetailsModel {
   dynamic cargoTonnage;
   dynamic operationType;
   dynamic deckCargo;
-  dynamic trade;
-  dynamic ballastCargo;
-  dynamic charterName;
-  dynamic berthing;
+  String? trade;
+  String? ballastCargo;
+  String? charterName;
+  String? berthing;
   int? isOilCessPaid;
   dynamic oilCessPaidDt;
   dynamic oilCessPaidValDt;
   dynamic portOilCessPaid;
-  int? vesselType;
-  dynamic deckCode;
-  dynamic cargoDesc;
+  String?vesselType;
+  String? deckCode;
+  String? cargoDesc;
   String? vcnNo;
   dynamic dateOfSubmsn;
   dynamic rotationDate;
   dynamic gateCloseDateTime;
   dynamic gateOpenDateTime;
   dynamic totalNoofCont;
-  dynamic hazCargo;
-  dynamic hazCargoTonnage;
+  String? hazCargo;
+  double? hazCargoTonnage;
   dynamic imp20HazCont;
   dynamic imp40AboveHazCont;
   dynamic exp20HazCont;
@@ -145,18 +144,18 @@ class EpanDetailsModel {
   String? vesselId;
   String? vesselNationalityType;
   String? officialNo;
-  int? vesselTerm;
-  int? vesselClass;
+  String? vesselTerm;
+  String? vesselClass;
   String? callSign;
-  int? customStation;
-  int? exitCustomStation;
-  dynamic outboundHandling;
+  String? customStation;
+  String? exitCustomStation;
+  String? outboundHandling;
   String? psaName;
   String? psaCode;
   String? entryPoint;
-  double? finalPort;
-  double? inboundServiceLane;
-  double? outboundServiceLane;
+  String? finalPort;
+  String? inboundServiceLane;
+  String? outboundServiceLane;
   dynamic carNo;
   dynamic isOutboundAgent;
   dynamic outboundToLocation;
@@ -172,40 +171,40 @@ class EpanDetailsModel {
   String? ownerCodeS;
   String? ownerNameS;
   String? ownerAddressS;
-  int? ownerCountryIdS;
-  int? ownerStateIdS;
-  int? ownerCityIdS;
-  int? ownerPincodeS;
-  String? ownerEmailAddressS;
-  dynamic ownerMobS;
-  int? chartererCodeS;
+  String? ownerCountryIdS;
+  String? ownerStateIdS;
+  String? ownerCityIdS;
+  String? ownerPincodeS;
+  dynamic ownerEmailAddressS;
+  String? ownerMobS;
+  String? chartererCodeS;
   String? chartererNameS;
   String? chartererAddressS;
   String? chartererCountryIdS;
-  int? chartererStateIdS;
-  int? chartererCityIdS;
-  int? chartererPincodeS;
+  String? chartererStateIdS;
+  String? chartererCityIdS;
+  String? chartererPincodeS;
   String? chartererEmailS;
-  dynamic chartererMobS;
-  int? beamS;
+  String? chartererMobS;
+  String? beamS;
   String? beamUnitS;
-  int? loaS;
+  String? loaS;
   String? loaUnitS;
   int? lbpS;
   String? lbpUnitS;
-  int? positionofBridgeS;
-  int? areaOperationS;
-  int? dwtS;
+  String? positionofBridgeS;
+  String? areaOperationS;
+  String? dwtS;
   String? dwtUnitS;
-  int? standardDraughtS;
+  String? standardDraughtS;
   String? draughtUnitS;
   dynamic teuCapacityS;
-  int? teuUnitS;
-  int? displacementS;
+  String? teuUnitS;
+  String? displacementS;
   String? displacementUnitS;
-  int? vesselCapacityS;
-  int? vesselCapUnitS;
-  double? freeBoardS;
+  String? vesselCapacityS;
+  String? vesselCapUnitS;
+  String? freeBoardS;
   String? freeBoardUnitS;
   dynamic callIdOman;
   int? vesselIdOman;
@@ -216,10 +215,10 @@ class EpanDetailsModel {
   String? inboundVoyageNo;
   String? purposeofCall;
   String? portOfRegistry;
-  int? shippingAgentId;
-  int? lastPortofCall;
-  int? nextPortofCall;
-  int? yearBuilt;
+  String? shippingAgentId;
+  String? lastPortofCall;
+  String? nextPortofCall;
+  String? yearBuilt;
   String? berthNo;
   String? agentCode;
   String? agentName;
@@ -234,30 +233,30 @@ class EpanDetailsModel {
   String? grossUnit;
   int? netTonnage;
   String? netUnit;
-  dynamic sumDeadWeight;
+  double? sumDeadWeight;
   String? sumDeadWeightUnit;
   int? cargoType;
   String? scnId;
   String? vesselFlag;
   int? isOutboundAgentCode;
   int? dangerousCargoonBoard;
-  dynamic cargotoDischarge;
+  String? cargotoDischarge;
   int? dangeroudGoods;
   int? prohibitedgoodsUn;
   String? nameofMaster;
   int? totalNoofCrew;
   int? totalNoofPassenger;
   int? validIssc;
-  dynamic isscFilename;
-  dynamic isscSaverFilename;
-  dynamic ispsDocExpityDate;
-  dynamic issuedBy;
-  dynamic securityLevel;
+  String? isscFilename;
+  String? isscSaverFilename;
+  String? ispsDocExpityDate;
+  String? issuedBy;
+  String? securityLevel;
   int? istheShipCarryingDg;
   int? doesyourCompliant;
   int? convention1;
   int? convention2;
-  dynamic convention2Yes;
+  String? convention2Yes;
   int? convention3;
   int? convention4;
   int? convention5;
@@ -268,18 +267,18 @@ class EpanDetailsModel {
   int? convention10;
   int? convention11;
   int? convention12;
-  double? ispScodecomplaints1;
-  double? ispScodecomplaints2;
-  double? ispScodecomplaints3;
-  double? ispScodecomplaints4;
-  double? ispScodecomplaints5;
-  double? ispScodecomplaints6;
-  double? ispScodecomplaints7;
-  double? ispScodecomplaints8;
-  double? ispScodecomplaints9;
-  dynamic ispScodecomplaints9Yes;
-  double? ispScodecomplaints10;
-  double? ispScodecomplaints10Yes;
+  int? ispScodecomplaints1;
+  int? ispScodecomplaints2;
+  int? ispScodecomplaints3;
+  int? ispScodecomplaints4;
+  int? ispScodecomplaints5;
+  int? ispScodecomplaints6;
+  int? ispScodecomplaints7;
+  int? ispScodecomplaints8;
+  int? ispScodecomplaints9;
+  String? ispScodecomplaints9Yes;
+  int? ispScodecomplaints10;
+  String? ispScodecomplaints10Yes;
   int? specialoradditionalsecurity;
   String? specialoradditionalsecurityYes;
   int? weaponsOnBoard;
@@ -290,68 +289,68 @@ class EpanDetailsModel {
   String? submittedon;
   String? crewUplPanActualFile;
   String? crewUplPanRandomFile;
-  dynamic passengerUplPanActualFile;
-  dynamic passengerUplPanRandomFile;
-  dynamic dgCargoUplPanActualFile;
-  dynamic dgCargoUplPanRandomFile;
+  String? passengerUplPanActualFile;
+  String? passengerUplPanRandomFile;
+  String? dgCargoUplPanActualFile;
+  String? dgCargoUplPanRandomFile;
   int? masterNationality;
   int? naId;
   dynamic portofOriginId;
   dynamic portofOriginCode;
-  dynamic portofOriginName;
+  String? portofOriginName;
   dynamic portofDestinationId;
   dynamic portofDestinationCode;
-  dynamic portofDestinationName;
+  String? portofDestinationName;
   dynamic portEntityId;
   dynamic terminalId;
-  dynamic terminalName;
-  dynamic portOperatorName;
-  dynamic servicetype;
-  dynamic surveyor;
+  String? terminalName;
+  String? portOperatorName;
+  String? servicetype;
+  String? surveyor;
   dynamic vesseluid;
   dynamic classificationsociety;
   dynamic summerdeadweight;
   dynamic teucapacity;
-  dynamic hatchcovertype;
-  dynamic satcomid;
-  dynamic mmsinumber;
+  String? hatchcovertype;
+  String? satcomid;
+  String? mmsinumber;
   String? owneremailaddress;
   String? shippingagent;
   String? shippingagentcode;
-  dynamic docbyteLast10;
-  dynamic docLast10Contenttype;
-  dynamic docbytePassengerlist;
-  dynamic docPassengerlistContenttype;
-  dynamic docbyteListofarms;
-  dynamic docListofarmsContenttype;
-  dynamic docbytePassport;
-  dynamic docPassportContenttype;
-  dynamic docbyteOther;
-  dynamic docOtherContenttype;
-  dynamic docbyteMdh;
-  dynamic docMdhContenttype;
-  dynamic fromLocationCode;
-  dynamic toLocationCode;
-  dynamic fromLocationId;
-  dynamic toLocationId;
-  dynamic fromLocationName;
-  dynamic toLocationName;
+  String? docbyteLast10;
+  String? docLast10Contenttype;
+  String? docbytePassengerlist;
+  String? docPassengerlistContenttype;
+  String? docbyteListofarms;
+  String? docListofarmsContenttype;
+  String? docbytePassport;
+  String? docPassportContenttype;
+  String? docbyteOther;
+  String? docOtherContenttype;
+  String? docbyteMdh;
+  String? docMdhContenttype;
+  String? fromLocationCode;
+  String? toLocationCode;
+  String? fromLocationId;
+  String? toLocationId;
+  String? fromLocationName;
+  String? toLocationName;
   String? scn2;
   String? vesselFlagName;
   String? vesselFlagCode;
   int? slOrgId;
-  int? lastPortofCallId;
+  String? lastPortofCallId;
   String? lastPortofCallCode;
   String? lastPortofCallName;
-  int? nextPortofCallId;
+  String? nextPortofCallId;
   String? nextPortofCallCode;
   String? nextPortofCallName;
-  int? portOfRegistryId;
+  String? portOfRegistryId;
   String? portOfRegistryCode;
   String? portOfRegistryName;
   double? loa;
-  dynamic masterNationalityName;
-  dynamic masterNationalityCode;
+  String? masterNationalityName;
+  String? masterNationalityCode;
   dynamic amendedCrewListFileDate;
   dynamic amendedPassengerListFileDate;
   dynamic amendedDgCargoListFileDate;
@@ -363,8 +362,12 @@ class EpanDetailsModel {
   String? shippingagentValue;
   String? cargoTypeValue;
   String? docFileFolder;
+  String? docVesselFileFolder;
+  String? portNamesWithValue;
   List<ListofLastTenPortofCall>? listofLastTenPortofCall;
   List<ListofPaymentSlip>? listofPaymentSlip;
+  String? imdgCodeClassTextWithComma;
+  List<dynamic>? listCountryofOrigin;
 
   EpanDetailsModel({
     this.shpPrefix,
@@ -729,8 +732,12 @@ class EpanDetailsModel {
     this.shippingagentValue,
     this.cargoTypeValue,
     this.docFileFolder,
+    this.docVesselFileFolder,
+    this.portNamesWithValue,
     this.listofLastTenPortofCall,
     this.listofPaymentSlip,
+    this.imdgCodeClassTextWithComma,
+    this.listCountryofOrigin,
   });
 
   factory EpanDetailsModel.fromJson(Map<String, dynamic> json) => EpanDetailsModel(
@@ -1096,6 +1103,10 @@ class EpanDetailsModel {
     shippingagentValue: json["shippingagent_VALUE"],
     cargoTypeValue: json["CargoType_VALUE"],
     docFileFolder: json["DocFileFolder"],
+    docVesselFileFolder: json["DocFileFolder_VesselDocs"],
+    portNamesWithValue: json["portNameTextWithComma"],
+    imdgCodeClassTextWithComma: json["IMDGCodeClassTextWithComma"],
+    listCountryofOrigin: json["ListCountryofOrigin"] == null ? [] : List<dynamic>.from(json["ListCountryofOrigin"]!.map((x) => x)),
     listofLastTenPortofCall: json["ListofLastTenPortofCall"] == null ? [] : List<ListofLastTenPortofCall>.from(json["ListofLastTenPortofCall"]!.map((x) => ListofLastTenPortofCall.fromJson(x))),
     listofPaymentSlip: json["ListofPaymentSlip"] == null ? [] : List<ListofPaymentSlip>.from(json["ListofPaymentSlip"]!.map((x) => ListofPaymentSlip.fromJson(x))),
   );
@@ -1610,4 +1621,16 @@ class ListofPaymentSlip {
     "isFALInsertion": isFalInsertion,
     "FALDOCID": faldocid,
   };
+}
+
+class EnumValues<T> {
+  Map<String, T> map;
+  late Map<T, String> reverseMap;
+
+  EnumValues(this.map);
+
+  Map<T, String> get reverse {
+    reverseMap = map.map((k, v) => MapEntry(v, k));
+    return reverseMap;
+  }
 }

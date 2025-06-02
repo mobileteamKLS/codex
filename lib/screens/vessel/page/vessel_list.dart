@@ -1,6 +1,7 @@
 import 'package:codex_pcs/screens/vessel/page/vessel_details.dart';
 import 'package:codex_pcs/utils/color_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 
@@ -30,7 +31,7 @@ class _VesselListingState extends State<VesselListing> {
   bool isLoading = false;
   bool hasNoRecord = false;
   int currentPage = 1;
-  final int pageSize = 10;
+  final int pageSize = 200;
   bool hasMoreData = true;
   ScrollController _scrollController = ScrollController();
   bool isFilterApplied = false;
@@ -517,8 +518,10 @@ class _VesselListingState extends State<VesselListing> {
                                         1.5),
                             CustomTextField(
                               controller: imoNumberController,
+                              inputFormatters: [ FilteringTextInputFormatter.digitsOnly,LengthLimitingTextInputFormatter(7)],
                               labelText: "IMO No.",
                               isValidationRequired: false,
+
                             ),
                             SizedBox(
                                 height:
@@ -738,7 +741,7 @@ class _VesselListingState extends State<VesselListing> {
                               press: () {
                                 Navigator.pop(context);
                                 if (selectedFilter != null) {
-                                  getAllVessels(status: selectedFilter);
+                                  getAllVessels(status: selectedFilter,imoName: imoName,vesselId: vesselId,vesselName: vesselName);
                                 } else {
                                   _refreshData();
                                 }
@@ -826,9 +829,9 @@ class _VesselListingState extends State<VesselListing> {
             ),
             const SizedBox(height: 8),
             buildLabelValue('IMO No.', vesselDetails.imoNo),
-            buildLabelValue('Vessel Name', vesselDetails.vslName),
+            buildLabelValue('Vessel Flag', vesselDetails.nationality),
             buildLabelValue('Call Sign', vesselDetails.callsign),
-            buildLabelValue('Shipping Line/Agent', ""),
+            buildLabelValue('Shipping Line/Agent', vesselDetails.agentName),
             const SizedBox(height: 4),
             Utils.customDivider(
               space: 0,

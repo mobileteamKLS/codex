@@ -347,6 +347,7 @@ class _EpanDetailsState extends State<EpanDetails> {
 
   Widget ispsMeasuresComplaintsContent() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         fullWidthInfoBlock(
             "Has a DoS been issued at the last port/marine facility?",
@@ -392,19 +393,49 @@ class _EpanDetailsState extends State<EpanDetails> {
             "Are dangerous goods onboard?If above is Yes,State IMDG Code Class",
             (vesselDetailsModel.ispScodecomplaints9?.toInt() == 1)
                 ? "Yes"
-                : "No"),
+                : "No",showDivider: false),
+        SizedBox(
+            height:
+            ((vesselDetailsModel.ispScodecomplaints9?.toInt() == 1))
+                ? 8
+                : 0),
+        ((vesselDetailsModel.ispScodecomplaints9?.toInt() == 1))
+            ? Text(
+          vesselDetailsModel.ispScodecomplaints9Yes ?? "",
+          style: AppStyle.defaultTitle,
+        )
+            : const SizedBox(),
+        if(vesselDetailsModel.ispScodecomplaints9?.toInt() == 1)const SizedBox(height: 12),
+        Divider(
+          color: Colors.grey[300],
+          thickness: 0.5,
+          height: 1,
+        ),
+        const SizedBox(height: 12),
         fullWidthInfoBlock(
-            "	Prohibited goods under UN Security Council/Resolution onboard? If above is Yes,please specify",
+            "	Prohibited goods under UN Security Council / Resolution onboard? If above is Yes,please specify",
             (vesselDetailsModel.ispScodecomplaints10?.toInt() == 1)
                 ? "Yes"
                 : "No",
             showDivider: false),
+        SizedBox(
+            height:
+            ((vesselDetailsModel.ispScodecomplaints10?.toInt() == 1))
+                ? 8
+                : 0),
+        ((vesselDetailsModel.ispScodecomplaints10?.toInt() == 1))
+            ? Text(
+          vesselDetailsModel.ispScodecomplaints10Yes ?? "",
+          style: AppStyle.defaultTitle,
+        )
+            : const SizedBox(),
       ],
     );
   }
 
   Widget ispsSecurityCertificateContent() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         fullWidthInfoBlock(
             "Was last port of call an ISPS compliant marine facility?",
@@ -412,7 +443,26 @@ class _EpanDetailsState extends State<EpanDetails> {
 
         fullWidthInfoBlock(
             "	Any control measures imposed at last port? if Yes give details?",
-            (vesselDetailsModel.convention2?.toInt() == 1) ? "Yes" : "No"),
+            (vesselDetailsModel.convention2?.toInt() == 1) ? "Yes" : "No",showDivider: false),
+
+        SizedBox(
+            height:
+            ((vesselDetailsModel.convention2?.toInt() == 1))
+                ? 8
+                : 0),
+        ((vesselDetailsModel.convention2?.toInt() == 1))
+            ? Text(
+          vesselDetailsModel.convention2Yes ?? "",
+          style: AppStyle.defaultTitle,
+        )
+            : const SizedBox(),
+        if(vesselDetailsModel.convention2?.toInt() == 1)const SizedBox(height: 12),
+        Divider(
+          color: Colors.grey[300],
+          thickness: 0.5,
+          height: 1,
+        ),
+        const SizedBox(height: 12),
 
         fullWidthInfoBlock("Have you conducted a SSA for your ship?",
             (vesselDetailsModel.convention3?.toInt() == 1) ? "Yes" : "No"),
@@ -505,7 +555,7 @@ class _EpanDetailsState extends State<EpanDetails> {
           ),
           SizedBox(height: 2),
           Text(
-            portCall.portName??"",
+           "${portCall.portcode ?? ""}-${portCall.portName ?? ""}",
             style: AppStyle.defaultTitle.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -581,11 +631,20 @@ class _EpanDetailsState extends State<EpanDetails> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if(vesselDetailsModel.lastPortRemark!="")Text(
+            "Reason Why the Vessel Has Fewer Than 10 Port Calls :",
+            style: AppStyle.sideDescText,
+          ),
+          if(vesselDetailsModel.lastPortRemark!="")Text(
+            vesselDetailsModel.lastPortRemark ?? "" ,
+            style: AppStyle.defaultTitle,
+          ),
+          if(vesselDetailsModel.lastPortRemark!="")SizedBox(height: 6),
           Text(
             "Were there any special or additional security measures taken during any ship/port interface or ship-to-ship activity at the ports mentioned in the last 10 ports of call?",
             style: AppStyle.sideDescText,
           ),
-          SizedBox(height: 4),
+
           Text(
             (vesselDetailsModel.specialoradditionalsecurity ?? 0) == 1
                 ? "Yes"
@@ -659,10 +718,10 @@ class _EpanDetailsState extends State<EpanDetails> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Weapons Import & Export License",
+                      vesselDetailsModel.weaponsOnBoardFileName??"",
                       style: AppStyle.defaultTitle,
                     ),
-                    GestureDetector(
+                    if(vesselDetailsModel.weaponsOnBoardSaverFileName!=null)GestureDetector(
                       child: SvgPicture.asset(
                         download,
                         colorFilter: const ColorFilter.mode(
@@ -687,10 +746,10 @@ class _EpanDetailsState extends State<EpanDetails> {
 
   Widget attachedDocumentPanContent(){
     return Column(
-      children:(vesselDetailsModel.crewUplPanRandomFile!=null||vesselDetailsModel.passengerUplPanRandomFile!=null||vesselDetailsModel.dgCargoUplPanRandomFile!=null)?[
-        if(vesselDetailsModel.crewUplPanRandomFile!=null)documentRow("Crew List","-",vesselDetailsModel.crewUplPanActualFile!,vesselDetailsModel.crewUplPanRandomFile!,isExpiry: true),
-        if(vesselDetailsModel.passengerUplPanRandomFile!=null)documentRow("Passenger List","-",vesselDetailsModel.passengerUplPanActualFile!,vesselDetailsModel.passengerUplPanRandomFile!,isExpiry: true),
-        if(vesselDetailsModel.dgCargoUplPanRandomFile!=null)documentRow("DG Cargo","-",vesselDetailsModel.dgCargoUplPanActualFile!,vesselDetailsModel.dgCargoUplPanRandomFile!,isExpiry: true),
+      children:(vesselDetailsModel.crewUplPanRandomFile!=""||vesselDetailsModel.passengerUplPanRandomFile!=null||vesselDetailsModel.dgCargoUplPanRandomFile!=null)?[
+        if(vesselDetailsModel.crewUplPanRandomFile!=null)documentRow("Crew List","-",vesselDetailsModel.crewUplPanActualFile!,vesselDetailsModel.crewUplPanRandomFile!,isExpiry: true,hideDownload: (vesselDetailsModel.crewUplPanActualFile==null ||vesselDetailsModel.crewUplPanActualFile=="")),
+        if(vesselDetailsModel.passengerUplPanRandomFile!=null)documentRow("Passenger List","-",vesselDetailsModel.passengerUplPanActualFile!,vesselDetailsModel.passengerUplPanRandomFile!,isExpiry: true,hideDownload: (vesselDetailsModel.passengerUplPanActualFile==null ||vesselDetailsModel.passengerUplPanActualFile=="")),
+        if(vesselDetailsModel.dgCargoUplPanRandomFile!=null)documentRow("DG Cargo","-",vesselDetailsModel.dgCargoUplPanActualFile!,vesselDetailsModel.dgCargoUplPanRandomFile!,isExpiry: true,hideDownload: (vesselDetailsModel.dgCargoUplPanActualFile==null ||vesselDetailsModel.dgCargoUplPanActualFile=="")),
       ]: [
         documentRow("No documents available", "","","")
     ],
@@ -797,8 +856,14 @@ class _EpanDetailsState extends State<EpanDetails> {
   }
 
   Widget documentRow(
-          String title, String expiry, String fileName, String savedName,{bool isExpiry=false
-          }) =>
+    String title,
+    String expiry,
+    String fileName,
+    String savedName, {
+    bool isExpiry = false,
+    bool isVesselFolder = false,
+    bool hideDownload = false,
+  }) =>
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
@@ -810,24 +875,29 @@ class _EpanDetailsState extends State<EpanDetails> {
                     Text(title, style: AppStyle.defaultTitle),
                     SizedBox(height: 2),
                     Text(
-                      isExpiry?"$expiry": "Expires on $expiry",
+                      isExpiry ? "$expiry" : "Expires on $expiry",
                       style: AppStyle.sideDescText,
                     ),
                   ]),
             ),
-            GestureDetector(
-              child: SvgPicture.asset(
-                download,
-                colorFilter:
-                    const ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
-                height: ScreenDimension.onePercentOfScreenHight *
-                    AppDimensions.defaultIconSize,
+            if (!hideDownload)
+              GestureDetector(
+                child: SvgPicture.asset(
+                  download,
+                  colorFilter: const ColorFilter.mode(
+                      AppColors.primary, BlendMode.srcIn),
+                  height: ScreenDimension.onePercentOfScreenHight *
+                      AppDimensions.defaultIconSize,
+                ),
+                onTap: () {
+                  _downloadDocument(
+                      fileName,
+                      savedName,
+                      isVesselFolder
+                          ? vesselDetailsModel.docVesselFileFolder!
+                          : vesselDetailsModel.docFileFolder!);
+                },
               ),
-              onTap: () {
-                _downloadDocument(
-                    fileName, savedName, vesselDetailsModel.docFileFolder!);
-              },
-            ),
           ],
         ),
       );
@@ -1088,7 +1158,7 @@ class _EpanDetailsState extends State<EpanDetails> {
             ? "${vesselDetailsModel.yearBuilt!}"
             : ""),
         infoBlock("Berth No", vesselDetailsModel.berthNo ?? ""),
-        infoBlock("Port Name", "=="),
+        infoBlock("Port Name", vesselDetailsModel.portNamesWithValue ?? ""),
       ],
     );
   }
@@ -1160,9 +1230,10 @@ class _EpanDetailsState extends State<EpanDetails> {
 
         // Second row - certificate with download icon
         if (vesselDetailsModel.validIssc == 1)
-
           Container(
             width: double.infinity,
+            color: AppColors.cardBg,
+            padding: EdgeInsets.all(8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -1171,14 +1242,14 @@ class _EpanDetailsState extends State<EpanDetails> {
                   style: AppStyle.sideDescText,
                 ),
                 SizedBox(height: 2),
-                Row(
+               Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       "Expires on ${vesselDetailsModel.ispsDocExpityDate != null ? Utils.formatStringDate(vesselDetailsModel.ispsDocExpityDate, showTime: true) ?? "" : ""}",
                       style: AppStyle.defaultTitle,
                     ),
-                    GestureDetector(
+                    if(vesselDetailsModel.isscFilename!="")GestureDetector(
                       child: SvgPicture.asset(
                         download,
                         colorFilter: const ColorFilter.mode(
@@ -1187,7 +1258,7 @@ class _EpanDetailsState extends State<EpanDetails> {
                             AppDimensions.defaultIconSize,
                       ),
                       onTap: () {
-                        // _downloadDocument(fileName,savedName,vesselDetailsModel.docFileFolder!);
+                        _downloadDocument(vesselDetailsModel.isscFilename!,vesselDetailsModel.isscSaverFilename!,vesselDetailsModel.docFileFolder!);
                       },
                     ),
                   ],
@@ -1195,8 +1266,8 @@ class _EpanDetailsState extends State<EpanDetails> {
               ],
             ),
           ),
-        const SizedBox(height: 12),
-        Wrap(
+        if (vesselDetailsModel.validIssc == 1)const SizedBox(height: 12),
+        if (vesselDetailsModel.validIssc == 1)Wrap(
           spacing: 16,
           runSpacing: 12,
           children: [
@@ -1204,7 +1275,7 @@ class _EpanDetailsState extends State<EpanDetails> {
             infoBlock("Security Level", vesselDetailsModel.securityLevel ?? ""),
           ],
         ),
-        const SizedBox(height: 12),
+        if (vesselDetailsModel.validIssc == 1) const SizedBox(height: 12),
 
         // Fourth row - two columns for the longer text items
         Wrap(
@@ -1262,7 +1333,8 @@ class _EpanDetailsState extends State<EpanDetails> {
             document.docTitle ?? "Untitled Document",
             document.docExpiry ?? "No expiry date",
             document.fileName!,
-            document.saveFileName!
+            document.saveFileName!,
+            isVesselFolder: true
         );
       }).toList()
           : [
@@ -1357,7 +1429,7 @@ class _EpanDetailsState extends State<EpanDetails> {
                      height: 48,
                      child: ButtonWidgets.buildRoundedGradientButton(
                          press: () {
-                           final comment = commentController.text;
+                           final comment = commentController.text.trim();
                            if (comment.isEmpty) {
                              setState(() {
                                errorText = 'Comment cannot be empty';
