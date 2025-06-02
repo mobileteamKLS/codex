@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:codex_pcs/screens/vessel/page/vessel_list.dart';
 import 'package:codex_pcs/widgets/snackbar.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
@@ -108,7 +109,10 @@ class _VesselDetailsState extends State<VesselDetails> {
       if (response is Map<String, dynamic> && response["StatusCode"] == 200) {
         Utils.prints("Status", response["StatusMessage"]);
         CustomSnackBar.show(context, message: response["StatusMessage"],backgroundColor: AppColors.successColor,leftIcon: Icons.check_circle);
-        Navigator.pop(context);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const VesselListing()),
+        );
       } else {
         Utils.prints("Login failed:", "${response["StatusMessage"]}");
         CustomSnackBar.show(context, message: response["StatusMessage"],backgroundColor: Colors.red);}

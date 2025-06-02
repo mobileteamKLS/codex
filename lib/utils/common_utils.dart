@@ -6,12 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../theme/app_color.dart';
+import '../theme/app_theme.dart';
 
 class Utils {
-  static void prints(String tag, String message){
+  static void prints(String tag, String message) {
     if (kDebugMode) {
       print("$tag : $message");
-    }}
+    }
+  }
+
   static Widget tintLoader() {
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0),
@@ -44,6 +47,7 @@ class Utils {
       ),
     );
   }
+
   static Widget customDivider({
     double space = 20,
     Color color = AppColors.black,
@@ -61,9 +65,11 @@ class Utils {
       ],
     );
   }
+
   static String formatDate(DateTime date) {
     return DateFormat('d MMM yyyy').format(date);
   }
+
   static String formatStringDate(String? dateString,
       {bool showTime = false, bool onlyTime = false}) {
     if (dateString == null || dateString.isEmpty) {
@@ -103,10 +109,7 @@ class Utils {
   }
 
   static Future<bool?> confirmationDialog(
-      BuildContext context,
-      String msg,
-      String buttonText
-      ) {
+      BuildContext context, String msg, String buttonText) {
     return showDialog<bool>(
       barrierColor: AppColors.textColorPrimary.withOpacity(0.5),
       context: context,
@@ -129,7 +132,7 @@ class Utils {
               ),
             ],
           ),
-          content:  Text(
+          content: Text(
             "$msg",
             style: TextStyle(
                 fontSize: 16,
@@ -158,11 +161,11 @@ class Utils {
               },
               child: Container(
                 padding:
-                const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                    const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
                     color: AppColors.primary),
-                child:  Text(
+                child: Text(
                   "$buttonText",
                   style: TextStyle(
                       fontSize: 16,
@@ -177,18 +180,20 @@ class Utils {
     );
   }
 
-  bool isVisibleForCurrentRole(String roleId) {
-    final org = loginDetailsMaster.orgTypeName;
-    switch (org) {
-      case 'Marine Department':
-        return roleId == 'marineCard' || roleId == 'sharedCard';
-      case 'Port Authority':
-        return roleId == 'portCard';
-      case 'Logistics':
-        return roleId == 'logisticsCard' || roleId == 'sharedCard';
-      default:
-        return false;
-    }
+  static Widget buildCompactLabelValue(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$label:',
+            style: AppStyle.sideDescText,
+          ),
+          const SizedBox(height: 2),
+          Text(value, style: AppStyle.defaultTitle),
+        ],
+      ),
+    );
   }
-
 }

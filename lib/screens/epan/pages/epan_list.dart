@@ -995,12 +995,12 @@ class _EpanListingState extends State<EpanListing> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      buildCompactLabelValue('IMO No.', vesselDetails.imoNo),
+                      Utils.buildCompactLabelValue('IMO No.', vesselDetails.imoNo),
 
-                      buildCompactLabelValue(
+                      Utils.buildCompactLabelValue(
                           'Vessel Name', vesselDetails.vesselName),
 
-                      buildCompactLabelValue('SCN', vesselDetails.scnId),
+                      Utils.buildCompactLabelValue('SCN', vesselDetails.scnId),
                       // Assuming callsign maps to SCN// You may need to add this field to your model
                     ],
                   ),
@@ -1013,16 +1013,16 @@ class _EpanListingState extends State<EpanListing> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      buildCompactLabelValue(
+                      Utils.buildCompactLabelValue(
                           'ETA',
                           Utils.formatStringDate(vesselDetails.eta,
                               showTime: true)),
                       // You may need to add this field
-                      buildCompactLabelValue(
+                      Utils.buildCompactLabelValue(
                           'ETD',
                           Utils.formatStringDate(vesselDetails.etd,
                               showTime: true)),
-                      buildCompactLabelValue(
+                      Utils.buildCompactLabelValue(
                           'Vessel Id', vesselDetails.vesselid),
                       // You may need to add this field
                     ],
@@ -1080,31 +1080,5 @@ class _EpanListingState extends State<EpanListing> {
     );
   }
 
-  Widget buildCompactLabelValue(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '$label:',
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 }

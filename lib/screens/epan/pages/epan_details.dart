@@ -23,6 +23,7 @@ import '../../../widgets/appdrawer.dart';
 import '../../../widgets/buttons.dart';
 import '../../login/model/login_response_model.dart';
 import '../model/epan_details_model.dart';
+import 'epan_list.dart';
 
 class EpanDetails extends StatefulWidget {
   final String refNo;
@@ -123,7 +124,10 @@ class _EpanDetailsState extends State<EpanDetails> {
             message: response["StatusMessage"],
             backgroundColor: AppColors.successColor,
             leftIcon: Icons.check_circle);
-        Navigator.pop(context);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const EpanListing()),
+        );
       } else {
         Utils.prints("Login failed:", "${response["StatusMessage"]}");
         CustomSnackBar.show(context,
@@ -516,6 +520,80 @@ class _EpanDetailsState extends State<EpanDetails> {
     );
   }
 
+  Widget unSecurityContent() {
+    return Container(
+      color: AppColors.cardBg,
+      padding: EdgeInsets.all(8),
+      child: Column(
+        children: vesselDetailsModel.prohibitedGoodsDetails?.asMap().entries.map((entry) {
+          int index = entry.key;
+          var portCall = entry.value;
+          bool isLast = index == vesselDetailsModel.prohibitedGoodsDetails!.length - 1;
+
+          return Column(
+            children: [
+              unSecurityItem(portCall),
+              if (!isLast) ...[
+                const SizedBox(height: 12),
+                Divider(
+                  color: Colors.grey[300],
+                  thickness: 0.5,
+                  height: 1,
+                ),
+                const SizedBox(height: 12),
+              ],
+            ],
+          );
+        }).toList() ?? [],
+      ),
+    );
+
+  }
+
+  Widget unSecurityItem(ProhibitedGoodsDetails item) {
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Port label and name
+          Text(
+            "Country of Origin",
+            style: AppStyle.sideDescText,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            item.countryOrginName ?? "",
+            style: AppStyle.defaultTitle,
+          ),
+          const SizedBox(height: 12),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Items / Commodity",
+                      style: AppStyle.sideDescText,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      item.itemCommodity ?? "",
+                      style: AppStyle.defaultTitle,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget portCallsContent() {
     return Column(
       children: vesselDetailsModel.listofLastTenPortofCall?.asMap().entries.map((entry) {
@@ -717,11 +795,16 @@ class _EpanDetailsState extends State<EpanDetails> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      vesselDetailsModel.weaponsOnBoardFileName??"",
-                      style: AppStyle.defaultTitle,
+                    Expanded(
+                      child: Text(
+                        vesselDetailsModel.weaponsOnBoardFileName??"",
+                        style: AppStyle.defaultTitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    if(vesselDetailsModel.weaponsOnBoardSaverFileName!=null)GestureDetector(
+                    if(vesselDetailsModel.weaponsOnBoardSaverFileName!=null)
+                      GestureDetector(
                       child: SvgPicture.asset(
                         download,
                         colorFilter: const ColorFilter.mode(
@@ -1155,7 +1238,7 @@ class _EpanDetailsState extends State<EpanDetails> {
         infoBlock("Last Port of Call", "${vesselDetailsModel.lastPortofCallCode ?? ""} - ${vesselDetailsModel.lastPortofCallName ?? ""}"),
         infoBlock("Next Port of Call","${vesselDetailsModel.nextPortofCallCode ?? ""} - ${vesselDetailsModel.nextPortofCallName ?? ""}"),
         infoBlock("Year of Built", vesselDetailsModel.yearBuilt != null
-            ? "${vesselDetailsModel.yearBuilt!}"
+            ? vesselDetailsModel.yearBuilt!
             : ""),
         infoBlock("Berth No", vesselDetailsModel.berthNo ?? ""),
         infoBlock("Port Name", vesselDetailsModel.portNamesWithValue ?? ""),
@@ -1195,11 +1278,13 @@ class _EpanDetailsState extends State<EpanDetails> {
       Wrap(spacing: 16, runSpacing: 12, children: [
         infoBlock("Cargo Type",vesselDetailsModel.cargoTypeValue ?? ""),
         infoBlock("Dangerous Cargo On Board", (vesselDetailsModel.dangerousCargoonBoard ?? 0) == 1 ? "Yes" : "No",),
-        infoBlock("Cargo To Discharge ", vesselDetailsModel.cargotoDischarge ?? ""),
+        if(vesselDetailsModel.dangerousCargoonBoard==1)infoBlock("IMDG Code Class:", vesselDetailsModel.imdgCodeClassTextWithComma ?? ""),
+        infoBlock("Cargo To Discharge", vesselDetailsModel.cargotoDischarge ?? ""),
         infoBlock("Dangerous Good",(vesselDetailsModel.dangeroudGoods ?? 0) == 1 ? "Yes" : "No",),
         infoBlock(
             "Prohibited Goods Under UN Security Council / Resolution On Board?",
           (vesselDetailsModel.prohibitedgoodsUn ?? 0) == 1 ? "Yes" : "No",),
+        if(vesselDetailsModel.prohibitedgoodsUn==1)unSecurityContent(),
         infoBlock("Name of Master", vesselDetailsModel.nameofMaster ?? ""),
         infoBlock("Number of Crew(S)", vesselDetailsModel.totalNoofCrew != null ? "${vesselDetailsModel.totalNoofCrew!}": ""),
         infoBlock("Number of Passenger(S)",vesselDetailsModel.totalNoofPassenger != null ? "${vesselDetailsModel.totalNoofPassenger!}": ""),

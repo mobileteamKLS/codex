@@ -103,7 +103,11 @@ class _ScnlistingState extends State<Scnlisting> {
     _lastScrollPosition = _scrollController.position.pixels;
 
     currentPage++;
-    await getAllVoyages(status: selectedStatusValue,vesselName: vesselName,vesselId: vesselId,imoName: imoName);
+    await getAllVoyages(
+        status: selectedStatusValue,
+        vesselName: vesselName,
+        vesselId: vesselId,
+        imoName: imoName);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
@@ -145,7 +149,7 @@ class _ScnlistingState extends State<Scnlisting> {
           "CurrentPortEntity": null,
           "PageIndex": currentPage,
           "pagesize": pageSize,
-          "OrgType":  loginDetailsMaster.orgTypeName,
+          "OrgType": loginDetailsMaster.orgTypeName,
           "CREATED_BY": null,
           "ORG_ID": loginDetailsMaster.organizationId,
           "VOYAGE_NO": null,
@@ -549,7 +553,10 @@ class _ScnlistingState extends State<Scnlisting> {
                               controller: imoNumberController,
                               labelText: "IMO No.",
                               isValidationRequired: false,
-                              inputFormatters: [ FilteringTextInputFormatter.digitsOnly,LengthLimitingTextInputFormatter(7)],
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(7)
+                              ],
                             ),
                             SizedBox(
                                 height:
@@ -775,7 +782,11 @@ class _ScnlistingState extends State<Scnlisting> {
                                 Navigator.pop(context);
 
                                 if (selectedStatusValue != null) {
-                                  getAllVoyages(status: selectedStatusValue,vesselName: vesselName,vesselId: vesselId,imoName: imoName);
+                                  getAllVoyages(
+                                      status: selectedStatusValue,
+                                      vesselName: vesselName,
+                                      vesselId: vesselId,
+                                      imoName: imoName);
                                 } else {
                                   _refreshData();
                                 }
@@ -973,7 +984,8 @@ class _ScnlistingState extends State<Scnlisting> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: ColorUtils.getStatusColor(vesselDetails.status),
                     borderRadius: BorderRadius.circular(16),
@@ -1001,11 +1013,14 @@ class _ScnlistingState extends State<Scnlisting> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      buildCompactLabelValue('IMO No.', vesselDetails.imoNo),
+                      Utils.buildCompactLabelValue(
+                          'IMO No.', vesselDetails.imoNo),
 
-                      buildCompactLabelValue('Vessel Name', vesselDetails.vslName),
+                      Utils.buildCompactLabelValue(
+                          'Vessel Name', vesselDetails.vslName),
 
-                      buildCompactLabelValue('SCN', vesselDetails.vcnNo), // Assuming callsign maps to SCN// You may need to add this field to your model
+                      Utils.buildCompactLabelValue('SCN', vesselDetails.vcnNo),
+                      // Assuming callsign maps to SCN// You may need to add this field to your model
                     ],
                   ),
                 ),
@@ -1017,9 +1032,17 @@ class _ScnlistingState extends State<Scnlisting> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      buildCompactLabelValue('ETA', Utils.formatStringDate(vesselDetails.eta,showTime: true)), // You may need to add this field
-                      buildCompactLabelValue('ETD', Utils.formatStringDate(vesselDetails.etd,showTime: true)),
-                      buildCompactLabelValue('Vessel Id', vesselDetails.vesselId),
+                      Utils.buildCompactLabelValue(
+                          'ETA',
+                          Utils.formatStringDate(vesselDetails.eta,
+                              showTime: true)),
+                      // You may need to add this field
+                      Utils.buildCompactLabelValue(
+                          'ETD',
+                          Utils.formatStringDate(vesselDetails.etd,
+                              showTime: true)),
+                      Utils.buildCompactLabelValue(
+                          'Vessel Id', vesselDetails.vesselId),
                       // You may need to add this field
                     ],
                   ),
@@ -1028,12 +1051,12 @@ class _ScnlistingState extends State<Scnlisting> {
             ),
 
             const SizedBox(height: 4),
-                      Utils.customDivider(
-                        space: 0,
-                        color: Colors.black,
-                        hasColor: true,
-                        thickness: 1,
-                      ),
+            Utils.customDivider(
+              space: 0,
+              color: Colors.black,
+              hasColor: true,
+              thickness: 1,
+            ),
             const SizedBox(height: 4),
             InkWell(
               onTap: () {
@@ -1041,12 +1064,12 @@ class _ScnlistingState extends State<Scnlisting> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => SCNDetails(
-                          refNo: vesselDetails.refNo,
-                          voyageId: vesselDetails.voyId,
-                          port: vesselDetails.poToPjLinked,
-                          scn: vesselDetails.vcnNo,
-                          vslName: vesselDetails.vslName,
-                        )));
+                              refNo: vesselDetails.refNo,
+                              voyageId: vesselDetails.voyId,
+                              port: vesselDetails.poToPjLinked,
+                              scn: vesselDetails.vcnNo,
+                              vslName: vesselDetails.vslName,
+                            )));
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1071,34 +1094,6 @@ class _ScnlistingState extends State<Scnlisting> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget buildCompactLabelValue(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '$label:',
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-          ),
-        ],
       ),
     );
   }
