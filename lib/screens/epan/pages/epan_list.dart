@@ -15,6 +15,7 @@ import '../../../core/media_query.dart';
 import '../../../theme/app_color.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/common_utils.dart';
+import '../../../utils/role_util.dart';
 import '../../../widgets/appdrawer.dart';
 import '../../../widgets/buttons.dart';
 import '../../../widgets/snackbar.dart';
@@ -47,13 +48,8 @@ class _EpanListingState extends State<EpanListing> {
   TextEditingController imoNumberController = TextEditingController();
   TextEditingController vesselNameController = TextEditingController();
   TextEditingController scnController = TextEditingController();
-  final List<Map<String, dynamic>> statusList = [
-    {"label": "Created", "value": 1},
-    {"label": "Submitted", "value": 2},
-    {"label": "Approved", "value": 3},
-    {"label": "Rejected", "value": 4},
-    {"label": "Cancelled", "value": 5},
-    {"label": "Closed", "value": 6},
+  late List<Map<String, dynamic>> statusList = [
+
   ];
 
   String vesselId = "";
@@ -67,6 +63,25 @@ class _EpanListingState extends State<EpanListing> {
   @override
   void initState() {
     super.initState();
+    if(OrganizationService.isMarineDepartment){
+      statusList = [
+        {"label": "Submitted", "value": 2},
+        {"label": "Approved", "value": 3},
+        {"label": "Rejected", "value": 4},
+        {"label": "Cancelled", "value": 5},
+        {"label": "Closed", "value": 6},
+      ];
+    }
+    else{
+      statusList = [
+        {"label": "Created", "value": 1},
+        {"label": "Submitted", "value": 2},
+        {"label": "Approved", "value": 3},
+        {"label": "Rejected", "value": 4},
+        {"label": "Cancelled", "value": 5},
+        {"label": "Closed", "value": 6},
+      ];
+    }
     _scrollController.addListener(_scrollListener);
     getAllEpans();
   }

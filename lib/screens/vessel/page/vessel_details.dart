@@ -290,7 +290,7 @@ class _VesselDetailsState extends State<VesselDetails> {
           ],
         ),
         bottomSheet: RoleConditionWidget(
-          condition: (OrganizationService.isMarineDepartment && widget.isSubmit & (widget.marineBranchId==loginDetailsMaster.organizationBranchId)),
+          condition: (OrganizationService.isMarineDepartment && widget.isSubmit && (widget.marineBranchId==loginDetailsMaster.organizationBranchId)),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Material(
@@ -696,8 +696,8 @@ class _VesselDetailsState extends State<VesselDetails> {
       children: vesselDetailsModel.pAndIList != null
           ? vesselDetailsModel.pAndIList!.map((pi) {
         return pIRow(
-            pi.piName ,
-            pi.piValidityUpto
+            pi.piName??"" ,
+            pi.piValidityUpto??""
         );
       }).toList()
           : [

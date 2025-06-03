@@ -295,10 +295,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         body: {
           "Loginid": userNameController.text.trim(),
         },
+        includeToken: false,
       );
 
       if (response is Map<String, dynamic> && response["StatusCode"] == 200) {
-        CustomSnackBar.show(context, message: "An email has been sent on your registered email id",backgroundColor: AppColors.successColor,leftIcon: Icons.check_circle);
+        CustomSnackBar.show(context, message: "${response["StatusMessage"]}",backgroundColor: AppColors.successColor,leftIcon: Icons.check_circle);
       }
       else {
         CustomSnackBar.show(context, message: response["StatusMessage"],backgroundColor: Colors.red);

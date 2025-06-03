@@ -618,8 +618,8 @@ class VesselRegistrationPiDetails {
   int operationType;
   int piId;
   int pvrId;
-  String piName;
-  String piValidityUpto;
+  String? piName;
+  String? piValidityUpto;
   String localCorrespondent;
   dynamic isDeleted;
   int orgId;

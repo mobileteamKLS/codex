@@ -13,6 +13,7 @@ import '../../../core/media_query.dart';
 import '../../../theme/app_color.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/common_utils.dart';
+import '../../../utils/role_util.dart';
 import '../../../widgets/appdrawer.dart';
 import '../../../widgets/buttons.dart';
 import '../../../widgets/snackbar.dart';
@@ -49,14 +50,8 @@ class _VesselListingState extends State<VesselListing> {
   TextEditingController imoNumberController = TextEditingController();
   TextEditingController vesselNameController = TextEditingController();
 
-  final List<Map<String, String>> statusList = [
-    {"label": "Created", "value": "Created"},
-    {"label": "Submitted", "value": "Submitted"},
-    {"label": "Approved", "value": "Approved"},
-    {"label": "Rejected", "value": "Rejected"},
-    {"label": "Inactive", "value": "Inactive"},
-    {"label": "Blacklisted", "value": "Suspended"},
-    {"label": "Cancelled", "value": "Cancelled"},
+  late List<Map<String, String>> statusList = [
+
   ];
 
   String vesselId = "";
@@ -69,6 +64,27 @@ class _VesselListingState extends State<VesselListing> {
   @override
   void initState() {
     super.initState();
+    if(OrganizationService.isMarineDepartment){
+      statusList = [
+        {"label": "Submitted", "value": "Submitted"},
+        {"label": "Approved", "value": "Approved"},
+        {"label": "Rejected", "value": "Rejected"},
+        {"label": "Inactive", "value": "Inactive"},
+        {"label": "Blacklisted", "value": "Suspended"},
+        {"label": "Cancelled", "value": "Cancelled"},
+      ];
+    }
+    else{
+      statusList = [
+        {"label": "Created", "value": "Created"},
+        {"label": "Submitted", "value": "Submitted"},
+        {"label": "Approved", "value": "Approved"},
+        {"label": "Rejected", "value": "Rejected"},
+        {"label": "Inactive", "value": "Inactive"},
+        {"label": "Blacklisted", "value": "Suspended"},
+        {"label": "Cancelled", "value": "Cancelled"},
+      ];
+    }
     _scrollController.addListener(_scrollListener);
     getAllVessels();
   }
