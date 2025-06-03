@@ -724,17 +724,18 @@ class _EpanDetailsState extends State<EpanDetails> {
           ),
 
           Text(
-            (vesselDetailsModel.specialoradditionalsecurity ?? 0) == 1
-                ? "Yes"
-                : "No",
+            (vesselDetailsModel.specialoradditionalsecurity == null)
+                ? ""
+                : (vesselDetailsModel.specialoradditionalsecurity == 1 ? "Yes" : "No")
+            ,
             style: AppStyle.defaultTitle,
           ),
           SizedBox(
               height:
-                  ((vesselDetailsModel.specialoradditionalsecurity ?? 0) == 1)
+                  (vesselDetailsModel.specialoradditionalsecurity  == 1)
                       ? 6
                       : 0),
-          ((vesselDetailsModel.specialoradditionalsecurity ?? 0) == 1)
+          (vesselDetailsModel.specialoradditionalsecurity  == 1)
               ? Text(
                   "If yes, please specify",
                   style: AppStyle.sideDescText,
@@ -767,15 +768,18 @@ class _EpanDetailsState extends State<EpanDetails> {
           ),
           SizedBox(height: 4),
           Text(
-            (vesselDetailsModel.weaponsOnBoard ?? 0) == 1 ? "Yes" : "No",
+            (vesselDetailsModel.weaponsOnBoard == null)
+                ? ""
+                : (vesselDetailsModel.weaponsOnBoard == 1 ? "Yes" : "No")
+            ,
             style: AppStyle.defaultTitle,
           ),
           SizedBox(
               height:
-              ((vesselDetailsModel.weaponsOnBoard ?? 0) == 1)
+              (vesselDetailsModel.weaponsOnBoard  == 1)
                   ? 6
                   : 0),
-          ((vesselDetailsModel.weaponsOnBoard ?? 0) == 1)
+          (vesselDetailsModel.weaponsOnBoard  == 1)
               ? Text(
             "If yes, please refer",
             style: AppStyle.sideDescText,
@@ -783,10 +787,10 @@ class _EpanDetailsState extends State<EpanDetails> {
               : const SizedBox(),
           SizedBox(
               height:
-              ((vesselDetailsModel.weaponsOnBoard ?? 0) == 1)
+              (vesselDetailsModel.weaponsOnBoard  == 1)
                   ? 4
                   : 0),
-          ((vesselDetailsModel.weaponsOnBoard ?? 0) == 1)
+          (vesselDetailsModel.weaponsOnBoard == 1)
               ? Container(
             width: double.infinity,
             child: Column(
@@ -1277,7 +1281,13 @@ class _EpanDetailsState extends State<EpanDetails> {
   Widget cargoPassengerContent() =>
       Wrap(spacing: 16, runSpacing: 12, children: [
         infoBlock("Cargo Type",vesselDetailsModel.cargoTypeValue ?? ""),
-        infoBlock("Dangerous Cargo On Board", (vesselDetailsModel.dangerousCargoonBoard ?? 0) == 1 ? "Yes" : "No",),
+        infoBlock(
+            "Dangerous Cargo On Board",
+            (vesselDetailsModel.dangerousCargoonBoard == null)
+                ? ""
+                : (vesselDetailsModel.dangerousCargoonBoard == 1
+                    ? "Yes"
+                    : "No")),
         if(vesselDetailsModel.dangerousCargoonBoard==1)infoBlock("IMDG Code Class:", vesselDetailsModel.imdgCodeClassTextWithComma ?? ""),
         infoBlock("Cargo To Discharge", vesselDetailsModel.cargotoDischarge ?? ""),
         infoBlock("Dangerous Good",(vesselDetailsModel.dangeroudGoods ?? 0) == 1 ? "Yes" : "No",),
@@ -1305,7 +1315,10 @@ class _EpanDetailsState extends State<EpanDetails> {
               ),
               const SizedBox(height: 2),
               Text(
-                (vesselDetailsModel.validIssc ?? 0) == 1 ? "Yes" : "No",
+                (vesselDetailsModel.validIssc == null)
+                    ? ""
+                    : (vesselDetailsModel.validIssc == 1 ? "Yes" : "No")
+                ,
                 style: AppStyle.defaultTitle,
               ),
             ],
@@ -1369,14 +1382,16 @@ class _EpanDetailsState extends State<EpanDetails> {
           children: [
             infoBlock(
                 "Is The Ship Carrying DG 1 & 2",
-                (vesselDetailsModel.istheShipCarryingDg ?? 0) == 1
-                    ? "Yes"
-                    : "No"),
+                (vesselDetailsModel.istheShipCarryingDg == null)
+                    ? ""
+                    : (vesselDetailsModel.istheShipCarryingDg == 1 ? "Yes" : "No")
+            ),
             infoBlock(
                 "Does Your Compliant Ship Arrives From A Non-Compliant Port?",
-                (vesselDetailsModel.doesyourCompliant ?? 0) == 1
-                    ? "Yes"
-                    : "No"),
+                (vesselDetailsModel.doesyourCompliant == null)
+                    ? ""
+                    : (vesselDetailsModel.doesyourCompliant == 1 ? "Yes" : "No")
+            ),
           ],
         ),
       ],
