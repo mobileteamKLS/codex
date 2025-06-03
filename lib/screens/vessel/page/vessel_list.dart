@@ -64,8 +64,9 @@ class _VesselListingState extends State<VesselListing> {
   @override
   void initState() {
     super.initState();
-    if(OrganizationService.isMarineDepartment){
+    if(OrganizationService.isShippingAgent){
       statusList = [
+        {"label": "Created", "value": "Created"},
         {"label": "Submitted", "value": "Submitted"},
         {"label": "Approved", "value": "Approved"},
         {"label": "Rejected", "value": "Rejected"},
@@ -76,7 +77,6 @@ class _VesselListingState extends State<VesselListing> {
     }
     else{
       statusList = [
-        {"label": "Created", "value": "Created"},
         {"label": "Submitted", "value": "Submitted"},
         {"label": "Approved", "value": "Approved"},
         {"label": "Rejected", "value": "Rejected"},

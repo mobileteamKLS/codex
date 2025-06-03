@@ -1,6 +1,6 @@
 import '../../../../api/app_service.dart';
 import '../../../../core/global.dart';
-import '../../../vessel/model/vessel_list_model.dart';
+import '../model/departureListModel.dart';
 
 abstract class DepartureRepository {
   Future<VesselListResponse> getAllVessels({
@@ -9,7 +9,7 @@ abstract class DepartureRepository {
     String? vesselName,
     String? status,
     int pageIndex = 1,
-    int pageSize = 10,
+    int pageSize = 200,
   });
 }
 
@@ -21,29 +21,38 @@ class VesselRepositoryImpl implements DepartureRepository {
     String? vesselName,
     String? status,
     int pageIndex = 1,
-    int pageSize = 10,
+    int pageSize = 200,
   }) async {
     try {
       final response = await ApiService().request(
-        endpoint: "/api_pcs1/Vessel/GetAllVesselRegistration",
+        endpoint: "/api_pcs1/DepartureClearance/GetAll",
         method: "POST",
         body: {
-          "Client": loginDetailsMaster.userAccountTypeId,
-          "OrgId": loginDetailsMaster.organizationId,
           "OperationType": 2,
-          "OrgType": loginDetailsMaster.orgTypeName,
-          "ServiceName": null,
-          "VesselId": vesselId,
-          "ImoNo": imoName,
-          "VesselName": vesselName,
-          "AgentName": null,
-          "VesselType": null,
-          "VesselStatus": status,
-          "Nationality": null,
           "CurrentPortEntity": -1,
-          "PlaceOfRegistry": 0,
+          "OrgId": loginDetailsMaster.organizationId,
+          "Client": loginDetailsMaster.userAccountTypeId,
+          "NameofAgent": loginDetailsMaster.orgTypeName,
+          "VesselName": vesselName,
+          "VCN":null,
+          "IMONo": null,
+          "FlagOfVessel": null,
+          "status": -1,
+          "ClearanceType": null,
+          "NameOfMaster": null,
+          "VesselType": "0",
+          "CreatedBy": configMaster.createdBy,
+          "OrgBranchId": loginDetailsMaster.organizationBranchId,
+          "validfromdt": null,
+          "validtodt": null,
+          "VESSELCountryFLAG": null,
+          "Client": int.parse(configMaster.clientID),
           "PageIndex": pageIndex,
-          "PageSize": pageSize
+          "PageSize": pageSize,
+          "CountryID": configMaster.countryId,
+          "IsExportToExcel": null,
+          "DR_ID": null,
+          "VesselID": null
         },
       );
 
@@ -60,8 +69,8 @@ class VesselRepositoryImpl implements DepartureRepository {
         List<dynamic> jsonData = response["data"];
         bool hasNoRecord = response["Status"] == "05";
 
-        List<VesselListModel> vessels = jsonData
-            .map((json) => VesselListModel.fromJson(json))
+        List<DepartureListModel> vessels = jsonData
+            .map((json) => DepartureListModel.fromJson(json))
             .toList();
 
         return VesselListResponse(
@@ -80,7 +89,7 @@ class VesselRepositoryImpl implements DepartureRepository {
 }
 
 class VesselListResponse {
-  final List<VesselListModel> vessels;
+  final List<DepartureListModel> vessels;
   final bool hasMoreData;
   final bool hasNoRecord;
   final String statusMessage;

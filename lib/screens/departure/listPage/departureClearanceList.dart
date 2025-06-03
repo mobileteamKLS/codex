@@ -16,6 +16,7 @@ import '../../../widgets/appdrawer.dart';
 import '../../../widgets/buttons.dart';
 import '../../../widgets/text_field.dart';
 import '../../vessel/model/vessel_list_model.dart';
+import 'model/departureListModel.dart';
 
 class DepartureListing extends StatefulWidget {
   const DepartureListing({super.key});
@@ -240,7 +241,7 @@ class _DepartureListingState extends State<DepartureListing> {
                         ListView.builder(
                           physics: const NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
-                            return _buildVesselCard(
+                            return buildVesselCard(
                                 vesselDetails: state.vessels[index],
                                 index: index);
                           },
@@ -663,114 +664,7 @@ class _DepartureListingState extends State<DepartureListing> {
     );
   }
 
-  Widget _buildVesselCard({
-    required VesselListModel vesselDetails,
-    required int index,
-  }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.0),
-        color: AppColors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            spreadRadius: 2,
-            blurRadius: 2,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  vesselDetails.refNo,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: ColorUtils.getStatusColor(vesselDetails.status),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    vesselDetails.status,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textColorPrimary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            _buildLabelValue('IMO No.', vesselDetails.imoNo),
-            _buildLabelValue('Vessel Name', vesselDetails.vslName),
-            _buildLabelValue('Call Sign', vesselDetails.callsign),
-            _buildLabelValue('Shipping Line/Agent', ""),
-            const SizedBox(height: 4),
-            Utils.customDivider(
-              space: 0,
-              color: Colors.black,
-              hasColor: true,
-              thickness: 1,
-            ),
-            const SizedBox(height: 4),
-            InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => VesselDetails(
-                      refNo: vesselDetails.refNo,
-                      pvrId: vesselDetails.pvrId,
-                      marineBranchId: vesselDetails.marineBranchId,
-                      isSubmit: (vesselDetails.status == "Submitted"),
-                    ),
-                  ),
-                );
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Show More Details',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      color: AppColors.gradient1,
-                    ),
-                    child: const Icon(
-                      Icons.keyboard_arrow_right_outlined,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLabelValue(String label, String value) {
+  Widget buildLabelValue(String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Row(
@@ -787,6 +681,157 @@ class _DepartureListingState extends State<DepartureListing> {
             child: Text(value, style: AppStyle.defaultTitle),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget buildVesselCard(
+      {required DepartureListModel vesselDetails, required int index}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.0),
+        color: AppColors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with vessel name and status
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    vesselDetails.referenceNo??"",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: ColorUtils.getStatusColor(vesselDetails.status??""),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    vesselDetails.status??"",
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textColorPrimary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // Vessel details in two columns
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Left column
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Utils.buildCompactLabelValue('IMO No.', vesselDetails.imoNo),
+
+                      Utils.buildCompactLabelValue(
+                          'Vessel Name', vesselDetails.vesselName??""),
+
+                      Utils.buildCompactLabelValue('SCN', vesselDetails.vcn??''),
+                      // Assuming callsign maps to SCN// You may need to add this field to your model
+                    ],
+                  ),
+                ),
+
+                const SizedBox(width: 16),
+
+                // Right column
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Utils.buildCompactLabelValue(
+                          'ETA',
+                          Utils.formatStringDate(vesselDetails.eta,
+                              showTime: true)),
+                      // You may need to add this field
+                      Utils.buildCompactLabelValue(
+                          'ETD',
+                          Utils.formatStringDate(vesselDetails.etd,
+                              showTime: true)),
+                      Utils.buildCompactLabelValue(
+                          'Vessel Id', vesselDetails.vesselId??""),
+                      // You may need to add this field
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 4),
+            Utils.customDivider(
+              space: 0,
+              color: Colors.black,
+              hasColor: true,
+              thickness: 1,
+            ),
+            const SizedBox(height: 4),
+            InkWell(
+              onTap: () {
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (context) => EpanDetails(
+                //           refNo: vesselDetails.referenceNo,
+                //           pvrId: vesselDetails.naId,
+                //           marineBranchId: int.parse(
+                //               vesselDetails.marineBranchId ?? "0"),
+                //           isSubmit: (vesselDetails.status == "Submitted"),
+                //           vesselId: vesselDetails.vesselid,
+                //         )));
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Show More Details',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: AppColors.gradient1,
+                      ),
+                      child: const Icon(Icons.keyboard_arrow_right_outlined,
+                          color: AppColors.primary)),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

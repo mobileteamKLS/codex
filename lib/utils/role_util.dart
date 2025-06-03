@@ -22,7 +22,7 @@ class OrganizationService {
   static const String PORT_HEALTH = 'Port Health';
   static const String PORT_TERMINAL_OPERATOR = 'Port/Terminal Operator';
   static const String PRIVATE_JETTY = 'Private Jetty';
-  static const String SHIPPING_AGENT = 'Shipping Agent';
+  static const String SHIPPING_AGENT = 'MLO-ShippingAgent';
 
   static bool get isMarineDepartment => orgTypeName == MARINE_DEPARTMENT;
   static bool get isCustoms => orgTypeName == CUSTOMS;

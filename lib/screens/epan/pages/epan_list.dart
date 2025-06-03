@@ -63,8 +63,9 @@ class _EpanListingState extends State<EpanListing> {
   @override
   void initState() {
     super.initState();
-    if(OrganizationService.isMarineDepartment){
+    if(OrganizationService.isShippingAgent){
       statusList = [
+        {"label": "Created", "value": 1},
         {"label": "Submitted", "value": 2},
         {"label": "Approved", "value": 3},
         {"label": "Rejected", "value": 4},
@@ -74,7 +75,6 @@ class _EpanListingState extends State<EpanListing> {
     }
     else{
       statusList = [
-        {"label": "Created", "value": 1},
         {"label": "Submitted", "value": 2},
         {"label": "Approved", "value": 3},
         {"label": "Rejected", "value": 4},

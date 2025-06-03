@@ -66,8 +66,9 @@ class _ScnlistingState extends State<Scnlisting> {
   @override
   void initState() {
     super.initState();
-    if(OrganizationService.isMarineDepartment){
+    if(OrganizationService.isShippingAgent){
       statusList=[
+        {"label": "Created", "value": 0},
         {"label": "Submitted", "value": 1},
         {"label": "SCN Approved", "value": 2},
         {"label": "SCN Cancelled", "value": 5},
@@ -75,11 +76,11 @@ class _ScnlistingState extends State<Scnlisting> {
       ];
     }else{
       statusList=[
-        {"label": "Created", "value": 0},
         {"label": "Submitted", "value": 1},
         {"label": "SCN Approved", "value": 2},
         {"label": "SCN Cancelled", "value": 5},
         {"label": "SCN Closed", "value": 4},
+
       ];
     }
     _scrollController.addListener(_scrollListener);

@@ -41,6 +41,8 @@ class DepartureCubit extends Cubit<DepartureState> {
         pageSize: _pageSize,
       );
 
+      print(response);
+
       emit(DepartureLoaded(
         vessels: response.vessels,
         hasMoreData: response.hasMoreData,

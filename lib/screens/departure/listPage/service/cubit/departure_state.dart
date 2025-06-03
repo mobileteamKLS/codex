@@ -1,6 +1,7 @@
 // vessel_state.dart
 import 'package:equatable/equatable.dart';
 import '../../../../vessel/model/vessel_list_model.dart';
+import '../../model/departureListModel.dart';
 
 abstract class DepartureState extends Equatable {
   const DepartureState();
@@ -14,7 +15,7 @@ class DepartureInitial extends DepartureState {}
 class DepartureLoading extends DepartureState {}
 
 class DepartureLoadingMore extends DepartureState {
-  final List<VesselListModel> currentVessels;
+  final List<DepartureListModel> currentVessels;
 
   const DepartureLoadingMore({required this.currentVessels});
 
@@ -23,7 +24,7 @@ class DepartureLoadingMore extends DepartureState {
 }
 
 class DepartureLoaded extends DepartureState {
-  final List<VesselListModel> vessels;
+  final List<DepartureListModel> vessels;
   final bool hasMoreData;
   final bool hasNoRecord;
   final int currentPage;
@@ -40,7 +41,7 @@ class DepartureLoaded extends DepartureState {
   });
 
   DepartureLoaded copyWith({
-    List<VesselListModel>? vessels,
+    List<DepartureListModel>? vessels,
     bool? hasMoreData,
     bool? hasNoRecord,
     int? currentPage,
