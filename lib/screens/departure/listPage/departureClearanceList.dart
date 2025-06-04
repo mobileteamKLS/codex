@@ -90,7 +90,23 @@ class _DepartureListingState extends State<DepartureListing> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
+      appBar: AppBar(
+        title: const Text(
+          'Departure Clearance',
+          style: TextStyle(color: Colors.white),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white, size: 32),
+        toolbarHeight: 60,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF0057D8), Color(0xFF1c86ff)],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+        ),
+      ),
       drawer: const Appdrawer(),
       body: Stack(
         children: [
@@ -124,25 +140,25 @@ class _DepartureListingState extends State<DepartureListing> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      title: const Text(
-        'Vessel Registration',
-        style: TextStyle(color: Colors.white),
-      ),
-      iconTheme: const IconThemeData(color: Colors.white, size: 32),
-      toolbarHeight: 60,
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF0057D8), Color(0xFF1c86ff)],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-        ),
-      ),
-    );
-  }
+  // PreferredSizeWidget _buildAppBar() {
+  //   return AppBar(
+  //     title: const Text(
+  //       'Departure Clearance',
+  //       style: TextStyle(color: Colors.white),
+  //     ),
+  //     iconTheme: const IconThemeData(color: Colors.white, size: 32),
+  //     toolbarHeight: 60,
+  //     flexibleSpace: Container(
+  //       decoration: const BoxDecoration(
+  //         gradient: LinearGradient(
+  //           colors: [Color(0xFF0057D8), Color(0xFF1c86ff)],
+  //           begin: Alignment.centerLeft,
+  //           end: Alignment.centerRight,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildHeader() {
     return Padding(
@@ -162,7 +178,7 @@ class _DepartureListingState extends State<DepartureListing> {
                 ),
               ),
               const SizedBox(width: 5),
-              Text('Vessel Listing', style: AppStyle.defaultHeading),
+              Text('Departure Clearance Listing', style: AppStyle.defaultHeading),
             ],
           ),
           Row(
@@ -528,6 +544,7 @@ class _DepartureListingState extends State<DepartureListing> {
 
   Widget _buildFilterHeader(StateSetter setState, String? selectedFilter) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
@@ -576,6 +593,7 @@ class _DepartureListingState extends State<DepartureListing> {
 
   Widget _buildStatusFilters(StateSetter setState, String? selectedFilter) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 0),
@@ -778,8 +796,8 @@ class _DepartureListingState extends State<DepartureListing> {
                           'ETD',
                           Utils.formatStringDate(vesselDetails.etd,
                               showTime: true)),
-                      Utils.buildCompactLabelValue(
-                          'Vessel Id', vesselDetails.vesselId??""),
+                      // Utils.buildCompactLabelValue(
+                      //     'Vessel Id', vesselDetails.vesselId??""),
                       // You may need to add this field
                     ],
                   ),

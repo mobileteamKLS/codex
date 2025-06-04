@@ -1,3 +1,4 @@
+import 'package:codex_pcs/core/global.dart';
 import 'package:flutter/material.dart';
 
 import '../../../api/app_service.dart';
@@ -294,6 +295,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         method: "POST",
         body: {
           "Loginid": userNameController.text.trim(),
+          "CountryId": configMaster.countryId,
+          "ClientID": int.parse(configMaster.clientID)
         },
         includeToken: false,
       );
