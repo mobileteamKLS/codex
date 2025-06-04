@@ -93,11 +93,11 @@ class _MswSubmenuState extends State<MswSubmenu> {
             //   title: 'Arrival Clearance',
             //   targetPage: VesselListing(),
             // ),
-            const NavigationCard(
-              icon: doubleCheck,
-              title: 'Departure Clearance',
-              targetPage: DepartureListing(),
-            ),
+            // const NavigationCard(
+            //   icon: doubleCheck,
+            //   title: 'Departure Clearance',
+            //   targetPage: DepartureListing(),
+            // ),
 
           ],
         ),

@@ -1344,7 +1344,7 @@ class _EpanDetailsState extends State<EpanDetails> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Expires on ${vesselDetailsModel.ispsDocExpityDate != null ? Utils.formatStringDate(vesselDetailsModel.ispsDocExpityDate, showTime: true) ?? "" : ""}",
+                      "Expires on ${vesselDetailsModel.ispsDocExpityDate != null ? Utils.formatStringDate(vesselDetailsModel.ispsDocExpityDate, showTime: false) ?? "" : ""}",
                       style: AppStyle.defaultTitle,
                     ),
                     if(vesselDetailsModel.isscFilename!="")GestureDetector(

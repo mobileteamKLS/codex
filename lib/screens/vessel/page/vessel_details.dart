@@ -29,7 +29,13 @@ class VesselDetails extends StatefulWidget {
   final int pvrId;
   final int marineBranchId;
   final bool isSubmit;
-  const VesselDetails({super.key, required this.refNo, required this.pvrId, required this.marineBranchId, required this.isSubmit});
+
+  const VesselDetails(
+      {super.key,
+      required this.refNo,
+      required this.pvrId,
+      required this.marineBranchId,
+      required this.isSubmit});
 
   @override
   State<VesselDetails> createState() => _VesselDetailsState();
@@ -38,7 +44,7 @@ class VesselDetails extends StatefulWidget {
 class _VesselDetailsState extends State<VesselDetails> {
   List<bool> _expanded = List.filled(5, false);
   bool isLoading = false;
-   VesselDetailsModel vesselDetailsModel=VesselDetailsModel();
+  VesselDetailsModel vesselDetailsModel = VesselDetailsModel();
   TextEditingController commentController = TextEditingController();
 
   void _toggleAll() {
@@ -67,7 +73,7 @@ class _VesselDetailsState extends State<VesselDetails> {
 
       if (response is Map<String, dynamic> && response["StatusCode"] == 200) {
         vesselDetailsModel = VesselDetailsModel.fromJson(response["data"]);
-        Utils.prints("IMO", vesselDetailsModel.positionofBridge??"");
+        Utils.prints("IMO", vesselDetailsModel.positionofBridge ?? "");
       } else {
         Utils.prints("Login failed:", "${response["StatusMessage"]}");
       }
@@ -83,7 +89,7 @@ class _VesselDetailsState extends State<VesselDetails> {
     }
   }
 
-  void approveReject(String comment,int opType) async {
+  void approveReject(String comment, int opType) async {
     setState(() {
       isLoading = true;
     });
@@ -108,14 +114,19 @@ class _VesselDetailsState extends State<VesselDetails> {
 
       if (response is Map<String, dynamic> && response["StatusCode"] == 200) {
         Utils.prints("Status", response["StatusMessage"]);
-        CustomSnackBar.show(context, message: response["StatusMessage"],backgroundColor: AppColors.successColor,leftIcon: Icons.check_circle);
+        CustomSnackBar.show(context,
+            message: response["StatusMessage"],
+            backgroundColor: AppColors.successColor,
+            leftIcon: Icons.check_circle);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const VesselListing()),
         );
       } else {
         Utils.prints("Login failed:", "${response["StatusMessage"]}");
-        CustomSnackBar.show(context, message: response["StatusMessage"],backgroundColor: Colors.red);}
+        CustomSnackBar.show(context,
+            message: response["StatusMessage"], backgroundColor: Colors.red);
+      }
       setState(() {
         isLoading = false;
       });
@@ -172,13 +183,15 @@ class _VesselDetailsState extends State<VesselDetails> {
           children: [
             Container(
               constraints: const BoxConstraints.expand(),
-              margin: (OrganizationService.isMarineDepartment)?const EdgeInsets.only(bottom: 100):const EdgeInsets.only(bottom: 0),
+              margin: (OrganizationService.isMarineDepartment)
+                  ? const EdgeInsets.only(bottom: 100)
+                  : const EdgeInsets.only(bottom: 0),
               padding: EdgeInsets.only(
-                  left: ScreenDimension.onePercentOfScreenWidth *
-                      AppDimensions.defaultPageHorizontalPadding,
+                left: ScreenDimension.onePercentOfScreenWidth *
+                    AppDimensions.defaultPageHorizontalPadding,
                 right: ScreenDimension.onePercentOfScreenWidth *
                     AppDimensions.defaultPageHorizontalPadding,
-                bottom:(OrganizationService.isMarineDepartment)?0:20,
+                bottom: (OrganizationService.isMarineDepartment) ? 0 : 20,
               ),
               color: AppColors.background,
               child: SingleChildScrollView(
@@ -203,7 +216,7 @@ class _VesselDetailsState extends State<VesselDetails> {
                             const SizedBox(
                               width: 5,
                             ),
-                             Expanded(
+                            Expanded(
                               child: Text(widget.refNo,
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w500,
@@ -217,7 +230,8 @@ class _VesselDetailsState extends State<VesselDetails> {
                                 _expanded.every((e) => e)
                                     ? 'Collapse All'
                                     : 'Expand All',
-                                style: const TextStyle(color: AppColors.primary),
+                                style:
+                                    const TextStyle(color: AppColors.primary),
                               ),
                             ),
                           ],
@@ -240,8 +254,14 @@ class _VesselDetailsState extends State<VesselDetails> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                           Text("Approving Authority",style: AppStyle.sideDescText,),
-                          Text(vesselDetailsModel.marineBranchValue??"",style: AppStyle.defaultTitle,),
+                          Text(
+                            "Approving Authority",
+                            style: AppStyle.sideDescText,
+                          ),
+                          Text(
+                            vesselDetailsModel.marineBranchValue ?? "",
+                            style: AppStyle.defaultTitle,
+                          ),
                         ],
                       ),
                     ),
@@ -262,10 +282,9 @@ class _VesselDetailsState extends State<VesselDetails> {
                               0, "Vessel Details", vesselDetailsContent()),
                           buildSection(
                               1, "Owner/Agent Details", ownerAgentContent()),
-                          buildSection(2, "Shipper Dimension",
+                          buildSection(2, "Vessel Dimension",
                               shipperDimensionContent()),
-                          buildSection(
-                              3, "P&I Details", pAndIDetailsContent()),
+                          buildSection(3, "P&I Details", pAndIDetailsContent()),
                           buildSection(4, "Attached Documents",
                               attachedDocumentsContent()),
                         ],
@@ -290,12 +309,16 @@ class _VesselDetailsState extends State<VesselDetails> {
           ],
         ),
         bottomSheet: RoleConditionWidget(
-          condition: (OrganizationService.isMarineDepartment && widget.isSubmit && (widget.marineBranchId==loginDetailsMaster.organizationBranchId)),
+          condition: (OrganizationService.isMarineDepartment &&
+              widget.isSubmit &&
+              (widget.marineBranchId ==
+                  loginDetailsMaster.organizationBranchId)),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Material(
               elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
               color: Colors.white,
               child: IntrinsicHeight(
                 child: Padding(
@@ -312,8 +335,7 @@ class _VesselDetailsState extends State<VesselDetails> {
                             showRejectWithCommentsBottomSheet(
                               context: context,
                               onSubmit: (comment) {
-
-                                 approveReject(comment,2);
+                                approveReject(comment, 2);
                               },
                             );
                           },
@@ -324,10 +346,12 @@ class _VesselDetailsState extends State<VesselDetails> {
                         child: ButtonWidgets.buildRoundedGradientButton(
                           text: 'Approve',
                           press: () async {
-                            bool? isTrue =
-                                await Utils.confirmationDialog(context,"Are you sure you want to Approve ?","Approve");
-                            if(isTrue!){
-                              approveReject("",1);
+                            bool? isTrue = await Utils.confirmationDialog(
+                                context,
+                                "Are you sure you want to Approve ?",
+                                "Approve");
+                            if (isTrue!) {
+                              approveReject("", 1);
                             }
                           },
                         ),
@@ -339,7 +363,6 @@ class _VesselDetailsState extends State<VesselDetails> {
             ),
           ),
         ),
-
       ),
       isLoading ? Utils.tintLoader() : const SizedBox(),
     ]);
@@ -372,7 +395,8 @@ class _VesselDetailsState extends State<VesselDetails> {
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5),
-                      color: AppColors.gradient1,),
+                      color: AppColors.gradient1,
+                    ),
                     child: const Icon(Icons.keyboard_arrow_down_rounded,
                         color: AppColors.primary),
                   ),
@@ -414,14 +438,16 @@ class _VesselDetailsState extends State<VesselDetails> {
             label,
             style: AppStyle.sideDescText,
           ),
-          SizedBox(height: 2),
+          const SizedBox(height: 2),
           Text(value, style: AppStyle.defaultTitle),
         ],
       ),
     );
   }
 
-  Widget documentRow(String title, String expiry,String fileName,String savedName) => Padding(
+  Widget documentRow(
+          String title, String expiry, String fileName, String savedName) =>
+      Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
           children: [
@@ -430,25 +456,27 @@ class _VesselDetailsState extends State<VesselDetails> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(title, style: AppStyle.defaultTitle),
-                    SizedBox(height: 2),
+                    const SizedBox(height: 2),
                     Text(
                       "Expires on $expiry",
                       style: AppStyle.sideDescText,
                     ),
                   ]),
             ),
-            GestureDetector(
-              child: SvgPicture.asset(
-                download,
-                colorFilter:
-                    const ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
-                height: ScreenDimension.onePercentOfScreenHight *
-                    AppDimensions.defaultIconSize,
+            if (fileName != "")
+              GestureDetector(
+                child: SvgPicture.asset(
+                  download,
+                  colorFilter: const ColorFilter.mode(
+                      AppColors.primary, BlendMode.srcIn),
+                  height: ScreenDimension.onePercentOfScreenHight *
+                      AppDimensions.defaultIconSize,
+                ),
+                onTap: () {
+                  _downloadDocument(
+                      fileName, savedName, vesselDetailsModel.docFileFolder!);
+                },
               ),
-              onTap: (){
-                _downloadDocument(fileName,savedName,vesselDetailsModel.docFileFolder!);
-              },
-            ),
           ],
         ),
       );
@@ -464,15 +492,12 @@ class _VesselDetailsState extends State<VesselDetails> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                 Text(
+                Text(
                   'Name Of P & I Club',
                   style: AppStyle.sideDescText,
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  title,
-                  style: AppStyle.defaultTitle
-                ),
+                Text(title, style: AppStyle.defaultTitle),
               ],
             ),
           ),
@@ -482,15 +507,13 @@ class _VesselDetailsState extends State<VesselDetails> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                 Text(
+                Text(
                   'P & I Validity Upto',
                   style: AppStyle.sideDescText,
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  Utils.formatStringDate(expiry),
-                  style: AppStyle.defaultTitle
-                ),
+                Text(Utils.formatStringDate(expiry),
+                    style: AppStyle.defaultTitle),
               ],
             ),
           ),
@@ -499,7 +522,8 @@ class _VesselDetailsState extends State<VesselDetails> {
     );
   }
 
-  Future<void> _downloadDocument(String fileName,String savedName,String folderLocation) async {
+  Future<void> _downloadDocument(
+      String fileName, String savedName, String folderLocation) async {
     try {
       showDialog(
         context: context,
@@ -569,7 +593,8 @@ class _VesselDetailsState extends State<VesselDetails> {
     }
   }
 
-  Future<void> _performDownload(String sourcePath, String destinationPath) async {
+  Future<void> _performDownload(
+      String sourcePath, String destinationPath) async {
     print(sourcePath);
     try {
       final dio = Dio();
@@ -581,7 +606,8 @@ class _VesselDetailsState extends State<VesselDetails> {
           sendTimeout: const Duration(minutes: 5),
         ),
         onReceiveProgress: (received, total) {
-          debugPrint('Download progress: ${(received / total * 100).toStringAsFixed(0)}%');
+          debugPrint(
+              'Download progress: ${(received / total * 100).toStringAsFixed(0)}%');
         },
       );
     } on DioException catch (e) {
@@ -618,64 +644,108 @@ class _VesselDetailsState extends State<VesselDetails> {
       spacing: 16,
       runSpacing: 12,
       children: [
-        infoBlock("Vessel ID", vesselDetailsModel.vesselId??""),
-        infoBlock("IMO No.", vesselDetailsModel.imoNo??""),
-        infoBlock("Vessel Nationality Type",vesselDetailsModel.nationalityType??""),
-        infoBlock("Vessel Name", vesselDetailsModel.vslName??""),
-        infoBlock("Official No",vesselDetailsModel.officialNo??""),
-        infoBlock("Vessel Flag", vesselDetailsModel.nationality??""),
-        infoBlock("Vessel Type", vesselDetailsModel.vslTypeValue??""),
-        infoBlock("Vessel Class", vesselDetailsModel.vesselClassValue??""),
-        infoBlock("Vessel Term", vesselDetailsModel.vesselTermValue??""),
-        infoBlock("Cargo Type", vesselDetailsModel.cargotypeValue??""),
-        infoBlock("MT /MV", vesselDetailsModel.shpPrefix??""),
-        infoBlock("Call Sign", vesselDetailsModel.callsign??""),
-        infoBlock("Type Of Agent",vesselDetailsModel.agency??""),
-        infoBlock("Agent Code", vesselDetailsModel.agentCode??""),
+        infoBlock("Vessel ID", vesselDetailsModel.vesselId ?? ""),
+        infoBlock("IMO No.", vesselDetailsModel.imoNo ?? ""),
+        infoBlock("Vessel Nationality Type",
+            vesselDetailsModel.nationalityType ?? ""),
+        infoBlock("Vessel Name", vesselDetailsModel.vslName ?? ""),
+        infoBlock("Official No", vesselDetailsModel.officialNo ?? ""),
+        infoBlock("Vessel Flag", vesselDetailsModel.nationality ?? ""),
+        infoBlock("Vessel Type", vesselDetailsModel.vslTypeValue ?? ""),
+        infoBlock("Vessel Class", vesselDetailsModel.vesselClassValue ?? ""),
+        infoBlock("Vessel Term", vesselDetailsModel.vesselTermValue ?? ""),
+        infoBlock("Cargo Type", vesselDetailsModel.cargotypeValue ?? ""),
+        infoBlock("MT /MV", vesselDetailsModel.shpPrefix ?? ""),
+        infoBlock("Call Sign", vesselDetailsModel.callsign ?? ""),
+        infoBlock("Type Of Agent", vesselDetailsModel.agency ?? ""),
+        infoBlock("Agent Code", vesselDetailsModel.agentCode ?? ""),
         infoBlock(
           "Port Of Registry",
           "${vesselDetailsModel.placeOfRegistyCode ?? ""} - ${vesselDetailsModel.placeOfRegistyName ?? ""}",
         ),
-        infoBlock("ISPS Compliance", vesselDetailsModel.isps??""),
-        infoBlock("CAP II Certificate", vesselDetailsModel.isCapiiCert??""),
-        infoBlock("Safety Mgmt Certificate",vesselDetailsModel.isSafetyManagCert??""),
-        infoBlock("Year Of Build",vesselDetailsModel.builtYear.toString()??""),
-        infoBlock("Other Vessel Type", vesselDetailsModel.otherVslTypeValue??""),
-        infoBlock("Shipping Line Name / Operator","${vesselDetailsModel.shippingAgentCode ?? ""} - ${vesselDetailsModel.shippingAgent ?? ""}"),
+        infoBlock("ISPS Compliance", vesselDetailsModel.isps ?? ""),
+        infoBlock("CAP II Certificate", vesselDetailsModel.isCapiiCert ?? ""),
+        infoBlock("Safety Mgmt Certificate",
+            vesselDetailsModel.isSafetyManagCert ?? ""),
+        infoBlock(
+            "Year Of Build", vesselDetailsModel.builtYear.toString() ?? ""),
+        infoBlock(
+            "Other Vessel Type", vesselDetailsModel.otherVslTypeValue ?? ""),
+        infoBlock("Shipping Line Name / Operator",
+            "${vesselDetailsModel.shippingAgentCode ?? ""} - ${vesselDetailsModel.shippingAgent ?? ""}"),
       ],
     );
   }
 
   Widget ownerAgentContent() => Wrap(spacing: 16, runSpacing: 12, children: [
-        infoBlock("Owner Name", vesselDetailsModel.ownerName??""),
-        infoBlock("Owner Address",vesselDetailsModel.ownerAddress??""),
-        infoBlock("Owner Country",vesselDetailsModel.ownerCountry??""),
-        infoBlock("Agent Code", vesselDetailsModel.agencyCode??""),
-        infoBlock("Ship Agent Name", vesselDetailsModel.agentName??""),
-        infoBlock("Ship Agent Address",  vesselDetailsModel.agentAddress??""),
-        infoBlock("Ship Agent Country",  vesselDetailsModel.agentCountry??""),
-        infoBlock("Ship Agent State", vesselDetailsModel.agentState??""),
-        infoBlock("Ship Agent District",  vesselDetailsModel.agentCity??""),
-        infoBlock("Ship Agent Postcode", vesselDetailsModel.agentPincode??""),
-        infoBlock("Ship Agent E-Mail",  vesselDetailsModel.agentEmail??""),
-        infoBlock("Ship Agent Mobile No",  vesselDetailsModel.agentMobNo??""),
+        infoBlock("Owner Name", vesselDetailsModel.ownerName ?? ""),
+        infoBlock("Owner Address", vesselDetailsModel.ownerAddress ?? ""),
+        infoBlock("Owner Country", vesselDetailsModel.ownerCountry ?? ""),
+        infoBlock("Agent Code", vesselDetailsModel.agencyCode ?? ""),
+        infoBlock("Ship Agent Name", vesselDetailsModel.agentName ?? ""),
+        infoBlock("Ship Agent Address", vesselDetailsModel.agentAddress ?? ""),
+        infoBlock("Ship Agent Country", vesselDetailsModel.agentCountry ?? ""),
+        infoBlock("Ship Agent State", vesselDetailsModel.agentState ?? ""),
+        infoBlock("Ship Agent District", vesselDetailsModel.agentCity ?? ""),
+        infoBlock("Ship Agent Postcode", vesselDetailsModel.agentPincode ?? ""),
+        infoBlock("Ship Agent E-Mail", vesselDetailsModel.agentEmail ?? ""),
+        infoBlock("Ship Agent Mobile No", vesselDetailsModel.agentMobNo ?? ""),
       ]);
 
   Widget shipperDimensionContent() =>
       Wrap(spacing: 16, runSpacing: 12, children: [
-        infoBlock("Beam", vesselDetailsModel.beam != null ? "${vesselDetailsModel.beam!.toStringAsFixed(3)} ${vesselDetailsModel.beamUnit}": ""),
-        infoBlock("LOA",  vesselDetailsModel.loa != null ? "${vesselDetailsModel.loa!.toStringAsFixed(3)} ${vesselDetailsModel.loaUnit}": ""),
-        infoBlock("LBP",  vesselDetailsModel.lbp != null ? "${vesselDetailsModel.lbp!.toStringAsFixed(3)} ${vesselDetailsModel.lbpUnit}": ""),
-        infoBlock("Position Of Bridge",vesselDetailsModel.positionofBridge??""),
-        infoBlock("Area Of Operation", vesselDetailsModel.areaOperationValue??""),
-        infoBlock("Gross Tonnage", vesselDetailsModel.grt != null ? "${vesselDetailsModel.grt!.toStringAsFixed(3)} ${vesselDetailsModel.grtUnit}": ""),
-        infoBlock("Net Tonnage", vesselDetailsModel.nrt != null ? "${vesselDetailsModel.nrt!.toStringAsFixed(3)} ${vesselDetailsModel.nrtUnit}": ""),
-        infoBlock("Tropical DWT", vesselDetailsModel.dwt != null ? "${vesselDetailsModel.dwt!.toStringAsFixed(3)} ${vesselDetailsModel.dwtUnit}": ""),
-        infoBlock("Standard Draught", vesselDetailsModel.standardDraught != null ? "${vesselDetailsModel.standardDraught!.toStringAsFixed(3)} ${vesselDetailsModel.draughtUnit}": ""),
-        infoBlock("Displacement", vesselDetailsModel.displacement != null ? "${vesselDetailsModel.displacement!.toStringAsFixed(3)} ${vesselDetailsModel.displacementUnit}": ""),
-        infoBlock("Vessel Capacity", vesselDetailsModel.vesselCapacity != null ? "${vesselDetailsModel.vesselCapacity!.toStringAsFixed(3)} ${vesselDetailsModel.vesselCapUnit}": ""),
-        infoBlock("Vessel With Gear", (vesselDetailsModel.vslWithGearId ?? 0) == 1 ? "Yes" : "No"),
-        infoBlock("Type of Hull",vesselDetailsModel.hullTypeValue??""),
+        infoBlock(
+            "Beam",
+            vesselDetailsModel.beam != null
+                ? "${vesselDetailsModel.beam!.toStringAsFixed(3)} ${vesselDetailsModel.beamUnit}"
+                : ""),
+        infoBlock(
+            "LOA",
+            vesselDetailsModel.loa != null
+                ? "${vesselDetailsModel.loa!.toStringAsFixed(3)} ${vesselDetailsModel.loaUnit}"
+                : ""),
+        infoBlock(
+            "LBP",
+            vesselDetailsModel.lbp != null
+                ? "${vesselDetailsModel.lbp!.toStringAsFixed(3)} ${vesselDetailsModel.lbpUnit}"
+                : ""),
+        infoBlock(
+            "Position Of Bridge", vesselDetailsModel.positionofBridge ?? ""),
+        infoBlock(
+            "Area Of Operation", vesselDetailsModel.areaOperationValue ?? ""),
+        infoBlock(
+            "Gross Tonnage",
+            vesselDetailsModel.grt != null
+                ? "${vesselDetailsModel.grt!.toStringAsFixed(3)} ${vesselDetailsModel.grtUnit}"
+                : ""),
+        infoBlock(
+            "Net Tonnage",
+            vesselDetailsModel.nrt != null
+                ? "${vesselDetailsModel.nrt!.toStringAsFixed(3)} ${vesselDetailsModel.nrtUnit}"
+                : ""),
+        infoBlock(
+            "Tropical DWT",
+            vesselDetailsModel.dwt != null
+                ? "${vesselDetailsModel.dwt!.toStringAsFixed(3)} ${vesselDetailsModel.dwtUnit}"
+                : ""),
+        infoBlock(
+            "Standard Draught",
+            vesselDetailsModel.standardDraught != null
+                ? "${vesselDetailsModel.standardDraught!.toStringAsFixed(3)} ${vesselDetailsModel.draughtUnit}"
+                : ""),
+        infoBlock(
+            "Displacement",
+            vesselDetailsModel.displacement != null
+                ? "${vesselDetailsModel.displacement!.toStringAsFixed(3)} ${vesselDetailsModel.displacementUnit}"
+                : ""),
+        infoBlock(
+            "Vessel Capacity",
+            vesselDetailsModel.vesselCapacity != null
+                ? "${vesselDetailsModel.vesselCapacity!.toStringAsFixed(3)} ${vesselDetailsModel.vesselCapUnit}"
+                : ""),
+        infoBlock("Vessel With Gear",
+            (vesselDetailsModel.vslWithGearId ?? 0) == 1 ? "Yes" : "No"),
+        infoBlock("Type of Hull", vesselDetailsModel.hullTypeValue ?? ""),
       ]);
 
   // Widget pAndIDetailsContent() =>
@@ -695,30 +765,23 @@ class _VesselDetailsState extends State<VesselDetails> {
     return Column(
       children: vesselDetailsModel.pAndIList != null
           ? vesselDetailsModel.pAndIList!.map((pi) {
-        return pIRow(
-            pi.piName??"" ,
-            pi.piValidityUpto??""
-        );
-      }).toList()
-          : [
-        infoRow("No P & I Details available", "")
-      ],
+              return pIRow(pi.piName ?? "", pi.piValidityUpto ?? "");
+            }).toList()
+          : [infoRow("No P & I Details available", "")],
     );
   }
+
   Widget attachedDocumentsContent() {
     return Column(
       children: vesselDetailsModel.documentList != null
           ? vesselDetailsModel.documentList!.map((document) {
-        return documentRow(
-            document.docTitle ?? "Untitled Document",
-            document.docExpiry ?? "No expiry date",
-            document.fileName!,
-          document.saveFileName!
-        );
-      }).toList()
-          : [
-        documentRow("No documents available", "","","")
-      ],
+              return documentRow(
+                  document.docTitle ?? "Untitled Document",
+                  document.docExpiry ?? "No expiry date",
+                  document.fileName ?? "",
+                  document.saveFileName ?? "");
+            }).toList()
+          : [documentRow("No documents available", "", "", "")],
     );
   }
 
@@ -739,7 +802,7 @@ class _VesselDetailsState extends State<VesselDetails> {
       ),
       builder: (context) {
         return StatefulBuilder(
-          builder: (context ,setState){
+          builder: (context, setState) {
             return Padding(
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -833,6 +896,4 @@ class _VesselDetailsState extends State<VesselDetails> {
       },
     );
   }
-
 }
-

@@ -415,7 +415,8 @@ class _EpanListingState extends State<EpanListing> {
               vesselId: vesselId,
               imoName: imoName,
               vesselName: vesselName,
-              scn: scn);
+              scn: scn,
+          status: selectedStatusValue);
 
           Navigator.pop(context);
         }

@@ -406,7 +406,7 @@ class _VesselListingState extends State<VesselListing> {
             currentPage = 1;
           });
           getAllVessels(
-              vesselId: vesselId, imoName: imoName, vesselName: vesselName);
+              vesselId: vesselId, imoName: imoName, vesselName: vesselName,status: selectedFilter);
 
           Navigator.pop(context);
         }
