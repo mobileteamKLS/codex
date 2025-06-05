@@ -512,9 +512,9 @@ class _EpanDetailsState extends State<EpanDetails> {
         Container(color: AppColors.cardBg,
             padding: EdgeInsets.all(8),
             child: portCallsContent()),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         additionalSecurityReasonSection(),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         weaponReasonSection(),
       ],
     );

@@ -16,6 +16,7 @@ import '../../../widgets/appdrawer.dart';
 import '../../../widgets/buttons.dart';
 import '../../../widgets/text_field.dart';
 import '../../vessel/model/vessel_list_model.dart';
+import '../detailsPage/departureClearanceDetails.dart';
 import 'model/departureListModel.dart';
 
 class DepartureListing extends StatefulWidget {
@@ -815,17 +816,15 @@ class _DepartureListingState extends State<DepartureListing> {
             const SizedBox(height: 4),
             InkWell(
               onTap: () {
-                // Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) => EpanDetails(
-                //           refNo: vesselDetails.referenceNo,
-                //           pvrId: vesselDetails.naId,
-                //           marineBranchId: int.parse(
-                //               vesselDetails.marineBranchId ?? "0"),
-                //           isSubmit: (vesselDetails.status == "Submitted"),
-                //           vesselId: vesselDetails.vesselid,
-                //         )));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => DepartureClearanceDetails(
+                          refNo: vesselDetails.referenceNo!,
+                          drId: vesselDetails.drId!,
+                          marineBranchId:0,
+                          isSubmit: (vesselDetails.status == "Submitted"),
+                        )));
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
