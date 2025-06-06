@@ -420,7 +420,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
   }
 
   Widget documentRow(
-      String title, String expiry, String fileName, String savedName) =>
+      String title, String expiry, String fileName, String savedName, String folderPath) =>
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
@@ -447,8 +447,8 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                       AppDimensions.defaultIconSize,
                 ),
                 onTap: () {
-                  // _downloadDocument(
-                  //     fileName, savedName, vesselDetailsModel.docFileFolder!);
+                  _downloadDocument(
+                      fileName, savedName, folderPath);
                 },
               ),
           ],
@@ -1149,19 +1149,20 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
   //   );
   // }
   //
-  // Widget attachedDocumentsContent() {
-  //   return Column(
-  //     children: vesselDetailsModel.documentList != null
-  //         ? vesselDetailsModel.documentList!.map((document) {
-  //       return documentRow(
-  //           document.docTitle ?? "Untitled Document",
-  //           document.docExpiry ?? "No expiry date",
-  //           document.fileName ?? "",
-  //           document.saveFileName ?? "");
-  //     }).toList()
-  //         : [documentRow("No documents available", "", "", "")],
-  //   );
-  // }
+  Widget attachedDocumentsContent() {
+    return Column(
+      children: vesselDetailsModel.lstUploadDetails != null
+          ? vesselDetailsModel.lstUploadDetails!.map((document) {
+        return documentRow(
+            document.docTitle ?? "Untitled Document",
+            document.docExpiry ?? "No expiry date",
+            document.fileName ?? "",
+            document.saveFileName ?? "",
+            "${vesselDetailsModel.docFileFolderDcAttachment ?? ""}/");
+      }).toList()
+          : [documentRow("No documents available", "", "", "","")],
+    );
+  }
 
   void showRejectWithCommentsBottomSheet({
     required BuildContext context,
