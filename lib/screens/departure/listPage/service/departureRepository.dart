@@ -7,7 +7,8 @@ abstract class DepartureRepository {
     String? vesselId,
     String? imoName,
     String? vesselName,
-    String? status,
+    String? scn,
+    int? status,
     int pageIndex = 1,
     int pageSize = 200,
   });
@@ -19,7 +20,8 @@ class VesselRepositoryImpl implements DepartureRepository {
     String? vesselId,
     String? imoName,
     String? vesselName,
-    String? status,
+    String? scn,
+    int? status,
     int pageIndex = 1,
     int pageSize = 200,
   }) async {
@@ -34,10 +36,10 @@ class VesselRepositoryImpl implements DepartureRepository {
           "Client": loginDetailsMaster.userAccountTypeId,
           "NameofAgent": loginDetailsMaster.orgTypeName,
           "VesselName": vesselName,
-          "VCN":null,
-          "IMONo": null,
+          "VCN":scn,
+          "IMONo": imoName,
           "FlagOfVessel": null,
-          "status": null,
+          "status": status,
           "ClearanceType": null,
           "NameOfMaster": null,
           "VesselType": null,
@@ -52,7 +54,7 @@ class VesselRepositoryImpl implements DepartureRepository {
           "CountryID": configMaster.countryId,
           "IsExportToExcel": null,
           "DR_ID": null,
-          "VesselID": null
+          "VesselID": vesselId
         },
       );
 

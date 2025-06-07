@@ -12,6 +12,7 @@ import '../../../core/media_query.dart';
 import '../../../theme/app_color.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/common_utils.dart';
+import '../../../utils/role_util.dart';
 import '../../../widgets/appdrawer.dart';
 import '../../../widgets/buttons.dart';
 import '../../../widgets/text_field.dart';
@@ -32,26 +33,48 @@ class _DepartureListingState extends State<DepartureListing> {
 
   // Controllers for search fields
   late TextEditingController vesselIdController;
+  late TextEditingController scnController;
   late TextEditingController imoNumberController;
   late TextEditingController vesselNameController;
+  String vesselId = "";
+  String imoName = "";
+  String vesselName = "";
+  String scn = "";
   bool _isLoadingMore = false;
-  final List<Map<String, String>> statusList = [
-    {"label": "Created", "value": "Created"},
-    {"label": "Submitted", "value": "Submitted"},
-    {"label": "Approved", "value": "Approved"},
-    {"label": "Rejected", "value": "Rejected"},
-    {"label": "Inactive", "value": "Inactive"},
-    {"label": "Blacklisted", "value": "Suspended"},
-    {"label": "Cancelled", "value": "Cancelled"},
-  ];
+  int? selectedStatusValue;
+  late List<Map<String, dynamic>> statusList = [];
 
   @override
   void initState() {
+    if (OrganizationService.isShippingAgent) {
+      statusList = [
+        {"label": "Submitted", "value": 1},
+        {"label": "Approved", "value": 2},
+        {"label": "Rejected", "value": 3},
+        {"label": "Created", "value": 4},
+        {"label": "Checked", "value": 5},
+        {"label": "Cancelled", "value": 6},
+        {"label": "Void", "value": 7},
+        {"label": "Closed", "value": 8},
+      ];
+    } else {
+      statusList = [
+        {"label": "Submitted", "value": 1},
+        {"label": "Approved", "value": 2},
+        {"label": "Rejected", "value": 3},
+        {"label": "Checked", "value": 5},
+        {"label": "Cancelled", "value": 6},
+        {"label": "Void", "value": 7},
+        {"label": "Closed", "value": 8},
+      ];
+    }
+
     super.initState();
     _scrollController = ScrollController();
     _vesselCubit = context.read<DepartureCubit>();
 
     vesselIdController = TextEditingController();
+    scnController = TextEditingController();
     imoNumberController = TextEditingController();
     vesselNameController = TextEditingController();
 
@@ -64,6 +87,7 @@ class _DepartureListingState extends State<DepartureListing> {
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     vesselIdController.dispose();
+    scnController.dispose();
     imoNumberController.dispose();
     vesselNameController.dispose();
     super.dispose();
@@ -78,10 +102,11 @@ class _DepartureListingState extends State<DepartureListing> {
       final state = _vesselCubit.state;
       if (state is DepartureLoaded && state.hasMoreData) {
         // Check if we're already loading more data
-        if (!_isLoadingMore) {  // Add this check
-          _isLoadingMore = true;  // Set loading flag
+        if (!_isLoadingMore) {
+          // Add this check
+          _isLoadingMore = true; // Set loading flag
           _vesselCubit.loadMoreVessels().then((_) {
-            _isLoadingMore = false;  // Reset loading flag when done
+            _isLoadingMore = false; // Reset loading flag when done
           });
         }
       }
@@ -179,7 +204,8 @@ class _DepartureListingState extends State<DepartureListing> {
                 ),
               ),
               const SizedBox(width: 5),
-              Text('Departure Clearance Listing', style: AppStyle.defaultHeading),
+              Text('Departure Clearance Listing',
+                  style: AppStyle.defaultHeading),
             ],
           ),
           Row(
@@ -199,7 +225,7 @@ class _DepartureListingState extends State<DepartureListing> {
               ),
               SizedBox(width: ScreenDimension.onePercentOfScreenWidth * 4),
               InkWell(
-                onTap: () => _showVesselFilterBottomSheet(context),
+                onTap: () => showVesselFilterBottomSheet(context),
                 child: Padding(
                   padding: const EdgeInsets.all(2.0),
                   child: SvgPicture.asset(
@@ -245,35 +271,36 @@ class _DepartureListingState extends State<DepartureListing> {
               child: SingleChildScrollView(
                 controller: _scrollController,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 8.0, left: 0.0, bottom: 80),
+                  padding:
+                      const EdgeInsets.only(top: 8.0, left: 0.0, bottom: 80),
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width / 1.01,
                     child: state.hasNoRecord
                         ? const SizedBox(
-                      height: 400,
-                      child: Center(child: Text("No Data Found")),
-                    )
+                            height: 400,
+                            child: Center(child: Text("No Data Found")),
+                          )
                         : Column(
-                      children: [
-                        ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            return buildVesselCard(
-                                vesselDetails: state.vessels[index],
-                                index: index);
-                          },
-                          itemCount: state.vessels.length,
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.all(2),
-                        ),
-                        if (state is DepartureLoadingMore)
-                          const Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: CircularProgressIndicator(
-                                color: AppColors.primary),
+                            children: [
+                              ListView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemBuilder: (context, index) {
+                                  return buildVesselCard(
+                                      vesselDetails: state.vessels[index],
+                                      index: index);
+                                },
+                                itemCount: state.vessels.length,
+                                shrinkWrap: true,
+                                padding: const EdgeInsets.all(2),
+                              ),
+                              if (state is DepartureLoadingMore)
+                                const Padding(
+                                  padding: EdgeInsets.all(16.0),
+                                  child: CircularProgressIndicator(
+                                      color: AppColors.primary),
+                                ),
+                            ],
                           ),
-                      ],
-                    ),
                   ),
                 ),
               ),
@@ -291,7 +318,10 @@ class _DepartureListingState extends State<DepartureListing> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () => _vesselCubit.loadVessels(isRefresh: true),
-                    child: const Text('Retry',style: TextStyle(color: Colors.white),),
+                    child: const Text(
+                      'Retry',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
@@ -340,7 +370,8 @@ class _DepartureListingState extends State<DepartureListing> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.only(bottom: 16, right: 16, top: 16, left: 16),
+          padding:
+              const EdgeInsets.only(bottom: 16, right: 16, top: 16, left: 16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -382,7 +413,8 @@ class _DepartureListingState extends State<DepartureListing> {
           thickness: 1,
         ),
         Padding(
-          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 0),
+          padding: const EdgeInsets.only(
+              left: 16.0, right: 16.0, top: 16.0, bottom: 0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -416,6 +448,7 @@ class _DepartureListingState extends State<DepartureListing> {
                 ),
                 onTap: () {
                   vesselIdController.clear();
+                  scnController.clear();
                   imoNumberController.clear();
                   vesselNameController.clear();
                 },
@@ -432,6 +465,12 @@ class _DepartureListingState extends State<DepartureListing> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
+          CustomTextField(
+            controller: scnController,
+            labelText: "SCN",
+            isValidationRequired: false,
+          ),
+          SizedBox(height: ScreenDimension.onePercentOfScreenHight * 1.5),
           CustomTextField(
             controller: vesselIdController,
             labelText: "Vessel ID",
@@ -477,6 +516,7 @@ class _DepartureListingState extends State<DepartureListing> {
                   verticalPadding: 10,
                   press: () {
                     vesselIdController.clear();
+                    scnController.clear();
                     imoNumberController.clear();
                     vesselNameController.clear();
                     Navigator.pop(context);
@@ -488,10 +528,15 @@ class _DepartureListingState extends State<DepartureListing> {
                 child: ButtonWidgets.buildRoundedGradientButton(
                   text: 'Search',
                   press: () {
+                    vesselId = vesselIdController.text.trim();
+                    imoName = imoNumberController.text.trim();
+                    vesselName = vesselNameController.text.trim();
+                    scn = scnController.text.trim();
                     _vesselCubit.searchVessels(
-                      vesselId: vesselIdController.text,
-                      imoName: imoNumberController.text,
-                      vesselName: vesselNameController.text,
+                      vesselId: vesselId,
+                      imoName: imoName,
+                      vesselName: vesselName,
+                      scn: scn,
                     );
                     Navigator.pop(context);
                   },
@@ -514,7 +559,7 @@ class _DepartureListingState extends State<DepartureListing> {
       builder: (BuildContext context) {
         return BlocBuilder<DepartureCubit, DepartureState>(
           builder: (context, state) {
-            String? selectedFilter;
+            int? selectedFilter;
             if (state is DepartureLoaded) {
               selectedFilter = state.appliedFilter;
             }
@@ -543,7 +588,7 @@ class _DepartureListingState extends State<DepartureListing> {
     );
   }
 
-  Widget _buildFilterHeader(StateSetter setState, String? selectedFilter) {
+  Widget _buildFilterHeader(StateSetter setState, int? selectedFilter) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -592,12 +637,13 @@ class _DepartureListingState extends State<DepartureListing> {
     );
   }
 
-  Widget _buildStatusFilters(StateSetter setState, String? selectedFilter) {
+  Widget _buildStatusFilters(StateSetter setState, int? selectedFilter) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 0),
+          padding: const EdgeInsets.only(
+              left: 16.0, right: 16.0, top: 16.0, bottom: 0),
           child: Text(
             "SORT BY STATUS",
             style: TextStyle(
@@ -652,7 +698,7 @@ class _DepartureListingState extends State<DepartureListing> {
     );
   }
 
-  Widget _buildFilterButtons(String? selectedFilter) {
+  Widget _buildFilterButtons(int? selectedFilter) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -680,6 +726,178 @@ class _DepartureListingState extends State<DepartureListing> {
           ),
         ],
       ),
+    );
+  }
+
+  void showVesselFilterBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.white,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (BuildContext context) {
+        TextEditingController originController = TextEditingController();
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return FractionallySizedBox(
+              widthFactor: 1,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Filter/Sort',
+                            style: AppStyle.defaultHeading,
+                          ),
+                          InkWell(
+                            child: Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: SvgPicture.asset(
+                                    clear,
+                                    height: ScreenDimension
+                                        .onePercentOfScreenHight *
+                                        AppDimensions.cardIconsSize,
+                                  ),
+                                ),
+                                Text("Clear",
+                                    style: TextStyle(
+                                      color: AppColors.primary,
+                                      fontSize: ScreenDimension.textSize *
+                                          AppDimensions.bodyTextLarge,
+                                      fontWeight: FontWeight.w500,
+                                    )),
+                              ],
+                            ),
+                            onTap: () {
+                              setState(() {
+                                selectedStatusValue = null;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    Utils.customDivider(
+                      space: 0,
+                      color: Colors.black,
+                      hasColor: true,
+                      thickness: 1,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 16.0, right: 16.0, top: 16.0, bottom: 0),
+                      child: Text(
+                        "SORT BY STATUS",
+                        style: TextStyle(
+                          fontSize: ScreenDimension.textSize *
+                              AppDimensions.bodyTextSmall,
+                          color: AppColors.textColorSecondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 8.0),
+                      child: Wrap(
+                        spacing: 8.0,
+                        children: statusList.map((status) {
+                          bool isSelected =
+                          (selectedStatusValue == status["value"]);
+
+                          return FilterChip(
+                            label: Text(
+                              status["label"],
+                              style: const TextStyle(color: AppColors.primary),
+                            ),
+                            selected: isSelected,
+                            showCheckmark: false,
+                            onSelected: (bool selected) {
+                              setState(() {
+                                if (selected) {
+                                  selectedStatusValue = status["value"] as int;
+                                } else {
+                                  selectedStatusValue = null;
+                                }
+                                print(
+                                    "Selected status value: $selectedStatusValue");
+                              });
+                            },
+                            selectedColor: AppColors.primary.withOpacity(0.1),
+                            backgroundColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                              side: BorderSide(
+                                color: isSelected
+                                    ? AppColors.primary
+                                    : Colors.transparent,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    Utils.customDivider(
+                      space: 0,
+                      color: Colors.black,
+                      hasColor: true,
+                      thickness: 1,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ButtonWidgets.buildRoundedGradientButton(
+                              text: 'Cancel',
+                              isborderButton: true,
+                              textColor: AppColors.primary,
+                              verticalPadding: 10,
+                              press: () {
+                                setState(() {
+                                  selectedStatusValue = null;
+                                });
+
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Expanded(
+                            child: ButtonWidgets.buildRoundedGradientButton(
+                              text: 'Apply',
+                              press: () {
+                                Navigator.pop(context);
+                                if (selectedStatusValue != null) {
+                                  _vesselCubit.applyStatusFilter(selectedStatusValue);
+                                  // Navigator.pop(context);
+                                } else {
+                                  // _refreshData();
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -732,7 +950,7 @@ class _DepartureListingState extends State<DepartureListing> {
               children: [
                 Expanded(
                   child: Text(
-                    vesselDetails.referenceNo??"",
+                    vesselDetails.referenceNo ?? "",
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -742,13 +960,14 @@ class _DepartureListingState extends State<DepartureListing> {
                 ),
                 Container(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: ColorUtils.getStatusColor(vesselDetails.status??""),
+                    color:
+                        ColorUtils.getStatusColor(vesselDetails.status ?? ""),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
-                    vesselDetails.status??"",
+                    vesselDetails.status ?? "",
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
@@ -773,9 +992,10 @@ class _DepartureListingState extends State<DepartureListing> {
                       // Utils.buildCompactLabelValue('IMO No.', vesselDetails.imoNo),
 
                       Utils.buildCompactLabelValue(
-                          'Vessel Name', vesselDetails.vesselName??""),
+                          'Vessel Name', vesselDetails.vesselName ?? ""),
 
-                      Utils.buildCompactLabelValue('SCN', vesselDetails.vcn??''),
+                      Utils.buildCompactLabelValue(
+                          'SCN', vesselDetails.vcn ?? ''),
                       // Assuming callsign maps to SCN// You may need to add this field to your model
                     ],
                   ),
@@ -820,11 +1040,11 @@ class _DepartureListingState extends State<DepartureListing> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => DepartureClearanceDetails(
-                          refNo: vesselDetails.referenceNo!,
-                          drId: vesselDetails.drId!,
-                          marineBranchId:0,
-                          isSubmit: (vesselDetails.status == "Submitted"),
-                        )));
+                              refNo: vesselDetails.referenceNo!,
+                              drId: vesselDetails.drId!,
+                              marineBranchId: 0,
+                              isSubmit: (vesselDetails.status == "Submitted"),
+                            )));
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

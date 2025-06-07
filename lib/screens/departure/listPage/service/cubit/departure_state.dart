@@ -28,7 +28,7 @@ class DepartureLoaded extends DepartureState {
   final bool hasMoreData;
   final bool hasNoRecord;
   final int currentPage;
-  final String? appliedFilter;
+  final int? appliedFilter;
   final VesselSearchFilters searchFilters;
 
   const DepartureLoaded({
@@ -45,7 +45,7 @@ class DepartureLoaded extends DepartureState {
     bool? hasMoreData,
     bool? hasNoRecord,
     int? currentPage,
-    String? appliedFilter,
+    int? appliedFilter,
     VesselSearchFilters? searchFilters,
   }) {
     return DepartureLoaded(
@@ -80,17 +80,20 @@ class VesselError extends DepartureState {
 
 class VesselSearchFilters extends Equatable {
   final String? vesselId;
+  final String? scn;
   final String? imoName;
   final String? vesselName;
 
   const VesselSearchFilters({
     this.vesselId,
+    this.scn,
     this.imoName,
     this.vesselName,
   });
 
   bool get hasFilters =>
       (vesselId?.isNotEmpty ?? false) ||
+          (scn?.isNotEmpty ?? false) ||
           (imoName?.isNotEmpty ?? false) ||
           (vesselName?.isNotEmpty ?? false);
 
@@ -98,11 +101,13 @@ class VesselSearchFilters extends Equatable {
     String? vesselId,
     String? imoName,
     String? vesselName,
+    String? scn,
   }) {
     return VesselSearchFilters(
       vesselId: vesselId ?? this.vesselId,
       imoName: imoName ?? this.imoName,
       vesselName: vesselName ?? this.vesselName,
+      scn: vesselName ?? this.scn,
     );
   }
 
@@ -111,5 +116,5 @@ class VesselSearchFilters extends Equatable {
   }
 
   @override
-  List<Object?> get props => [vesselId, imoName, vesselName];
+  List<Object?> get props => [vesselId, imoName, vesselName,scn];
 }

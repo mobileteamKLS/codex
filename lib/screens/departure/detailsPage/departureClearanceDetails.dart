@@ -420,7 +420,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
   }
 
   Widget documentRow(
-      String title, String expiry, String fileName, String savedName, String folderPath) =>
+      String title, String expiry, String fileName, String savedName, String folderPath,{ bool isExpiry = false,}) =>
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
@@ -431,7 +431,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                   children: [
                     Text(title, style: AppStyle.defaultTitle),
                     const SizedBox(height: 2),
-                    Text(
+                    if(!isExpiry) Text(
                       "Expires on $expiry",
                       style: AppStyle.sideDescText,
                     ),
@@ -625,7 +625,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
             vesselDetailsModel.vesselNationalityType ?? ""),
         infoBlock("Vessel Name", vesselDetailsModel.vesselName ?? ""),
         infoBlock("Voyage No", vesselDetailsModel.voyage ?? ""),
-        infoBlock("Port Name", "=="),
+        infoBlock("Port Name", ""),
         infoBlock("Vessel Type", vesselDetailsModel.vesselTypeName ?? ""),
         infoBlock("Estimated Date and Time of Arrival", vesselDetailsModel.arrivalDt != null ? Utils.formatStringDate(vesselDetailsModel.arrivalDt, showTime: true):""),
         infoBlock("Estimated Date and Time of Departure",  vesselDetailsModel.departureDt != null ? Utils.formatStringDate(vesselDetailsModel.departureDt, showTime: true):""),
@@ -684,7 +684,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
       padding: EdgeInsets.all(8),
       child: Column(
         children: [
-          portCallItem("Tonnage of Cargo","Containerised","Net Wight", "As per Manifest","UOM","MTS"),
+          portCallItem("Tonnage of Cargo","Containerised","Net Wight", vesselDetailsModel.containerised==null?"AS PER MANIFEST":"","UOM",vesselDetailsModel.contUnit??""),
           const SizedBox(height: 12),
           Divider(
             color: Colors.grey[300],
@@ -692,7 +692,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
             height: 1,
           ),
           const SizedBox(height: 12),
-          portCallItem("Tonnage of Cargo","Non-Containerised","Net Wight", "As per Manifest","UOM","MTS"),
+          portCallItem("Tonnage of Cargo","Non-Containerised","Net Wight", vesselDetailsModel.containerised==null?"AS PER MANIFEST":"","UOM",vesselDetailsModel.nonConUnit??""),
           const SizedBox(height: 12),
           Divider(
             color: Colors.grey[300],
@@ -700,7 +700,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
             height: 1,
           ),
           const SizedBox(height: 12),
-          portCallItem("Total Container","Empty","20", "As per Manifest","40","As per Manifest"),
+          portCallItem("Total Container","Empty","20", vesselDetailsModel.containerised==null?"AS PER MANIFEST":"","40",vesselDetailsModel.containerised==null?"AS PER MANIFEST":""),
           const SizedBox(height: 12),
           Divider(
             color: Colors.grey[300],
@@ -708,7 +708,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
             height: 1,
           ),
           const SizedBox(height: 12),
-          portCallItem("Total Container","Loaded","20", "As per Manifest","40","As per Manifest"),
+          portCallItem("Total Container","Loaded","20", vesselDetailsModel.containerised==null?"AS PER MANIFEST":"","40",vesselDetailsModel.containerised==null?"AS PER MANIFEST":""),
           const SizedBox(height: 12),
           Divider(
             color: Colors.grey[300],
@@ -716,7 +716,8 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
             height: 1,
           ),
           const SizedBox(height: 12),
-          portCallItem("Description of Goods","As per Manifest","Gross Wight", "As per Manifest","Remarks","As per Manifest"),
+          cargoList()
+          //portCallItem("Description of Goods","AS PER MANIFEST","Gross Wight", "AS PER MANIFEST","Remarks","AS PER MANIFEST"),
         ],
       ),
     );
@@ -731,6 +732,23 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
         return Column(
           children: [
             buildPassportCardAlternative(crewData:crew ),
+            if (!isLast) ...[
+              const SizedBox(height: 8),
+            ],
+          ],
+        );
+      }).toList() ?? [],
+    );
+  }
+  Widget cargoList(){
+    return Column(
+      children: vesselDetailsModel.lstGoods?.asMap().entries.map((entry) {
+        int index = entry.key;
+        var goods = entry.value;
+        bool isLast = index == vesselDetailsModel.lstGoods!.length - 1;
+        return Column(
+          children: [
+            portCallItem("Description of Goods",goods.descName??"","Gross Wight", goods.grossWeight??"","Remarks",goods.remarks??""),
             if (!isLast) ...[
               const SizedBox(height: 8),
             ],
@@ -1155,7 +1173,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
           ? vesselDetailsModel.lstUploadDetails!.map((document) {
         return documentRow(
             document.docTitle ?? "Untitled Document",
-            document.docExpiry ?? "No expiry date",
+            document.docExpiry ?? "-",
             document.fileName ?? "",
             document.saveFileName ?? "",
             "${vesselDetailsModel.docFileFolderDcAttachment ?? ""}/");

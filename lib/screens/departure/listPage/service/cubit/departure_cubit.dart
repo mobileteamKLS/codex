@@ -24,7 +24,7 @@ class DepartureCubit extends Cubit<DepartureState> {
 
   Future<void> loadVessels({
     bool isRefresh = false,
-    String? statusFilter,
+    int? statusFilter,
     VesselSearchFilters? searchFilters,
   }) async {
     try {
@@ -36,6 +36,7 @@ class DepartureCubit extends Cubit<DepartureState> {
         vesselId: searchFilters?.vesselId,
         imoName: searchFilters?.imoName,
         vesselName: searchFilters?.vesselName,
+        scn:searchFilters?.scn,
         status: statusFilter,
         pageIndex: 1,
         pageSize: _pageSize,
@@ -97,14 +98,16 @@ class DepartureCubit extends Cubit<DepartureState> {
     required String? vesselId,
     required String? imoName,
     required String? vesselName,
+    required String? scn,
   }) async {
     final searchFilters = VesselSearchFilters(
       vesselId: vesselId?.trim().isEmpty == true ? null : vesselId?.trim(),
       imoName: imoName?.trim().isEmpty == true ? null : imoName?.trim(),
       vesselName: vesselName?.trim().isEmpty == true ? null : vesselName?.trim(),
+      scn: scn?.trim().isEmpty == true ? null : scn?.trim(),
     );
 
-    String? currentStatusFilter;
+    int? currentStatusFilter;
     if (state is DepartureLoaded) {
       currentStatusFilter = (state as DepartureLoaded).appliedFilter;
     }
@@ -116,7 +119,7 @@ class DepartureCubit extends Cubit<DepartureState> {
     );
   }
 
-  Future<void> applyStatusFilter(String? statusFilter) async {
+  Future<void> applyStatusFilter(int? statusFilter) async {
     VesselSearchFilters? currentSearchFilters;
     if (state is DepartureLoaded) {
       currentSearchFilters = (state as DepartureLoaded).searchFilters;
@@ -138,7 +141,7 @@ class DepartureCubit extends Cubit<DepartureState> {
   }
 
   Future<void> refreshData() async {
-    String? currentStatusFilter;
+    int? currentStatusFilter;
     VesselSearchFilters? currentSearchFilters;
 
     if (state is DepartureLoaded) {
