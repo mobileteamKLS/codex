@@ -35,6 +35,7 @@ class VesselDetailsModel {
   String? shpRegValDt;
   String? shpRegCertNo;
   String? isSafetyManagCert;
+  String? isSafetyManagCertValue;
   dynamic safetyManagCertValDt;
   String? safetyManagCertNo;
   String? isps;
@@ -178,6 +179,7 @@ class VesselDetailsModel {
      this.shpRegValDt,
      this.shpRegCertNo,
      this.isSafetyManagCert,
+     this.isSafetyManagCertValue,
      this.safetyManagCertValDt,
      this.safetyManagCertNo,
      this.isps,
@@ -322,6 +324,7 @@ class VesselDetailsModel {
     shpRegValDt:json["SHP_REG_VAL_DT"],
     shpRegCertNo: json["SHP_REG_CERT_NO"],
     isSafetyManagCert: json["IS_SAFETY_MANAG_CERT"],
+    isSafetyManagCertValue: json["IS_SAFETY_MANAG_CERT_Value"],
     safetyManagCertValDt: json["SAFETY_MANAG_CERT_VAL_DT"],
     safetyManagCertNo: json["SAFETY_MANAG_CERT_NO"],
     isps: json["ISPS"],

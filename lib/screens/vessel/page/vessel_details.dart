@@ -665,7 +665,7 @@ class _VesselDetailsState extends State<VesselDetails> {
         infoBlock("ISPS Compliance", vesselDetailsModel.isps ?? ""),
         infoBlock("CAP II Certificate", vesselDetailsModel.isCapiiCert ?? ""),
         infoBlock("Safety Mgmt Certificate",
-            vesselDetailsModel.isSafetyManagCert ?? ""),
+            vesselDetailsModel.isSafetyManagCertValue ?? ""),
         infoBlock(
             "Year Of Build", vesselDetailsModel.builtYear.toString() ?? ""),
         infoBlock(

@@ -31,7 +31,7 @@ class VesselRepositoryImpl implements DepartureRepository {
         method: "POST",
         body: {
           "OperationType": 2,
-          "CurrentPortEntity": null,
+          "CurrentPortEntity": 0,
           "OrgId": loginDetailsMaster.organizationId,
           "Client": loginDetailsMaster.userAccountTypeId,
           "NameofAgent": loginDetailsMaster.orgTypeName,

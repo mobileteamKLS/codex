@@ -154,7 +154,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
       Scaffold(
         appBar: AppBar(
           title: const Text(
-            'Vessel Registration',
+            'Departure Clearance',
             style: TextStyle(color: Colors.white),
           ),
           iconTheme: const IconThemeData(color: Colors.white, size: 32),
