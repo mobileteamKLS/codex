@@ -1,5 +1,6 @@
 
 import 'package:codex_pcs/screens/login/pages/get_started_screen.dart';
+import 'package:codex_pcs/screens/login/pages/privacy_policy.dart';
 import 'package:codex_pcs/screens/menu/dashboard.dart';
 import 'package:codex_pcs/utils/common_utils.dart';
 import 'package:flutter/material.dart';
@@ -231,49 +232,54 @@ class _SignInScreenState extends State<SignInScreen> {
                               ),
                               const Spacer(),
                               SizedBox(height: ScreenDimension.onePercentOfScreenHight * 0.5,),
-                              Text.rich(
-                                TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: "Read ",
-                                      style:  TextStyle(
-                                          fontSize: ScreenDimension.textSize * AppDimensions.bodyTextMedium,
-                                          color: AppColors.textColorPrimary,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                              InkWell(
+                                child: Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: "Read ",
+                                        style:  TextStyle(
+                                            fontSize: ScreenDimension.textSize * AppDimensions.bodyTextMedium,
+                                            color: AppColors.textColorPrimary,
+                                            fontWeight: FontWeight.w500,
+                                          ),
 
-                                    ),
-                                    TextSpan(
-                                      text: "Privacy Policy",
-                                      style: TextStyle(
-                                          fontSize: ScreenDimension.textSize *AppDimensions.bodyTextMedium,
-                                          color: AppColors.primary,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: "Privacy Policy",
+                                        style: TextStyle(
+                                            fontSize: ScreenDimension.textSize *AppDimensions.bodyTextMedium,
+                                            color: AppColors.primary,
+                                            fontWeight: FontWeight.w500,
+                                          ),
 
-                                    ),
-                                    TextSpan(
-                                      text: " and ",
-                                      style: TextStyle(
-                                          fontSize: ScreenDimension.textSize * AppDimensions.bodyTextMedium,
-                                          color: AppColors.textColorPrimary,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: " and ",
+                                        style: TextStyle(
+                                            fontSize: ScreenDimension.textSize * AppDimensions.bodyTextMedium,
+                                            color: AppColors.textColorPrimary,
+                                            fontWeight: FontWeight.w500,
+                                          ),
 
-                                    ),
-                                    TextSpan(
-                                      text: "Terms & Conditions",
-                                      style: TextStyle(
-                                          fontSize: ScreenDimension.textSize *  AppDimensions.bodyTextMedium,
-                                          color: AppColors.primary,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: "Terms & Conditions",
+                                        style: TextStyle(
+                                            fontSize: ScreenDimension.textSize *  AppDimensions.bodyTextMedium,
+                                            color: AppColors.primary,
+                                            fontWeight: FontWeight.w500,
+                                          ),
 
-                                    ),
+                                      ),
 
-                                  ],
+                                    ],
+                                  ),
+                                  textAlign: TextAlign.start,
                                 ),
-                                textAlign: TextAlign.start,
+                                onTap: (){
+                                  _showPrivacyPolicyBottomSheet(context);
+                                },
                               ),
                               Padding(
                                 padding: EdgeInsets.symmetric(vertical: ScreenDimension.onePercentOfScreenHight * 2),
@@ -333,6 +339,70 @@ class _SignInScreenState extends State<SignInScreen> {
         isLoading = false;
       });
     }
+  }
+
+  void _showPrivacyPolicyWebView(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const PrivacyPolicyWebView(),
+      ),
+    );
+  }
+
+  // Method 3: Show in bottom sheet
+  void _showPrivacyPolicyBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.8,
+        maxChildSize: 0.95,
+        minChildSize: 0.5,
+        builder: (context, scrollController) => Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 12),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Privacy Policy',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: const PrivacyPolicyWebView(showAppBar: false),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
 }

@@ -756,11 +756,11 @@ class _VesselListingState extends State<VesselListing> {
                               text: 'Apply',
                               press: () {
                                 Navigator.pop(context);
-                                if (selectedFilter != null) {
+                                // if (selectedFilter != null) {
                                   getAllVessels(status: selectedFilter,imoName: imoName,vesselId: vesselId,vesselName: vesselName);
-                                } else {
-                                  _refreshData();
-                                }
+                                // } else {
+                                //   _refreshData();
+                                // }
                               },
                             ),
                           ),

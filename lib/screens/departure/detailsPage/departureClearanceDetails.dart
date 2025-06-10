@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:codex_pcs/screens/departure/listPage/departureClearanceList.dart';
 import 'package:codex_pcs/screens/vessel/page/vessel_list.dart';
 import 'package:codex_pcs/widgets/snackbar.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -24,6 +25,7 @@ import '../../../widgets/appdrawer.dart';
 import '../../../widgets/buttons.dart';
 import '../../login/model/login_response_model.dart';
 import '../../vessel/model/vessel_details_model.dart';
+import 'departureClearanceCrewDetails.dart';
 import 'model/departuredetailsmodel.dart';
 
 class DepartureClearanceDetails extends StatefulWidget {
@@ -123,7 +125,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
             leftIcon: Icons.check_circle);
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const VesselListing()),
+          MaterialPageRoute(builder: (_) => const DepartureListing()),
         );
       } else {
         Utils.prints("Login failed:", "${response["StatusMessage"]}");
@@ -186,15 +188,21 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
           children: [
             Container(
               constraints: const BoxConstraints.expand(),
-              margin: (OrganizationService.isMarineDepartment)
+              margin:(OrganizationService.isMarineDepartment &&
+                  widget.isSubmit &&
+                  (widget.marineBranchId ==
+                      loginDetailsMaster.organizationBranchId))
                   ? const EdgeInsets.only(bottom: 100)
-                  : const EdgeInsets.only(bottom: 0),
+                  : const EdgeInsets.only(bottom: 10),
               padding: EdgeInsets.only(
                 left: ScreenDimension.onePercentOfScreenWidth *
                     AppDimensions.defaultPageHorizontalPadding,
                 right: ScreenDimension.onePercentOfScreenWidth *
                     AppDimensions.defaultPageHorizontalPadding,
-                bottom: (OrganizationService.isMarineDepartment) ? 0 : 20,
+                bottom: (OrganizationService.isMarineDepartment &&
+                    widget.isSubmit &&
+                    (widget.marineBranchId ==
+                        loginDetailsMaster.organizationBranchId)) ? 0 : 8,
               ),
               color: AppColors.background,
               child: SingleChildScrollView(
@@ -639,10 +647,10 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
             : ""),
         // infoBlock("Name of Master", vesselDetailsModel.name ?? ""),
         infoBlock(
-          "Last Port of Registry",
+          "Last Port of Call",
           "${vesselDetailsModel.lastPortCode ?? ""} - ${vesselDetailsModel.lastPortName ?? ""}",
         ),
-        infoBlock("Next Port of Registry", "${vesselDetailsModel.nextPortCode ?? ""} - ${vesselDetailsModel.nextPortName ?? ""}",),
+        infoBlock("Next Port of Call", "${vesselDetailsModel.nextPortCode ?? ""} - ${vesselDetailsModel.nextPortName ?? ""}",),
         infoBlock("Number of Crew(s)", vesselDetailsModel.noofCrew != null
             ? "${vesselDetailsModel.noofCrew!}"
             : ""),
@@ -684,7 +692,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
       padding: EdgeInsets.all(8),
       child: Column(
         children: [
-          portCallItem("Tonnage of Cargo","Containerised","Net Wight", vesselDetailsModel.containerised==null?"AS PER MANIFEST":"","UOM",vesselDetailsModel.contUnit??""),
+          portCallItem("Tonnage of Cargo","Containerised","Net Wight", vesselDetailsModel.containerised==null?"AS PER MANIFEST": vesselDetailsModel.containerised.toString(),"UOM",vesselDetailsModel.contUnit??""),
           const SizedBox(height: 12),
           Divider(
             color: Colors.grey[300],
@@ -692,7 +700,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
             height: 1,
           ),
           const SizedBox(height: 12),
-          portCallItem("Tonnage of Cargo","Non-Containerised","Net Wight", vesselDetailsModel.containerised==null?"AS PER MANIFEST":"","UOM",vesselDetailsModel.nonConUnit??""),
+          portCallItem("Tonnage of Cargo","Non-Containerised","Net Wight", vesselDetailsModel.nonContainerised==null?"AS PER MANIFEST": vesselDetailsModel.nonContainerised.toString(),"UOM",vesselDetailsModel.nonConUnit??""),
           const SizedBox(height: 12),
           Divider(
             color: Colors.grey[300],
@@ -700,7 +708,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
             height: 1,
           ),
           const SizedBox(height: 12),
-          portCallItem("Total Container","Empty","20", vesselDetailsModel.containerised==null?"AS PER MANIFEST":"","40",vesselDetailsModel.containerised==null?"AS PER MANIFEST":""),
+          portCallItem("Total Container","Empty","20", vesselDetailsModel.containerised==null?"AS PER MANIFEST":vesselDetailsModel.empty20.toString(),"40",vesselDetailsModel.containerised==null?"AS PER MANIFEST":vesselDetailsModel.empty40.toString()),
           const SizedBox(height: 12),
           Divider(
             color: Colors.grey[300],
@@ -708,7 +716,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
             height: 1,
           ),
           const SizedBox(height: 12),
-          portCallItem("Total Container","Loaded","20", vesselDetailsModel.containerised==null?"AS PER MANIFEST":"","40",vesselDetailsModel.containerised==null?"AS PER MANIFEST":""),
+          portCallItem("Total Container","Loaded","20", vesselDetailsModel.containerised==null?"AS PER MANIFEST":vesselDetailsModel.loaded20.toString(),"40",vesselDetailsModel.containerised==null?"AS PER MANIFEST":vesselDetailsModel.loaded40.toString()),
           const SizedBox(height: 12),
           Divider(
             color: Colors.grey[300],
@@ -972,7 +980,11 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
     VoidCallback? onTap,
   }) {
     return InkWell(
-      onTap: onTap,
+      onTap: (){
+        Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) =>  DepartureCrewDetails(crew: crewData,)));
+      },
       child: Container(
         color: AppColors.cardBg,
         padding: const EdgeInsets.all(8),
@@ -1025,7 +1037,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: infoBlock('Expiry Date', "expiryDate"),
+                        child: infoBlock('Expiry Date',  crewData.crewListDateIdentityDate != null ? Utils.formatStringDate(crewData.crewListDateIdentityDate,) : "",),
                       ),
                     ],
                   ),
@@ -1059,10 +1071,10 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
             letterSpacing: 0.5,
           ),
         ),
-        SizedBox(height: 3),
+        const SizedBox(height: 3),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: Colors.black87,

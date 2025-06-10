@@ -654,7 +654,7 @@ class _EpanDetailsState extends State<EpanDetails> {
                     ),
                     SizedBox(height: 2),
                     Text(
-                        portCall.arrival != null ? Utils.formatStringDate(portCall.arrival,) ?? "" : "",
+                        portCall.arrival != null ? Utils.formatStringDate(portCall.arrival,) : "",
                       style: AppStyle.defaultTitle,
                     ),
                   ],

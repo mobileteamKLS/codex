@@ -336,10 +336,10 @@ class LstDepartureCrew {
   String? crewListFamilyName;
   String? crewListGivenName;
   String? crewListRankRating;
-  dynamic crewListNationality;
+  String? crewListNationality;
   String? crewListDob;
   String? crewListPlaceOfBirth;
-  dynamic crewListGender;
+  String? crewListGender;
   String? crewListNatureOfDoc;
   String? crewListNoofIdentityDoc;
   String? crewListIssueStateDoc;
@@ -413,10 +413,10 @@ class LstDepartureCrew {
     crewListFamilyName: json["CrewListFamilyName"],
     crewListGivenName: json["CrewListGivenName"],
     crewListRankRating: json["CrewListRankRating"],
-    crewListNationality: json["CrewListNationality"],
+    crewListNationality: json["NationalityText"],
     crewListDob: json["CrewListDOB"],
     crewListPlaceOfBirth: json["CrewListPlaceOfBirth"],
-    crewListGender: json["CrewListGender"],
+    crewListGender: json["Gender"],
     crewListNatureOfDoc: json["CrewListNatureOfDoc"],
     crewListNoofIdentityDoc: json["CrewListNoofIdentityDoc"],
     crewListIssueStateDoc: json["CrewListIssueStateDoc"],

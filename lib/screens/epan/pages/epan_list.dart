@@ -784,15 +784,15 @@ class _EpanListingState extends State<EpanListing> {
                               press: () {
                                 Navigator.pop(context);
 
-                                if (selectedStatusValue != null) {
+                                // if (selectedStatusValue != null) {
                                   getAllEpans(
                                       status: selectedStatusValue,
                                       imoName: imoName,
                                       vesselId: vesselId,
                                       vesselName: vesselName);
-                                } else {
-                                  _refreshData();
-                                }
+                                // } else {
+                                //   _refreshData();
+                                // }
                               },
                             ),
                           ),

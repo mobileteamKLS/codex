@@ -796,15 +796,15 @@ class _ScnlistingState extends State<Scnlisting> {
                               press: () {
                                 Navigator.pop(context);
 
-                                if (selectedStatusValue != null) {
+                                // if (selectedStatusValue != null) {
                                   getAllVoyages(
                                       status: selectedStatusValue,
                                       vesselName: vesselName,
                                       vesselId: vesselId,
                                       imoName: imoName);
-                                } else {
-                                  _refreshData();
-                                }
+                                // } else {
+                                //   _refreshData();
+                                // }
                               },
                             ),
                           ),
