@@ -66,3 +66,4 @@ const ticket = "assets/svgs/ticket.svg";
 const doubleCheck = "assets/svgs/check_double.svg";
 const anchorCheck = "assets/svgs/anchor_check.svg";
 const locationCheck = "assets/svgs/location_check.svg";
+const mpbad = "assets/images/MPABD.jpeg";

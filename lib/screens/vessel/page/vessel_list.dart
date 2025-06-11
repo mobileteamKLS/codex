@@ -16,6 +16,7 @@ import '../../../utils/common_utils.dart';
 import '../../../utils/role_util.dart';
 import '../../../widgets/appdrawer.dart';
 import '../../../widgets/buttons.dart';
+import '../../../widgets/custom_chip.dart';
 import '../../../widgets/snackbar.dart';
 import '../../../widgets/text_field.dart';
 import '../model/vessel_details_model.dart';
@@ -44,6 +45,7 @@ class _VesselListingState extends State<VesselListing> {
   List<bool> _isExpandedList = [];
   List<String> selectedFilters = [];
   String? selectedFilter;
+  String? selectedFilterTextValue;
 
   List<VesselListModel> filteredList = [];
   TextEditingController vesselIdController = TextEditingController();
@@ -234,7 +236,7 @@ class _VesselListingState extends State<VesselListing> {
     return Scaffold(
       appBar: AppBar(
           title: const Text(
-            'Vessel Registration',
+            'Ship Registration',
             style: TextStyle(color: Colors.white),
           ),
           iconTheme: const IconThemeData(color: Colors.white, size: 32),
@@ -262,6 +264,7 @@ class _VesselListingState extends State<VesselListing> {
                     AppDimensions.defaultPageHorizontalPadding),
             color: AppColors.background,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: EdgeInsets.symmetric(
@@ -330,6 +333,23 @@ class _VesselListingState extends State<VesselListing> {
                     ],
                   ),
                 ),
+                if (selectedFilter != null)
+                  FilterResultChip(
+                    text: selectedFilterTextValue ?? "",
+                    backgroundColor: AppColors.white,
+                    textColor: AppColors.textColorSecondary,
+                    onDelete: () {
+                      setState(() {
+                        selectedFilter = null;
+                        selectedFilterTextValue = null;
+                      });
+                      getAllVessels(
+                          status: selectedFilter,
+                          imoName: imoName,
+                          vesselId: vesselId,
+                          vesselName: vesselName);
+                    },
+                  ),
                 isLoading
                     ? const Center(
                         child: SizedBox(
@@ -359,7 +379,7 @@ class _VesselListingState extends State<VesselListing> {
                                       itemBuilder: (BuildContext, index) {
                                         VesselListModel shipmentDetails =
                                             vesselDetailsList.elementAt(index);
-                                        return buildVesselCard(
+                                        return buildVesselCardV2(
                                             vesselDetails: shipmentDetails,
                                             index: index);
                                       },
@@ -704,8 +724,11 @@ class _VesselListingState extends State<VesselListing> {
                               setState(() {
                                 if (selected) {
                                   selectedFilter = status["value"];
+                                  selectedFilterTextValue = status["label"];
                                 } else {
                                   selectedFilter = null;
+                                  selectedFilterTextValue = null;
+
                                 }
                               });
                             },
@@ -742,6 +765,8 @@ class _VesselListingState extends State<VesselListing> {
                               press: () {
                                 setState(() {
                                   selectedFilter = null;
+                                  selectedFilterTextValue = null;
+
                                 });
                                 _refreshData();
                                 Navigator.pop(context);
@@ -867,6 +892,106 @@ class _VesselListingState extends State<VesselListing> {
                               marineBranchId: vesselDetails.marineBranchId,
                               isSubmit: (vesselDetails.status == "Submitted"),
                             )));
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Show More Details',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: AppColors.gradient1,
+                      ),
+                      child: const Icon(Icons.keyboard_arrow_right_outlined,
+                          color: AppColors.primary)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  Widget buildVesselCardV2(
+      {required VesselListModel vesselDetails, required int index}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0),
+        color: AppColors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            spreadRadius: 2,
+            blurRadius: 2,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  vesselDetails.vslName,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+                Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: ColorUtils.getStatusColor(vesselDetails.status),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    vesselDetails.status,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textColorPrimary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            buildLabelValue('Vessel Flag', vesselDetails.nationality),
+            buildLabelValue('IMO No.', vesselDetails.imoNo),
+            buildLabelValue('Call Sign', vesselDetails.callsign),
+            buildLabelValue('Port of Registry', vesselDetails.placeOfRegistyName),
+            const SizedBox(height: 4),
+            Utils.customDivider(
+              space: 0,
+              color: Colors.black,
+              hasColor: true,
+              thickness: 1,
+            ),
+            const SizedBox(height: 4),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => VesselDetails(
+                          refNo: vesselDetails.vslName,
+                          pvrId: vesselDetails.pvrId,
+                          marineBranchId: vesselDetails.marineBranchId,
+                          isSubmit: (vesselDetails.status == "Submitted"),
+                        )));
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

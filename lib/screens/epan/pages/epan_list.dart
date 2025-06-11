@@ -18,6 +18,7 @@ import '../../../utils/common_utils.dart';
 import '../../../utils/role_util.dart';
 import '../../../widgets/appdrawer.dart';
 import '../../../widgets/buttons.dart';
+import '../../../widgets/custom_chip.dart';
 import '../../../widgets/snackbar.dart';
 import '../../../widgets/text_field.dart';
 import '../model/epan_list_model.dart';
@@ -41,6 +42,7 @@ class _EpanListingState extends State<EpanListing> {
   List<bool> _isExpandedList = [];
   List<String> selectedFilters = [];
   String? selectedFilter;
+  String? selectedFilterTextValue;
   int? selectedStatusValue;
 
   List<EpanListModel> filteredList = [];
@@ -270,6 +272,7 @@ class _EpanListingState extends State<EpanListing> {
                     AppDimensions.defaultPageHorizontalPadding),
             color: AppColors.background,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: EdgeInsets.symmetric(
@@ -338,6 +341,23 @@ class _EpanListingState extends State<EpanListing> {
                     ],
                   ),
                 ),
+                if (selectedStatusValue != null)
+                  FilterResultChip(
+                    text: selectedFilterTextValue ?? "",
+                    backgroundColor: AppColors.white,
+                    textColor: AppColors.textColorSecondary,
+                    onDelete: () {
+                      setState(() {
+                        selectedStatusValue = null;
+                        selectedFilterTextValue = null;
+                      });
+                      getAllEpans(
+                          status: selectedStatusValue,
+                          imoName: imoName,
+                          vesselId: vesselId,
+                          vesselName: vesselName);
+                    },
+                  ),
                 isLoading
                     ? const Center(
                         child: SizedBox(
@@ -367,7 +387,7 @@ class _EpanListingState extends State<EpanListing> {
                                       itemBuilder: (BuildContext, index) {
                                         EpanListModel shipmentDetails =
                                             scnDetailsList.elementAt(index);
-                                        return buildVesselCard(
+                                        return buildVesselCardV2(
                                             vesselDetails: shipmentDetails,
                                             index: index);
                                       },
@@ -682,6 +702,8 @@ class _EpanListingState extends State<EpanListing> {
                               setState(() {
                                 selectedFilter = "";
                                 selectedStatusValue = null;
+                                selectedFilterTextValue = null;
+
                                 isFilterApplied = false;
                               });
                             },
@@ -728,8 +750,10 @@ class _EpanListingState extends State<EpanListing> {
                               setState(() {
                                 if (selected) {
                                   selectedStatusValue = status["value"] as int;
+                                  selectedFilterTextValue = status["label"] ;
                                 } else {
                                   selectedStatusValue = null;
+                                  selectedFilterTextValue = null;
                                 }
                                 print(
                                     "Selected status value: $selectedStatusValue");
@@ -769,6 +793,7 @@ class _EpanListingState extends State<EpanListing> {
                                 setState(() {
                                   selectedFilter = "";
                                   selectedStatusValue = null;
+                                  selectedFilterTextValue = null;
                                 });
                                 _refreshData();
                                 Navigator.pop(context);
@@ -931,7 +956,7 @@ class _EpanListingState extends State<EpanListing> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 130,
+
             child: Text(
               '$label:',
               style: AppStyle.sideDescText,
@@ -1068,6 +1093,144 @@ class _EpanListingState extends State<EpanListing> {
                               isSubmit: (vesselDetails.status == "Submitted"),
                               vesselId: vesselDetails.vesselid,
                             )));
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Show More Details',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: AppColors.gradient1,
+                      ),
+                      child: const Icon(Icons.keyboard_arrow_right_outlined,
+                          color: AppColors.primary)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  Widget buildVesselCardV2(
+      {required EpanListModel vesselDetails, required int index}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.0),
+        color: AppColors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with vessel name and status
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    vesselDetails.vesselName,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: ColorUtils.getStatusColor(vesselDetails.status),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    vesselDetails.status,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textColorPrimary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            buildLabelValue('Vessel Flag', ""),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      buildLabelValue('SCN', "        ${vesselDetails.scnId}"),
+                      buildLabelValue(
+                          'IMO No.', "  ${vesselDetails.imoNo}"),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      buildLabelValue(
+                          'ETA',
+                          Utils.formatStringDate(vesselDetails.eta,
+                              showTime: true)),
+                      // You may need to add this field
+                      buildLabelValue(
+                          'ETD',
+                          Utils.formatStringDate(vesselDetails.etd,
+                              showTime: true)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            buildLabelValue('Port of Registry'," ${vesselDetails.portName}"),
+            const SizedBox(height: 4),
+            Utils.customDivider(
+              space: 0,
+              color: Colors.black,
+              hasColor: true,
+              thickness: 1,
+            ),
+            const SizedBox(height: 4),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => EpanDetails(
+                          refNo: vesselDetails.vesselName,
+                          pvrId: vesselDetails.naId,
+                          marineBranchId: int.parse(
+                              vesselDetails.marineBranchId ?? "0"),
+                          isSubmit: (vesselDetails.status == "Submitted"),
+                          vesselId: vesselDetails.vesselid,
+                        )));
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

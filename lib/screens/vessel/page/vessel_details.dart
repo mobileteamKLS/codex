@@ -107,7 +107,7 @@ class _VesselDetailsState extends State<VesselDetails> {
           "BranchId": loginDetailsMaster.organizationBranchId,
           "PVR_ID": widget.pvrId,
           "IPAddress": "",
-          "Comments": comment
+          "Comments": comment,
         },
       );
 
@@ -150,7 +150,7 @@ class _VesselDetailsState extends State<VesselDetails> {
       Scaffold(
         appBar: AppBar(
           title: const Text(
-            'Vessel Registration',
+            'Ship Registration',
             style: TextStyle(color: Colors.white),
           ),
           iconTheme: const IconThemeData(color: Colors.white, size: 32),

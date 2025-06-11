@@ -1,4 +1,5 @@
 
+import 'package:codex_pcs/core/img_assets.dart';
 import 'package:codex_pcs/screens/login/pages/get_started_screen.dart';
 import 'package:codex_pcs/screens/login/pages/privacy_policy.dart';
 import 'package:codex_pcs/screens/menu/dashboard.dart';
@@ -231,6 +232,23 @@ class _SignInScreenState extends State<SignInScreen> {
                                 ],
                               ),
                               const Spacer(),
+                              (configMaster.clientID=="2")? Image.asset(
+                                mpbad,
+                                height: 100,
+                              ):Image.network(
+                                '${configMaster.applicationUIURL}${configMaster.clientLogo}',
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes != null
+                                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                        : null,
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Icon(Icons.error);
+                                },
+                              ),
                               SizedBox(height: ScreenDimension.onePercentOfScreenHight * 0.5,),
                               InkWell(
                                 child: Text.rich(

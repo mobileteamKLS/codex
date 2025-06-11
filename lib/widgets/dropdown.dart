@@ -7,6 +7,7 @@ class ConfigurationData {
   final String applicationUIURL;
   final String product;
   final String clientID;
+  final String clientLogo;
   final String clientRequestID;
   final String communityCode;
   final String environment;
@@ -23,6 +24,7 @@ class ConfigurationData {
     required this.applicationUIURL,
     required this.product,
     required this.clientID,
+    required this.clientLogo,
     required this.clientRequestID,
     required this.communityCode,
     required this.environment,
@@ -41,6 +43,7 @@ class ConfigurationData {
       applicationUIURL: json['ApplicationUIURL'],
       product: json['Product'],
       clientID: json['ClientID'],
+      clientLogo: json['ClientLogo'],
       clientRequestID: json['ClientRequestID'],
       communityCode: json['CommunityCode'],
       environment: json['Environment'],

@@ -75,7 +75,7 @@ class _MswSubmenuState extends State<MswSubmenu> {
             const SizedBox(height: 8,),
             const NavigationCard(
               icon: ship,
-              title: 'Vessel Registration',
+              title: 'Ship Registration',
               targetPage: VesselListing(),
             ),
             const NavigationCard(

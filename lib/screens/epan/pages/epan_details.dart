@@ -114,7 +114,10 @@ class _EpanDetailsState extends State<EpanDetails> {
           "BranchId": loginDetailsMaster.organizationBranchId,
           "Status" : opType,
           "NAId": widget.pvrId,
-          "Remark": comment
+          "Remark": comment,
+          "CountryId" : configMaster.countryId,
+          "ClientId" : int.parse(configMaster.clientID),
+          "BranchName" :loginDetailsMaster.branchName
         },
       );
 

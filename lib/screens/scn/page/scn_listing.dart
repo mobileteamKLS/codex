@@ -17,6 +17,7 @@ import '../../../utils/common_utils.dart';
 import '../../../utils/role_util.dart';
 import '../../../widgets/appdrawer.dart';
 import '../../../widgets/buttons.dart';
+import '../../../widgets/custom_chip.dart';
 import '../../../widgets/snackbar.dart';
 import '../../../widgets/text_field.dart';
 import '../model/scn_list_model.dart';
@@ -44,6 +45,7 @@ class _ScnlistingState extends State<Scnlisting> {
   List<bool> _isExpandedList = [];
   List<String> selectedFilters = [];
   String? selectedFilter;
+  String? selectedFilterTextValue;
   int? selectedStatusValue;
 
   List<ScnListDetailsModel> filteredList = [];
@@ -279,6 +281,7 @@ class _ScnlistingState extends State<Scnlisting> {
                     AppDimensions.defaultPageHorizontalPadding),
             color: AppColors.background,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: EdgeInsets.symmetric(
@@ -347,6 +350,23 @@ class _ScnlistingState extends State<Scnlisting> {
                     ],
                   ),
                 ),
+                if (selectedStatusValue != null)
+                  FilterResultChip(
+                    text: selectedFilterTextValue ?? "",
+                    backgroundColor: AppColors.white,
+                    textColor: AppColors.textColorSecondary,
+                    onDelete: () {
+                      setState(() {
+                        selectedStatusValue = null;
+                        selectedFilterTextValue = null;
+                      });
+                      getAllVoyages(
+                          status: selectedStatusValue,
+                          vesselName: vesselName,
+                          vesselId: vesselId,
+                          imoName: imoName);
+                    },
+                  ),
                 isLoading
                     ? const Center(
                         child: SizedBox(
@@ -376,7 +396,7 @@ class _ScnlistingState extends State<Scnlisting> {
                                       itemBuilder: (BuildContext, index) {
                                         ScnListDetailsModel shipmentDetails =
                                             scnDetailsList.elementAt(index);
-                                        return buildVesselCard(
+                                        return buildVesselCardV2(
                                             vesselDetails: shipmentDetails,
                                             index: index);
                                       },
@@ -694,6 +714,7 @@ class _ScnlistingState extends State<Scnlisting> {
                               setState(() {
                                 selectedFilter = "";
                                 selectedStatusValue = null;
+                                selectedFilterTextValue = null;
                                 isFilterApplied = false;
                               });
                             },
@@ -740,8 +761,10 @@ class _ScnlistingState extends State<Scnlisting> {
                               setState(() {
                                 if (selected) {
                                   selectedStatusValue = status["value"] as int;
+                                  selectedFilterTextValue= status["label"];
                                 } else {
                                   selectedStatusValue = null;
+                                  selectedFilterTextValue = null;
                                 }
                                 print(
                                     "Selected status value: $selectedStatusValue");
@@ -781,6 +804,7 @@ class _ScnlistingState extends State<Scnlisting> {
                                 setState(() {
                                   selectedFilter = "";
                                   selectedStatusValue = null;
+                                  selectedFilterTextValue = null;
                                 });
                                 _refreshData();
                                 Navigator.pop(context);
@@ -948,7 +972,7 @@ class _ScnlistingState extends State<Scnlisting> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 130,
+
             child: Text(
               '$label:',
               style: AppStyle.sideDescText,
@@ -1085,6 +1109,144 @@ class _ScnlistingState extends State<Scnlisting> {
                               scn: vesselDetails.vcnNo,
                               vslName: vesselDetails.vslName,
                             )));
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Show More Details',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: AppColors.gradient1,
+                      ),
+                      child: const Icon(Icons.keyboard_arrow_right_outlined,
+                          color: AppColors.primary)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildVesselCardV2(
+      {required ScnListDetailsModel vesselDetails, required int index}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.0),
+        color: AppColors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with vessel name and status
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    vesselDetails.vslName,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: ColorUtils.getStatusColor(vesselDetails.status),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    vesselDetails.status,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textColorPrimary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            buildLabelValue('Vessel Flag', ""),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      buildLabelValue('SCN', "        ${vesselDetails.vcnNo}"),
+                      buildLabelValue(
+                          'IMO No.', "  ${vesselDetails.imoNo}"),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      buildLabelValue(
+                          'ETA',
+                          Utils.formatStringDate(vesselDetails.eta,
+                              showTime: true)),
+                      // You may need to add this field
+                      buildLabelValue(
+                          'ETD',
+                          Utils.formatStringDate(vesselDetails.etd,
+                              showTime: true)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            buildLabelValue('Port of Registry'," ${vesselDetails.poToPjLinked}"),
+            const SizedBox(height: 4),
+            Utils.customDivider(
+              space: 0,
+              color: Colors.black,
+              hasColor: true,
+              thickness: 1,
+            ),
+            const SizedBox(height: 4),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => SCNDetails(
+                          refNo: vesselDetails.vslName,
+                          voyageId: vesselDetails.voyId,
+                          port: vesselDetails.poToPjLinked,
+                          scn: vesselDetails.vcnNo,
+                          vslName: vesselDetails.vslName,
+                        )));
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
