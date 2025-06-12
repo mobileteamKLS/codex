@@ -112,12 +112,12 @@ class _EpanDetailsState extends State<EpanDetails> {
           "CreatedBy": loginDetailsMaster.userId,
           "UpdatedBy": loginDetailsMaster.userId,
           "BranchId": loginDetailsMaster.organizationBranchId,
-          "Status" : opType,
+          "Status": opType,
           "NAId": widget.pvrId,
           "Remark": comment,
-          "CountryId" : configMaster.countryId,
-          "ClientId" : int.parse(configMaster.clientID),
-          "BranchName" :loginDetailsMaster.branchName
+          "CountryId": configMaster.countryId,
+          "ClientId": int.parse(configMaster.clientID),
+          "BranchName": loginDetailsMaster.branchName
         },
       );
 
@@ -400,19 +400,20 @@ class _EpanDetailsState extends State<EpanDetails> {
             "Are dangerous goods onboard?If above is Yes,State IMDG Code Class",
             (vesselDetailsModel.ispScodecomplaints9?.toInt() == 1)
                 ? "Yes"
-                : "No",showDivider: false),
+                : "No",
+            showDivider: false),
         SizedBox(
-            height:
-            ((vesselDetailsModel.ispScodecomplaints9?.toInt() == 1))
+            height: ((vesselDetailsModel.ispScodecomplaints9?.toInt() == 1))
                 ? 8
                 : 0),
         ((vesselDetailsModel.ispScodecomplaints9?.toInt() == 1))
             ? Text(
-          vesselDetailsModel.ispScodecomplaints9Yes ?? "",
-          style: AppStyle.defaultTitle,
-        )
+                vesselDetailsModel.ispScodecomplaints9Yes ?? "",
+                style: AppStyle.defaultTitle,
+              )
             : const SizedBox(),
-        if(vesselDetailsModel.ispScodecomplaints9?.toInt() == 1)const SizedBox(height: 12),
+        if (vesselDetailsModel.ispScodecomplaints9?.toInt() == 1)
+          const SizedBox(height: 12),
         Divider(
           color: Colors.grey[300],
           thickness: 0.5,
@@ -426,15 +427,14 @@ class _EpanDetailsState extends State<EpanDetails> {
                 : "No",
             showDivider: false),
         SizedBox(
-            height:
-            ((vesselDetailsModel.ispScodecomplaints10?.toInt() == 1))
+            height: ((vesselDetailsModel.ispScodecomplaints10?.toInt() == 1))
                 ? 8
                 : 0),
         ((vesselDetailsModel.ispScodecomplaints10?.toInt() == 1))
             ? Text(
-          vesselDetailsModel.ispScodecomplaints10Yes ?? "",
-          style: AppStyle.defaultTitle,
-        )
+                vesselDetailsModel.ispScodecomplaints10Yes ?? "",
+                style: AppStyle.defaultTitle,
+              )
             : const SizedBox(),
       ],
     );
@@ -450,20 +450,19 @@ class _EpanDetailsState extends State<EpanDetails> {
 
         fullWidthInfoBlock(
             "	Any control measures imposed at last port? if Yes give details?",
-            (vesselDetailsModel.convention2?.toInt() == 1) ? "Yes" : "No",showDivider: false),
+            (vesselDetailsModel.convention2?.toInt() == 1) ? "Yes" : "No",
+            showDivider: false),
 
         SizedBox(
-            height:
-            ((vesselDetailsModel.convention2?.toInt() == 1))
-                ? 8
-                : 0),
+            height: ((vesselDetailsModel.convention2?.toInt() == 1)) ? 8 : 0),
         ((vesselDetailsModel.convention2?.toInt() == 1))
             ? Text(
-          vesselDetailsModel.convention2Yes ?? "",
-          style: AppStyle.defaultTitle,
-        )
+                vesselDetailsModel.convention2Yes ?? "",
+                style: AppStyle.defaultTitle,
+              )
             : const SizedBox(),
-        if(vesselDetailsModel.convention2?.toInt() == 1)const SizedBox(height: 12),
+        if (vesselDetailsModel.convention2?.toInt() == 1)
+          const SizedBox(height: 12),
         Divider(
           color: Colors.grey[300],
           thickness: 0.5,
@@ -509,10 +508,11 @@ class _EpanDetailsState extends State<EpanDetails> {
     );
   }
 
-  Widget tenPortContent(){
+  Widget tenPortContent() {
     return Column(
       children: [
-        Container(color: AppColors.cardBg,
+        Container(
+            color: AppColors.cardBg,
             padding: EdgeInsets.all(8),
             child: portCallsContent()),
         const SizedBox(height: 16),
@@ -528,29 +528,33 @@ class _EpanDetailsState extends State<EpanDetails> {
       color: AppColors.cardBg,
       padding: EdgeInsets.all(8),
       child: Column(
-        children: vesselDetailsModel.prohibitedGoodsDetails?.asMap().entries.map((entry) {
-          int index = entry.key;
-          var portCall = entry.value;
-          bool isLast = index == vesselDetailsModel.prohibitedGoodsDetails!.length - 1;
+        children: vesselDetailsModel.prohibitedGoodsDetails
+                ?.asMap()
+                .entries
+                .map((entry) {
+              int index = entry.key;
+              var portCall = entry.value;
+              bool isLast = index ==
+                  vesselDetailsModel.prohibitedGoodsDetails!.length - 1;
 
-          return Column(
-            children: [
-              unSecurityItem(portCall),
-              if (!isLast) ...[
-                const SizedBox(height: 12),
-                Divider(
-                  color: Colors.grey[300],
-                  thickness: 0.5,
-                  height: 1,
-                ),
-                const SizedBox(height: 12),
-              ],
-            ],
-          );
-        }).toList() ?? [],
+              return Column(
+                children: [
+                  unSecurityItem(portCall),
+                  if (!isLast) ...[
+                    const SizedBox(height: 12),
+                    Divider(
+                      color: Colors.grey[300],
+                      thickness: 0.5,
+                      height: 1,
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                ],
+              );
+            }).toList() ??
+            [],
       ),
     );
-
   }
 
   Widget unSecurityItem(ProhibitedGoodsDetails item) {
@@ -599,28 +603,32 @@ class _EpanDetailsState extends State<EpanDetails> {
 
   Widget portCallsContent() {
     return Column(
-      children: vesselDetailsModel.listofLastTenPortofCall?.asMap().entries.map((entry) {
-        int index = entry.key;
-        var portCall = entry.value;
-        bool isLast = index == vesselDetailsModel.listofLastTenPortofCall!.length - 1;
+      children: vesselDetailsModel.listofLastTenPortofCall
+              ?.asMap()
+              .entries
+              .map((entry) {
+            int index = entry.key;
+            var portCall = entry.value;
+            bool isLast =
+                index == vesselDetailsModel.listofLastTenPortofCall!.length - 1;
 
-        return Column(
-          children: [
-            portCallItem(portCall),
-            if (!isLast) ...[
-              const SizedBox(height: 12),
-              Divider(
-                color: Colors.grey[300],
-                thickness: 0.5,
-                height: 1,
-              ),
-              const SizedBox(height: 12),
-            ],
-          ],
-        );
-      }).toList() ?? [],
+            return Column(
+              children: [
+                portCallItem(portCall),
+                if (!isLast) ...[
+                  const SizedBox(height: 12),
+                  Divider(
+                    color: Colors.grey[300],
+                    thickness: 0.5,
+                    height: 1,
+                  ),
+                  const SizedBox(height: 12),
+                ],
+              ],
+            );
+          }).toList() ??
+          [],
     );
-
   }
 
   Widget portCallItem(ListofLastTenPortofCall portCall) {
@@ -636,7 +644,7 @@ class _EpanDetailsState extends State<EpanDetails> {
           ),
           SizedBox(height: 2),
           Text(
-           "${portCall.portcode ?? ""}-${portCall.portName ?? ""}",
+            "${portCall.portcode ?? ""}-${portCall.portName ?? ""}",
             style: AppStyle.defaultTitle.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -657,7 +665,11 @@ class _EpanDetailsState extends State<EpanDetails> {
                     ),
                     SizedBox(height: 2),
                     Text(
-                        portCall.arrival != null ? Utils.formatStringDate(portCall.arrival,) : "",
+                      portCall.arrival != null
+                          ? Utils.formatStringUTCDate(
+                              portCall.arrival,
+                            )
+                          : "",
                       style: AppStyle.defaultTitle,
                     ),
                   ],
@@ -675,7 +687,12 @@ class _EpanDetailsState extends State<EpanDetails> {
                     ),
                     SizedBox(height: 2),
                     Text(
-                      portCall.departure != null ? Utils.formatStringDate(portCall.departure,) ?? "" : "",
+                      portCall.departure != null
+                          ? Utils.formatStringUTCDate(
+                                portCall.departure,
+                              ) ??
+                              ""
+                          : "",
                       style: AppStyle.defaultTitle,
                     ),
                   ],
@@ -693,7 +710,7 @@ class _EpanDetailsState extends State<EpanDetails> {
                     ),
                     SizedBox(height: 2),
                     Text(
-                      portCall.secutityLevel??"",
+                      portCall.secutityLevel ?? "",
                       style: AppStyle.defaultTitle,
                     ),
                   ],
@@ -712,33 +729,34 @@ class _EpanDetailsState extends State<EpanDetails> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if(vesselDetailsModel.lastPortRemark!="")Text(
-            "Reason Why the Vessel Has Fewer Than 10 Port Calls :",
-            style: AppStyle.sideDescText,
-          ),
-          if(vesselDetailsModel.lastPortRemark!="")Text(
-            vesselDetailsModel.lastPortRemark ?? "" ,
-            style: AppStyle.defaultTitle,
-          ),
-          if(vesselDetailsModel.lastPortRemark!="")SizedBox(height: 6),
+          if (vesselDetailsModel.lastPortRemark != "")
+            Text(
+              "Reason Why the Vessel Has Fewer Than 10 Port Calls :",
+              style: AppStyle.sideDescText,
+            ),
+          if (vesselDetailsModel.lastPortRemark != "")
+            Text(
+              vesselDetailsModel.lastPortRemark ?? "",
+              style: AppStyle.defaultTitle,
+            ),
+          if (vesselDetailsModel.lastPortRemark != "") SizedBox(height: 6),
           Text(
             "Were there any special or additional security measures taken during any ship/port interface or ship-to-ship activity at the ports mentioned in the last 10 ports of call?",
             style: AppStyle.sideDescText,
           ),
-
           Text(
             (vesselDetailsModel.specialoradditionalsecurity == null)
                 ? ""
-                : (vesselDetailsModel.specialoradditionalsecurity == 1 ? "Yes" : "No")
-            ,
+                : (vesselDetailsModel.specialoradditionalsecurity == 1
+                    ? "Yes"
+                    : "No"),
             style: AppStyle.defaultTitle,
           ),
           SizedBox(
-              height:
-                  (vesselDetailsModel.specialoradditionalsecurity  == 1)
-                      ? 6
-                      : 0),
-          (vesselDetailsModel.specialoradditionalsecurity  == 1)
+              height: (vesselDetailsModel.specialoradditionalsecurity == 1)
+                  ? 6
+                  : 0),
+          (vesselDetailsModel.specialoradditionalsecurity == 1)
               ? Text(
                   "If yes, please specify",
                   style: AppStyle.sideDescText,
@@ -759,6 +777,7 @@ class _EpanDetailsState extends State<EpanDetails> {
       ),
     );
   }
+
   Widget weaponReasonSection() {
     return Container(
       width: double.infinity,
@@ -773,83 +792,111 @@ class _EpanDetailsState extends State<EpanDetails> {
           Text(
             (vesselDetailsModel.weaponsOnBoard == null)
                 ? ""
-                : (vesselDetailsModel.weaponsOnBoard == 1 ? "Yes" : "No")
-            ,
+                : (vesselDetailsModel.weaponsOnBoard == 1 ? "Yes" : "No"),
             style: AppStyle.defaultTitle,
           ),
-          SizedBox(
-              height:
-              (vesselDetailsModel.weaponsOnBoard  == 1)
-                  ? 6
-                  : 0),
-          (vesselDetailsModel.weaponsOnBoard  == 1)
+          SizedBox(height: (vesselDetailsModel.weaponsOnBoard == 1) ? 6 : 0),
+          (vesselDetailsModel.weaponsOnBoard == 1)
               ? Text(
-            "If yes, please refer",
-            style: AppStyle.sideDescText,
-          )
+                  "If yes, please refer",
+                  style: AppStyle.sideDescText,
+                )
               : const SizedBox(),
-          SizedBox(
-              height:
-              (vesselDetailsModel.weaponsOnBoard  == 1)
-                  ? 4
-                  : 0),
+          SizedBox(height: (vesselDetailsModel.weaponsOnBoard == 1) ? 4 : 0),
           (vesselDetailsModel.weaponsOnBoard == 1)
               ? Container(
-            width: double.infinity,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        vesselDetailsModel.weaponsOnBoardFileName??"",
-                        style: AppStyle.defaultTitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                  width: double.infinity,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              vesselDetailsModel.weaponsOnBoardFileName ?? "",
+                              style: AppStyle.defaultTitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (vesselDetailsModel.weaponsOnBoardSaverFileName !=
+                              null)
+                            GestureDetector(
+                              child: SvgPicture.asset(
+                                download,
+                                colorFilter: const ColorFilter.mode(
+                                    AppColors.primary, BlendMode.srcIn),
+                                height:
+                                    ScreenDimension.onePercentOfScreenHight *
+                                        AppDimensions.defaultIconSize,
+                              ),
+                              onTap: () {
+                                _downloadDocument(
+                                    vesselDetailsModel.weaponsOnBoardFileName!,
+                                    vesselDetailsModel
+                                        .weaponsOnBoardSaverFileName!,
+                                    vesselDetailsModel.docFileFolder!);
+                              },
+                            ),
+                        ],
                       ),
-                    ),
-                    if(vesselDetailsModel.weaponsOnBoardSaverFileName!=null)
-                      GestureDetector(
-                      child: SvgPicture.asset(
-                        download,
-                        colorFilter: const ColorFilter.mode(
-                            AppColors.primary, BlendMode.srcIn),
-                        height: ScreenDimension.onePercentOfScreenHight *
-                            AppDimensions.defaultIconSize,
-                      ),
-                      onTap: () {
-                        _downloadDocument(vesselDetailsModel.weaponsOnBoardFileName!,vesselDetailsModel.weaponsOnBoardSaverFileName!,vesselDetailsModel.docFileFolder!);
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          )
+                    ],
+                  ),
+                )
               : const SizedBox(),
         ],
       ),
     );
   }
 
-  Widget attachedDocumentPanContent(){
+  Widget attachedDocumentPanContent() {
     return Column(
-      children:(vesselDetailsModel.crewUplPanRandomFile!=""||vesselDetailsModel.passengerUplPanRandomFile!=null||vesselDetailsModel.dgCargoUplPanRandomFile!=null)?[
-        if(vesselDetailsModel.crewUplPanRandomFile!=null)documentRow("Crew List","-",vesselDetailsModel.crewUplPanActualFile!,vesselDetailsModel.crewUplPanRandomFile!,isExpiry: true,hideDownload: (vesselDetailsModel.crewUplPanActualFile==null ||vesselDetailsModel.crewUplPanActualFile=="")),
-        if(vesselDetailsModel.passengerUplPanRandomFile!=null)documentRow("Passenger List","-",vesselDetailsModel.passengerUplPanActualFile!,vesselDetailsModel.passengerUplPanRandomFile!,isExpiry: true,hideDownload: (vesselDetailsModel.passengerUplPanActualFile==null ||vesselDetailsModel.passengerUplPanActualFile=="")),
-        if(vesselDetailsModel.dgCargoUplPanRandomFile!=null)documentRow("DG Cargo","-",vesselDetailsModel.dgCargoUplPanActualFile!,vesselDetailsModel.dgCargoUplPanRandomFile!,isExpiry: true,hideDownload: (vesselDetailsModel.dgCargoUplPanActualFile==null ||vesselDetailsModel.dgCargoUplPanActualFile=="")),
-      ]: [
-        documentRow("No documents available", "","","")
-    ],
+      children: (vesselDetailsModel.crewUplPanRandomFile != "" ||
+              vesselDetailsModel.passengerUplPanRandomFile != null ||
+              vesselDetailsModel.dgCargoUplPanRandomFile != null)
+          ? [
+              if (vesselDetailsModel.crewUplPanRandomFile != null)
+                documentRow(
+                    "Crew List",
+                    "-",
+                    vesselDetailsModel.crewUplPanActualFile!,
+                    vesselDetailsModel.crewUplPanRandomFile!,
+                    isExpiry: true,
+                    hideDownload:
+                        (vesselDetailsModel.crewUplPanActualFile == null ||
+                            vesselDetailsModel.crewUplPanActualFile == "")),
+              if (vesselDetailsModel.passengerUplPanRandomFile != null)
+                documentRow(
+                    "Passenger List",
+                    "-",
+                    vesselDetailsModel.passengerUplPanActualFile!,
+                    vesselDetailsModel.passengerUplPanRandomFile!,
+                    isExpiry: true,
+                    hideDownload:
+                        (vesselDetailsModel.passengerUplPanActualFile == null ||
+                            vesselDetailsModel.passengerUplPanActualFile ==
+                                "")),
+              if (vesselDetailsModel.dgCargoUplPanRandomFile != null)
+                documentRow(
+                    "DG Cargo",
+                    "-",
+                    vesselDetailsModel.dgCargoUplPanActualFile!,
+                    vesselDetailsModel.dgCargoUplPanRandomFile!,
+                    isExpiry: true,
+                    hideDownload:
+                        (vesselDetailsModel.dgCargoUplPanActualFile == null ||
+                            vesselDetailsModel.dgCargoUplPanActualFile == "")),
+            ]
+          : [documentRow("No documents available", "", "", "")],
     );
   }
-
 
   List<Widget> buildAllSections() {
     List<Widget> sections = [];
     int index = 0;
+    int? validIssc = vesselDetailsModel.validIssc;
+    int? doesyourCompliant = vesselDetailsModel.doesyourCompliant;
     sections
         .add(buildSection(index++, "Vessel Details", vesselDetailsContent()));
     sections.add(buildSection(
@@ -859,32 +906,38 @@ class _EpanDetailsState extends State<EpanDetails> {
     sections.add(buildSection(
         index++, "Cargo / Passenger Details", cargoPassengerContent()));
     sections.add(buildSection(index++, "ISPS Details", ispsDetailsContent()));
-    if ((vesselDetailsModel.validIssc?.toInt() == 1) &&
-        (vesselDetailsModel.doesyourCompliant?.toInt() == 1)) {
-      sections.add(buildSection(
-          index++,
-          "Measures to be taken when an ISPS code complaints ship arrives from a non ISPS complaints port/marine facility.",
-          ispsMeasuresComplaintsContent()));
-    } else if (!(vesselDetailsModel.validIssc?.toInt() == 1) &&
-        (vesselDetailsModel.doesyourCompliant?.toInt() == 1)) {
-      sections.add(buildSection(
-          index++,
-          "Measures to be taken for a convention ship that do not carry the International Ship Security Certificate on board.",
-          ispsSecurityCertificateContent()));
-      sections.add(buildSection(
-          index++,
-          "Measures to be taken when an ISPS code complaints ship arrives from a non ISPS complaints port/marine facility",
-          ispsMeasuresComplaintsContent()));
-    } else if (!(vesselDetailsModel.validIssc?.toInt() == 1) &&
-        !(vesselDetailsModel.doesyourCompliant?.toInt() == 1)) {
-      sections.add(buildSection(
-          index++,
-          "Measures to be taken for a convention ship that do not carry the International Ship Security Certificate on board.",
-          ispsSecurityCertificateContent()));
+    int? isvalidIssc = vesselDetailsModel.validIssc;
+    int? isyourCompliant = vesselDetailsModel.doesyourCompliant;
+
+    bool? A = isvalidIssc == null ? null : (isvalidIssc == 1);
+    bool? B = isyourCompliant == null ? null : (isyourCompliant == 1);
+
+// Show cargoPassengerContent when A=false (regardless of B) or when A=null && B=true
+    bool showCargo = (A == false) || (A == null && B == true);
+
+// Show ispsDetailsContent when B=true (regardless of A) or when A=null && B=true
+    bool showIsps = (B == true) || (A == null && B == true);
+
+// But don't show anything when A=true && B=false, A=true && B=null, A=null && B=null, or A=null && B=false
+    bool showNothing = (A == true && (B == false || B == null)) ||
+        (A == null && (B == null || B == false));
+
+    if (!showNothing) {
+      if (showCargo) {
+        sections.add(buildSection(index++, "Cargo / Passenger Details", cargoPassengerContent()));
+      }
+      if (showIsps) {
+        sections.add(buildSection(index++, "ISPS Details", ispsDetailsContent()));
+      }
     }
-    sections.add(buildSection(index++, "Last 10 Port of Calls - In chronological order (most recent call first)", tenPortContent()));
-    sections.add(buildSection(index++, "Attached Documents PAN", attachedDocumentPanContent()));
-    sections.add(buildSection(index++, "Attached Documents", attachedDocumentsContent()));
+    sections.add(buildSection(
+        index++,
+        "Last 10 Port of Calls - In chronological order (most recent call first)",
+        tenPortContent()));
+    sections.add(buildSection(
+        index++, "Attached Documents PAN", attachedDocumentPanContent()));
+    sections.add(buildSection(
+        index++, "Attached Documents", attachedDocumentsContent()));
     return sections;
   }
 
@@ -1023,7 +1076,7 @@ class _EpanDetailsState extends State<EpanDetails> {
                   style: AppStyle.sideDescText,
                 ),
                 const SizedBox(height: 2),
-                Text(Utils.formatStringDate(expiry),
+                Text(Utils.formatStringUTCDate(expiry),
                     style: AppStyle.defaultTitle),
               ],
             ),
@@ -1150,20 +1203,19 @@ class _EpanDetailsState extends State<EpanDetails> {
     }
   }
 
-
   Widget infoRow(String label, String value) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: AppStyle.sideDescText,
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: AppStyle.sideDescText,
+            ),
+            Text(value, style: AppStyle.defaultTitle),
+          ],
         ),
-        Text(value, style: AppStyle.defaultTitle),
-      ],
-    ),
-  );
+      );
 
   Widget infoBlock(String label, String value) {
     return SizedBox(
@@ -1235,18 +1287,33 @@ class _EpanDetailsState extends State<EpanDetails> {
           "Port Of Registry",
           "${vesselDetailsModel.portOfRegistryCode ?? ""} - ${vesselDetailsModel.portOfRegistryName ?? ""}",
         ),
-        infoBlock("Outbound Handling", (vesselDetailsModel.isOutboundAgentCode ?? 0) == 1 ? "Yes" : "No",),
-        infoBlock("Estimated Date and Time of Arrival",
-           vesselDetailsModel.eta != null ? Utils.formatStringDate(vesselDetailsModel.eta, showTime: true):""),
-        infoBlock("Estimated Date and Time of Departure",
-            vesselDetailsModel.etd != null ? Utils.formatStringDate(vesselDetailsModel.etd, showTime: true): ""),
         infoBlock(
-            "Shipping Line / Operator", vesselDetailsModel.shippingagentValue ?? ""),
-        infoBlock("Last Port of Call", "${vesselDetailsModel.lastPortofCallCode ?? ""} - ${vesselDetailsModel.lastPortofCallName ?? ""}"),
-        infoBlock("Next Port of Call","${vesselDetailsModel.nextPortofCallCode ?? ""} - ${vesselDetailsModel.nextPortofCallName ?? ""}"),
-        infoBlock("Year of Built", vesselDetailsModel.yearBuilt != null
-            ? vesselDetailsModel.yearBuilt!
-            : ""),
+          "Outbound Handling",
+          (vesselDetailsModel.isOutboundAgentCode ?? 0) == 1 ? "Yes" : "No",
+        ),
+        infoBlock(
+            "Estimated Date and Time of Arrival",
+            vesselDetailsModel.eta != null
+                ? Utils.formatStringUTCDate(vesselDetailsModel.eta,
+                    showTime: true)
+                : ""),
+        infoBlock(
+            "Estimated Date and Time of Departure",
+            vesselDetailsModel.etd != null
+                ? Utils.formatStringUTCDate(vesselDetailsModel.etd,
+                    showTime: true)
+                : ""),
+        infoBlock("Shipping Line / Operator",
+            vesselDetailsModel.shippingagentValue ?? ""),
+        infoBlock("Last Port of Call",
+            "${vesselDetailsModel.lastPortofCallCode ?? ""} - ${vesselDetailsModel.lastPortofCallName ?? ""}"),
+        infoBlock("Next Port of Call",
+            "${vesselDetailsModel.nextPortofCallCode ?? ""} - ${vesselDetailsModel.nextPortofCallName ?? ""}"),
+        infoBlock(
+            "Year of Built",
+            vesselDetailsModel.yearBuilt != null
+                ? vesselDetailsModel.yearBuilt!
+                : ""),
         infoBlock("Berth No", vesselDetailsModel.berthNo ?? ""),
         infoBlock("Port Name", vesselDetailsModel.portNamesWithValue ?? ""),
       ],
@@ -1283,7 +1350,7 @@ class _EpanDetailsState extends State<EpanDetails> {
 
   Widget cargoPassengerContent() =>
       Wrap(spacing: 16, runSpacing: 12, children: [
-        infoBlock("Cargo Type",vesselDetailsModel.cargoTypeValue ?? ""),
+        infoBlock("Cargo Type", vesselDetailsModel.cargoTypeValue ?? ""),
         infoBlock(
             "Dangerous Cargo On Board",
             (vesselDetailsModel.dangerousCargoonBoard == null)
@@ -1291,16 +1358,34 @@ class _EpanDetailsState extends State<EpanDetails> {
                 : (vesselDetailsModel.dangerousCargoonBoard == 1
                     ? "Yes"
                     : "No")),
-        if(vesselDetailsModel.dangerousCargoonBoard==1)infoBlock("IMDG Code Class:", vesselDetailsModel.imdgCodeClassTextWithComma ?? ""),
-        infoBlock("Cargo To Discharge", vesselDetailsModel.cargotoDischarge ?? ""),
-        infoBlock("Dangerous Good",(vesselDetailsModel.dangeroudGoods ?? 0) == 1 ? "Yes" : "No",),
+        if (vesselDetailsModel.dangerousCargoonBoard == 1)
+          infoBlock("IMDG Code Class:",
+              vesselDetailsModel.imdgCodeClassTextWithComma ?? ""),
         infoBlock(
-            "Prohibited Goods Under UN Security Council / Resolution On Board?",
-          (vesselDetailsModel.prohibitedgoodsUn ?? 0) == 1 ? "Yes" : "No",),
-        if(vesselDetailsModel.prohibitedgoodsUn==1)unSecurityContent(),
+            "Cargo To Discharge", vesselDetailsModel.cargotoDischarge ?? ""),
+        infoBlock(
+            "Dangerous Good",
+            (vesselDetailsModel.dangeroudGoods == null)
+                ? ""
+                : (vesselDetailsModel.dangeroudGoods == 1 ? "Yes" : "No")),
+        infoBlock(
+          "Prohibited Goods Under UN Security Council / Resolution On Board?",
+          (vesselDetailsModel.prohibitedgoodsUn == null)
+              ? ""
+              : (vesselDetailsModel.prohibitedgoodsUn == 1 ? "Yes" : "No"),
+        ),
+        if (vesselDetailsModel.prohibitedgoodsUn == 1) unSecurityContent(),
         infoBlock("Name of Master", vesselDetailsModel.nameofMaster ?? ""),
-        infoBlock("Number of Crew(S)", vesselDetailsModel.totalNoofCrew != null ? "${vesselDetailsModel.totalNoofCrew!}": ""),
-        infoBlock("Number of Passenger(S)",vesselDetailsModel.totalNoofPassenger != null ? "${vesselDetailsModel.totalNoofPassenger!}": ""),
+        infoBlock(
+            "Number of Crew(S)",
+            vesselDetailsModel.totalNoofCrew != null
+                ? "${vesselDetailsModel.totalNoofCrew!}"
+                : ""),
+        infoBlock(
+            "Number of Passenger(S)",
+            vesselDetailsModel.totalNoofPassenger != null
+                ? "${vesselDetailsModel.totalNoofPassenger!}"
+                : ""),
       ]);
 
   Widget ispsDetailsContent() {
@@ -1320,8 +1405,7 @@ class _EpanDetailsState extends State<EpanDetails> {
               Text(
                 (vesselDetailsModel.validIssc == null)
                     ? ""
-                    : (vesselDetailsModel.validIssc == 1 ? "Yes" : "No")
-                ,
+                    : (vesselDetailsModel.validIssc == 1 ? "Yes" : "No"),
                 style: AppStyle.defaultTitle,
               ),
             ],
@@ -1343,39 +1427,45 @@ class _EpanDetailsState extends State<EpanDetails> {
                   style: AppStyle.sideDescText,
                 ),
                 SizedBox(height: 2),
-               Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Expires on ${vesselDetailsModel.ispsDocExpityDate != null ? Utils.formatStringDate(vesselDetailsModel.ispsDocExpityDate, showTime: false) ?? "" : ""}",
+                      "Expires on ${vesselDetailsModel.ispsDocExpityDate != null ? Utils.formatStringUTCDate(vesselDetailsModel.ispsDocExpityDate, showTime: false) ?? "" : ""}",
                       style: AppStyle.defaultTitle,
                     ),
-                    if(vesselDetailsModel.isscFilename!="")GestureDetector(
-                      child: SvgPicture.asset(
-                        download,
-                        colorFilter: const ColorFilter.mode(
-                            AppColors.primary, BlendMode.srcIn),
-                        height: ScreenDimension.onePercentOfScreenHight *
-                            AppDimensions.defaultIconSize,
+                    if (vesselDetailsModel.isscFilename != "")
+                      GestureDetector(
+                        child: SvgPicture.asset(
+                          download,
+                          colorFilter: const ColorFilter.mode(
+                              AppColors.primary, BlendMode.srcIn),
+                          height: ScreenDimension.onePercentOfScreenHight *
+                              AppDimensions.defaultIconSize,
+                        ),
+                        onTap: () {
+                          _downloadDocument(
+                              vesselDetailsModel.isscFilename!,
+                              vesselDetailsModel.isscSaverFilename!,
+                              vesselDetailsModel.docFileFolder!);
+                        },
                       ),
-                      onTap: () {
-                        _downloadDocument(vesselDetailsModel.isscFilename!,vesselDetailsModel.isscSaverFilename!,vesselDetailsModel.docFileFolder!);
-                      },
-                    ),
                   ],
                 ),
               ],
             ),
           ),
-        if (vesselDetailsModel.validIssc == 1)const SizedBox(height: 12),
-        if (vesselDetailsModel.validIssc == 1)Wrap(
-          spacing: 16,
-          runSpacing: 12,
-          children: [
-            infoBlock("Issued by", vesselDetailsModel.issuedBy ?? ""),
-            infoBlock("Security Level", vesselDetailsModel.securityLevel ?? ""),
-          ],
-        ),
+        if (vesselDetailsModel.validIssc == 1) const SizedBox(height: 12),
+        if (vesselDetailsModel.validIssc == 1)
+          Wrap(
+            spacing: 16,
+            runSpacing: 12,
+            children: [
+              infoBlock("Issued by", vesselDetailsModel.issuedBy ?? ""),
+              infoBlock(
+                  "Security Level", vesselDetailsModel.securityLevel ?? ""),
+            ],
+          ),
         if (vesselDetailsModel.validIssc == 1) const SizedBox(height: 12),
 
         // Fourth row - two columns for the longer text items
@@ -1387,14 +1477,16 @@ class _EpanDetailsState extends State<EpanDetails> {
                 "Is The Ship Carrying DG 1 & 2",
                 (vesselDetailsModel.istheShipCarryingDg == null)
                     ? ""
-                    : (vesselDetailsModel.istheShipCarryingDg == 1 ? "Yes" : "No")
-            ),
+                    : (vesselDetailsModel.istheShipCarryingDg == 1
+                        ? "Yes"
+                        : "No")),
             infoBlock(
                 "Does Your Compliant Ship Arrives From A Non-Compliant Port?",
                 (vesselDetailsModel.doesyourCompliant == null)
                     ? ""
-                    : (vesselDetailsModel.doesyourCompliant == 1 ? "Yes" : "No")
-            ),
+                    : (vesselDetailsModel.doesyourCompliant == 1
+                        ? "Yes"
+                        : "No")),
           ],
         ),
       ],
@@ -1432,17 +1524,14 @@ class _EpanDetailsState extends State<EpanDetails> {
     return Column(
       children: vesselDetailsModel.listofPaymentSlip != null
           ? vesselDetailsModel.listofPaymentSlip!.map((document) {
-        return documentRow(
-            document.docTitle ?? "Untitled Document",
-            document.docExpiry ?? "No expiry date",
-            document.fileName!,
-            document.saveFileName!,
-            isVesselFolder: true
-        );
-      }).toList()
-          : [
-        documentRow("No documents available", "","","")
-      ],
+              return documentRow(
+                  document.docTitle ?? "Untitled Document",
+                  document.docExpiry ?? "No expiry date",
+                  document.fileName!,
+                  document.saveFileName!,
+                  isVesselFolder: true);
+            }).toList()
+          : [documentRow("No documents available", "", "", "")],
     );
   }
 
@@ -1463,96 +1552,96 @@ class _EpanDetailsState extends State<EpanDetails> {
       ),
       builder: (context) {
         return StatefulBuilder(
-         builder: (context ,setState){
-           return Padding(
-             padding: EdgeInsets.only(
-               bottom: MediaQuery.of(context).viewInsets.bottom,
-             ),
-             child: Container(
-               padding: const EdgeInsets.all(16),
-               child: Column(
-                 mainAxisSize: MainAxisSize.min,
-                 crossAxisAlignment: CrossAxisAlignment.start,
-                 children: [
-                   Row(
-                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                     children: [
-                       Text(
-                         title,
-                         style: const TextStyle(
-                           fontSize: 18,
-                           fontWeight: FontWeight.w500,
-                         ),
-                       ),
-                       IconButton(
-                         icon: const Icon(Icons.close),
-                         onPressed: () {
-                           commentController.clear();
-                           Navigator.pop(context);
-                         },
-                       ),
-                     ],
-                   ),
-                   const SizedBox(height: 16),
-                   const Text(
-                     'Comment*',
-                     style: TextStyle(
-                       fontSize: 14,
-                       color: Colors.grey,
-                     ),
-                   ),
-                   const SizedBox(height: 8),
-                   TextField(
-                     controller: commentController,
-                     decoration: InputDecoration(
-                       hintText: commentHint,
-                       border: OutlineInputBorder(
-                         borderRadius: BorderRadius.circular(8),
-                         borderSide: BorderSide(color: Colors.grey.shade300),
-                       ),
-                       contentPadding: const EdgeInsets.symmetric(
-                         horizontal: 12,
-                         vertical: 16,
-                       ),
-                       errorText: errorText,
-                     ),
-                     minLines: 3,
-                     maxLines: 5,
-                     onChanged: (value) {
-                       if (errorText != null) {
-                         setState(() {
-                           errorText = null;
-                         });
-                       }
-                     },
-                   ),
-                   const SizedBox(height: 24),
-                   SizedBox(
-                     width: double.infinity,
-                     height: 48,
-                     child: ButtonWidgets.buildRoundedGradientButton(
-                         press: () {
-                           final comment = commentController.text.trim();
-                           if (comment.isEmpty) {
-                             setState(() {
-                               errorText = 'Comment cannot be empty';
-                             });
-                             return;
-                           }
-                           if (comment.isNotEmpty) {
-                             onSubmit(comment);
-                             commentController.clear();
-                             Navigator.pop(context);
-                           }
-                         },
-                         text: "Submit"),
-                   ),
-                   const SizedBox(height: 16),
-                 ],
-               ),
-             ),
-           );
-         },
+          builder: (context, setState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            commentController.clear();
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Comment*',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: commentController,
+                      decoration: InputDecoration(
+                        hintText: commentHint,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 16,
+                        ),
+                        errorText: errorText,
+                      ),
+                      minLines: 3,
+                      maxLines: 5,
+                      onChanged: (value) {
+                        if (errorText != null) {
+                          setState(() {
+                            errorText = null;
+                          });
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ButtonWidgets.buildRoundedGradientButton(
+                          press: () {
+                            final comment = commentController.text.trim();
+                            if (comment.isEmpty) {
+                              setState(() {
+                                errorText = 'Comment cannot be empty';
+                              });
+                              return;
+                            }
+                            if (comment.isNotEmpty) {
+                              onSubmit(comment);
+                              commentController.clear();
+                              Navigator.pop(context);
+                            }
+                          },
+                          text: "Submit"),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );

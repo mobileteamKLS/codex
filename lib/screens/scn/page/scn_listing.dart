@@ -1073,12 +1073,12 @@ class _ScnlistingState extends State<Scnlisting> {
                     children: [
                       Utils.buildCompactLabelValue(
                           'ETA',
-                          Utils.formatStringDate(vesselDetails.eta,
+                          Utils.formatStringUTCDate(vesselDetails.eta,
                               showTime: true)),
                       // You may need to add this field
                       Utils.buildCompactLabelValue(
                           'ETD',
-                          Utils.formatStringDate(vesselDetails.etd,
+                          Utils.formatStringUTCDate(vesselDetails.etd,
                               showTime: true)),
                       Utils.buildCompactLabelValue(
                           'Vessel Id', vesselDetails.vesselId),
@@ -1214,19 +1214,19 @@ class _ScnlistingState extends State<Scnlisting> {
                     children: [
                       buildLabelValue(
                           'ETA',
-                          Utils.formatStringDate(vesselDetails.eta,
+                          Utils.formatStringUTCDate(vesselDetails.eta,
                               showTime: true)),
                       // You may need to add this field
                       buildLabelValue(
                           'ETD',
-                          Utils.formatStringDate(vesselDetails.etd,
+                          Utils.formatStringUTCDate(vesselDetails.etd,
                               showTime: true)),
                     ],
                   ),
                 ),
               ],
             ),
-            buildLabelValue('Port of Registry'," ${vesselDetails.poToPjLinked}"),
+            buildLabelValue('Port of Registry',""),
             const SizedBox(height: 4),
             Utils.customDivider(
               space: 0,

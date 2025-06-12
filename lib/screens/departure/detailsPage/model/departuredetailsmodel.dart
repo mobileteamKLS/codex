@@ -79,6 +79,7 @@ class DepartureDetailsModel {
   List<dynamic>? lstPassengers;
   List<LstUploadDetail>? lstUploadDetails;
   String? remarksbyPortHealth;
+  String? portName;
 
   DepartureDetailsModel({
     this.voyId,
@@ -161,6 +162,7 @@ class DepartureDetailsModel {
     this.lstPassengers,
     this.lstUploadDetails,
     this.remarksbyPortHealth,
+    this.portName,
   });
 
   factory DepartureDetailsModel.fromJson(Map<String, dynamic> json) => DepartureDetailsModel(
@@ -244,6 +246,7 @@ class DepartureDetailsModel {
     lstPassengers: json["lstPassengers"] == null ? [] : List<dynamic>.from(json["lstPassengers"]!.map((x) => x)),
     lstUploadDetails: json["lstUploadDetails"] == null ? [] : List<LstUploadDetail>.from(json["lstUploadDetails"]!.map((x) => LstUploadDetail.fromJson(x))),
     remarksbyPortHealth: json["RemarksbyPortHealth"],
+      portName:json["portNameTextWithComma"]
   );
 
   Map<String, dynamic> toJson() => {
@@ -428,8 +431,8 @@ class LstDepartureCrew {
     crewListNextPortOfCall: json["CrewListNextPortOfCall"],
     crewListXml: json["CrewListXml"],
     crewListStatus: json["CrewListStatus"],
-    crewListDateEmbark: json["CrewListDateEmbark"],
-    crewListDateDisEmbark: json["CrewListDateDisEmbark"],
+    crewListDateEmbark: json["DateEmbark"],
+    crewListDateDisEmbark: json["DateDisEmbark"],
     crewListDateIdentityDate: json["CrewListDateIdentityDate"],
     fileName: json["FileName"],
     saveFileName: json["SaveFileName"],

@@ -66,11 +66,16 @@ class Utils {
     );
   }
 
+  static String formatNonUTCDate(String input) {
+    DateTime dateTime = DateFormat("dd/MM/yyyy HH:mm").parse(input);
+    return DateFormat("dd MMM yyyy, HH:mm").format(dateTime);
+  }
+
   static String formatDate(DateTime date) {
     return DateFormat('d MMM yyyy').format(date);
   }
 
-  static String formatStringDate(String? dateString,
+  static String formatStringUTCDate(String? dateString,
       {bool showTime = false, bool onlyTime = false}) {
     if (dateString == null || dateString.isEmpty) {
       return '-';

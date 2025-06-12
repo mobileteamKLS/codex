@@ -4,6 +4,7 @@ import 'package:codex_pcs/screens/departure/listPage/service/cubit/departure_sta
 import 'package:codex_pcs/screens/vessel/page/vessel_details.dart';
 import 'package:codex_pcs/utils/color_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import '../../../core/dimensions.dart';
@@ -285,7 +286,7 @@ class _DepartureListingState extends State<DepartureListing> {
                               ListView.builder(
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemBuilder: (context, index) {
-                                  return buildVesselCard(
+                                  return buildVesselCardV2(
                                       vesselDetails: state.vessels[index],
                                       index: index);
                                 },
@@ -481,6 +482,10 @@ class _DepartureListingState extends State<DepartureListing> {
             controller: imoNumberController,
             labelText: "IMO No.",
             isValidationRequired: false,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(7)
+            ],
           ),
           SizedBox(height: ScreenDimension.onePercentOfScreenHight * 1.5),
           CustomTextField(
@@ -908,7 +913,6 @@ class _DepartureListingState extends State<DepartureListing> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 130,
             child: Text(
               '$label:',
               style: AppStyle.sideDescText,
@@ -1010,12 +1014,12 @@ class _DepartureListingState extends State<DepartureListing> {
                     children: [
                       Utils.buildCompactLabelValue(
                           'ETA',
-                          Utils.formatStringDate(vesselDetails.eta,
+                          Utils.formatStringUTCDate(vesselDetails.eta,
                               showTime: true)),
                       // You may need to add this field
                       Utils.buildCompactLabelValue(
                           'ETD',
-                          Utils.formatStringDate(vesselDetails.etd,
+                          Utils.formatStringUTCDate(vesselDetails.etd,
                               showTime: true)),
                       // Utils.buildCompactLabelValue(
                       //     'Vessel Id', vesselDetails.vesselId??""),
@@ -1045,6 +1049,143 @@ class _DepartureListingState extends State<DepartureListing> {
                               marineBranchId: 0,
                               isSubmit: (vesselDetails.status == "Submitted"),
                             )));
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Show More Details',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: AppColors.gradient1,
+                      ),
+                      child: const Icon(Icons.keyboard_arrow_right_outlined,
+                          color: AppColors.primary)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildVesselCardV2(
+      {required DepartureListModel vesselDetails, required int index}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.0),
+        color: AppColors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with vessel name and status
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    vesselDetails.vesselName ?? "",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color:
+                    ColorUtils.getStatusColor(vesselDetails.status ?? ""),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    vesselDetails.status ?? "",
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textColorPrimary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+            buildLabelValue('Vessel Flag', ""),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      buildLabelValue('SCN', "        ${vesselDetails.vcn}"),
+                      buildLabelValue(
+                          'IMO No.', " "),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      buildLabelValue(
+                          'ETA',
+                          Utils.formatStringUTCDate(vesselDetails.eta,
+                              showTime: true)),
+                      buildLabelValue(
+                          'ETD',
+                          Utils.formatStringUTCDate(vesselDetails.etd,
+                              showTime: true)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            buildLabelValue('Port of Registry',""),
+
+            const SizedBox(height: 4),
+            Utils.customDivider(
+              space: 0,
+              color: Colors.black,
+              hasColor: true,
+              thickness: 1,
+            ),
+            const SizedBox(height: 4),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => DepartureClearanceDetails(
+                          refNo: vesselDetails.vesselName!,
+                          drId: vesselDetails.drId!,
+                          marineBranchId: 0,
+                          isSubmit: (vesselDetails.status == "Submitted"),
+                        )));
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

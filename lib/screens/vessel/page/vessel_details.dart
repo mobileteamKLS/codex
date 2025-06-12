@@ -511,7 +511,7 @@ class _VesselDetailsState extends State<VesselDetails> {
                   style: AppStyle.sideDescText,
                 ),
                 const SizedBox(height: 2),
-                Text(Utils.formatStringDate(expiry),
+                Text(Utils.formatStringUTCDate(expiry),
                     style: AppStyle.defaultTitle),
               ],
             ),

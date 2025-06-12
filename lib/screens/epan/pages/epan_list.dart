@@ -1056,12 +1056,12 @@ class _EpanListingState extends State<EpanListing> {
                     children: [
                       Utils.buildCompactLabelValue(
                           'ETA',
-                          Utils.formatStringDate(vesselDetails.eta,
+                          Utils.formatStringUTCDate(vesselDetails.eta,
                               showTime: true)),
                       // You may need to add this field
                       Utils.buildCompactLabelValue(
                           'ETD',
-                          Utils.formatStringDate(vesselDetails.etd,
+                          Utils.formatStringUTCDate(vesselDetails.etd,
                               showTime: true)),
                       Utils.buildCompactLabelValue(
                           'Vessel Id', vesselDetails.vesselid),
@@ -1197,19 +1197,19 @@ class _EpanListingState extends State<EpanListing> {
                     children: [
                       buildLabelValue(
                           'ETA',
-                          Utils.formatStringDate(vesselDetails.eta,
-                              showTime: true)),
+                          Utils.formatNonUTCDate(vesselDetails.eta,
+                              )),
                       // You may need to add this field
                       buildLabelValue(
                           'ETD',
-                          Utils.formatStringDate(vesselDetails.etd,
-                              showTime: true)),
+                          Utils.formatNonUTCDate(vesselDetails.etd,
+                              )),
                     ],
                   ),
                 ),
               ],
             ),
-            buildLabelValue('Port of Registry'," ${vesselDetails.portName}"),
+            buildLabelValue('Port of Registry',""),
             const SizedBox(height: 4),
             Utils.customDivider(
               space: 0,

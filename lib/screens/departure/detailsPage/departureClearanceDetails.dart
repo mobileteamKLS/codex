@@ -36,13 +36,14 @@ class DepartureClearanceDetails extends StatefulWidget {
 
   const DepartureClearanceDetails(
       {super.key,
-        required this.refNo,
-        required this.drId,
-        required this.marineBranchId,
-        required this.isSubmit});
+      required this.refNo,
+      required this.drId,
+      required this.marineBranchId,
+      required this.isSubmit});
 
   @override
-  State<DepartureClearanceDetails> createState() => _DepartureClearanceDetailsState();
+  State<DepartureClearanceDetails> createState() =>
+      _DepartureClearanceDetailsState();
 }
 
 class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
@@ -69,7 +70,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
         method: "POST",
         body: {
           "OperationType": 1,
-          "OrgId":loginDetailsMaster.organizationId,
+          "OrgId": loginDetailsMaster.organizationId,
           "Client": int.parse(configMaster.clientID),
           "OrgBranchId": loginDetailsMaster.organizationBranchId,
           "DR_ID": widget.drId,
@@ -94,18 +95,68 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
     }
   }
 
-  void approveReject(String comment, int opType) async {
+  void approveDC(String remark, int opType) async {
     setState(() {
       isLoading = true;
     });
 
     try {
       final response = await ApiService().request(
-        endpoint: "/api_pcs1/Vessel/SetApproval",
+        endpoint: "/api_pcs1/DepartureClearance/SetApproval",
         method: "POST",
         body: {
-          "Client": int.parse(configMaster.clientID),
-          "OrgId": loginDetailsMaster.organizationId,
+          "IsMY": int.parse(configMaster.clientID),
+          "ORG_ID": loginDetailsMaster.organizationId,
+          "OperationType": opType,
+          "OrgType": "Marine Department",
+          "OrgTypeName": loginDetailsMaster.orgTypeName,
+          "CreatedBy": "150",
+          "BranchId": loginDetailsMaster.organizationBranchId,
+          "PVR_ID": widget.drId,
+          "IPAddress": "",
+          "Comments": remark
+        },
+      );
+
+      if (response is Map<String, dynamic> && response["StatusCode"] == 200) {
+        Utils.prints("Status", response["StatusMessage"]);
+        CustomSnackBar.show(context,
+            message: response["StatusMessage"],
+            backgroundColor: AppColors.successColor,
+            leftIcon: Icons.check_circle);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const DepartureListing()),
+        );
+      } else {
+        Utils.prints("Login failed:", "${response["StatusMessage"]}");
+        CustomSnackBar.show(context,
+            message: response["StatusMessage"], backgroundColor: Colors.red);
+      }
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      print("API Call Failed: $e");
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void rejectDC(String comment, int opType) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await ApiService().request(
+        endpoint: "/api_pcs1/DepartureClearance/SetReject",
+        method: "POST",
+        body: {
+          "IsMY": int.parse(configMaster.clientID),
+          "ORG_ID": loginDetailsMaster.organizationId,
           "OperationType": opType,
           "OrgType": "Marine Department",
           "OrgTypeName": loginDetailsMaster.orgTypeName,
@@ -188,10 +239,10 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
           children: [
             Container(
               constraints: const BoxConstraints.expand(),
-              margin:(OrganizationService.isMarineDepartment &&
-                  widget.isSubmit &&
-                  (widget.marineBranchId ==
-                      loginDetailsMaster.organizationBranchId))
+              margin: (OrganizationService.isMarineDepartment &&
+                      widget.isSubmit &&
+                      (widget.marineBranchId ==
+                          loginDetailsMaster.organizationBranchId))
                   ? const EdgeInsets.only(bottom: 100)
                   : const EdgeInsets.only(bottom: 10),
               padding: EdgeInsets.only(
@@ -200,9 +251,11 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                 right: ScreenDimension.onePercentOfScreenWidth *
                     AppDimensions.defaultPageHorizontalPadding,
                 bottom: (OrganizationService.isMarineDepartment &&
-                    widget.isSubmit &&
-                    (widget.marineBranchId ==
-                        loginDetailsMaster.organizationBranchId)) ? 0 : 8,
+                        widget.isSubmit &&
+                        (widget.marineBranchId ==
+                            loginDetailsMaster.organizationBranchId))
+                    ? 0
+                    : 8,
               ),
               color: AppColors.background,
               child: SingleChildScrollView(
@@ -212,7 +265,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                         padding: EdgeInsets.symmetric(
                             horizontal: ScreenDimension.onePercentOfScreenWidth,
                             vertical:
-                            ScreenDimension.onePercentOfScreenHight * 1.5),
+                                ScreenDimension.onePercentOfScreenHight * 1.5),
                         child: Row(
                           children: [
                             InkWell(
@@ -242,7 +295,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                                     ? 'Collapse All'
                                     : 'Expand All',
                                 style:
-                                const TextStyle(color: AppColors.primary),
+                                    const TextStyle(color: AppColors.primary),
                               ),
                             ),
                           ],
@@ -262,11 +315,11 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                         children: [
                           buildSection(
                               0, "Vessel Details", vesselDetailsContent()),
-                          buildSection(
-                              1, "Cargo Details", buildCargoDetails()),
+                          buildSection(1, "Cargo Details", buildCargoDetails()),
                           buildSection(2, "Operational Details",
                               operationalDetailsContent()),
-                          buildSection(3, "Crew and Passenger Details", crewAndPassenger()),
+                          buildSection(3, "Crew and Passenger Details",
+                              crewAndPassenger()),
                           buildSection(4, "Attached Documents",
                               attachedDocumentsContent()),
                         ],
@@ -317,7 +370,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                             showRejectWithCommentsBottomSheet(
                               context: context,
                               onSubmit: (comment) {
-                                approveReject(comment, 2);
+                                // approveReject(comment, 2);
                               },
                             );
                           },
@@ -333,7 +386,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                                 "Are you sure you want to Approve ?",
                                 "Approve");
                             if (isTrue!) {
-                              approveReject("", 1);
+                              // approveReject("", 1);
                             }
                           },
                         ),
@@ -361,8 +414,8 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
             decoration: BoxDecoration(
               border: index != 0
                   ? Border(
-                top: BorderSide(color: Colors.grey.shade300, width: 1),
-              )
+                      top: BorderSide(color: Colors.grey.shade300, width: 1),
+                    )
                   : null,
             ),
             child: Row(
@@ -397,18 +450,18 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
   }
 
   Widget infoRow(String label, String value) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: AppStyle.sideDescText,
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: AppStyle.sideDescText,
+            ),
+            Text(value, style: AppStyle.defaultTitle),
+          ],
         ),
-        Text(value, style: AppStyle.defaultTitle),
-      ],
-    ),
-  );
+      );
 
   Widget infoBlock(String label, String value) {
     return SizedBox(
@@ -428,7 +481,13 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
   }
 
   Widget documentRow(
-      String title, String expiry, String fileName, String savedName, String folderPath,{ bool isExpiry = false,}) =>
+    String title,
+    String expiry,
+    String fileName,
+    String savedName,
+    String folderPath, {
+    bool isExpiry = false,
+  }) =>
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
@@ -439,10 +498,11 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                   children: [
                     Text(title, style: AppStyle.defaultTitle),
                     const SizedBox(height: 2),
-                    if(!isExpiry) Text(
-                      "Expires on $expiry",
-                      style: AppStyle.sideDescText,
-                    ),
+                    if (!isExpiry)
+                      Text(
+                        "Expires on $expiry",
+                        style: AppStyle.sideDescText,
+                      ),
                   ]),
             ),
             if (fileName != "")
@@ -455,8 +515,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                       AppDimensions.defaultIconSize,
                 ),
                 onTap: () {
-                  _downloadDocument(
-                      fileName, savedName, folderPath);
+                  _downloadDocument(fileName, savedName, folderPath);
                 },
               ),
           ],
@@ -494,7 +553,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                   style: AppStyle.sideDescText,
                 ),
                 const SizedBox(height: 2),
-                Text(Utils.formatStringDate(expiry),
+                Text(Utils.formatStringUTCDate(expiry),
                     style: AppStyle.defaultTitle),
               ],
             ),
@@ -556,7 +615,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
         return;
       }
       String downloadPath =
-          "${configMaster.applicationUIURL}$folderLocation${savedName}";
+          "${configMaster.applicationUIURL}$folderLocation/${savedName}";
       await _performDownload(downloadPath, savePath);
 
       Navigator.pop(context);
@@ -633,35 +692,56 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
             vesselDetailsModel.vesselNationalityType ?? ""),
         infoBlock("Vessel Name", vesselDetailsModel.vesselName ?? ""),
         infoBlock("Voyage No", vesselDetailsModel.voyage ?? ""),
-        infoBlock("Port Name", ""),
+        infoBlock("Port Name", vesselDetailsModel.portName ?? ""),
         infoBlock("Vessel Type", vesselDetailsModel.vesselTypeName ?? ""),
-        infoBlock("Estimated Date and Time of Arrival", vesselDetailsModel.arrivalDt != null ? Utils.formatStringDate(vesselDetailsModel.arrivalDt, showTime: true):""),
-        infoBlock("Estimated Date and Time of Departure",  vesselDetailsModel.departureDt != null ? Utils.formatStringDate(vesselDetailsModel.departureDt, showTime: true):""),
+        infoBlock(
+            "Estimated Date and Time of Arrival",
+            vesselDetailsModel.arrivalDt != null
+                ? Utils.formatStringUTCDate(vesselDetailsModel.arrivalDt,
+                    showTime: true)
+                : ""),
+        infoBlock(
+            "Estimated Date and Time of Departure",
+            vesselDetailsModel.departureDt != null
+                ? Utils.formatStringUTCDate(vesselDetailsModel.departureDt,
+                    showTime: true)
+                : ""),
         infoBlock("Vessel Flag", vesselDetailsModel.flagOfVessel ?? ""),
         infoBlock("Berth No.", vesselDetailsModel.berthNo ?? ""),
-        infoBlock("Gross Tonnage", vesselDetailsModel.grt != null
-            ? "${vesselDetailsModel.grt!.toStringAsFixed(3)} ${vesselDetailsModel.grtUnit}"
-            : ""),
-        infoBlock("Net Tonnage", vesselDetailsModel.nrt != null
-            ? "${vesselDetailsModel.nrt!} ${vesselDetailsModel.nrtUnit}"
-            : ""),
+        infoBlock(
+            "Gross Tonnage",
+            vesselDetailsModel.grt != null
+                ? "${vesselDetailsModel.grt!.toStringAsFixed(3)} ${vesselDetailsModel.grtUnit}"
+                : ""),
+        infoBlock(
+            "Net Tonnage",
+            vesselDetailsModel.nrt != null
+                ? "${vesselDetailsModel.nrt!} ${vesselDetailsModel.nrtUnit}"
+                : ""),
         // infoBlock("Name of Master", vesselDetailsModel.name ?? ""),
         infoBlock(
           "Last Port of Call",
           "${vesselDetailsModel.lastPortCode ?? ""} - ${vesselDetailsModel.lastPortName ?? ""}",
         ),
-        infoBlock("Next Port of Call", "${vesselDetailsModel.nextPortCode ?? ""} - ${vesselDetailsModel.nextPortName ?? ""}",),
-        infoBlock("Number of Crew(s)", vesselDetailsModel.noofCrew != null
-            ? "${vesselDetailsModel.noofCrew!}"
-            : ""),
-        infoBlock("Number of Passengers(s)",
+        infoBlock(
+          "Next Port of Call",
+          "${vesselDetailsModel.nextPortCode ?? ""} - ${vesselDetailsModel.nextPortName ?? ""}",
+        ),
+        infoBlock(
+            "Number of Crew(s)",
+            vesselDetailsModel.noofCrew != null
+                ? "${vesselDetailsModel.noofCrew!}"
+                : ""),
+        infoBlock(
+            "Number of Passengers(s)",
             vesselDetailsModel.passengersOnBoard != null
                 ? "${vesselDetailsModel.passengersOnBoard!}"
                 : ""),
+        infoBlock("Name of Captain", vesselDetailsModel.nameofCaption ?? ""),
         infoBlock(
-            "Name of Captain", vesselDetailsModel.nameofCaption ?? ""),
-        infoBlock(
-            "Port of Registry",  "${vesselDetailsModel.portRegistryCode ?? ""} - ${vesselDetailsModel.portRegistryName ?? ""}",),
+          "Port of Registry",
+          "${vesselDetailsModel.portRegistryCode ?? ""} - ${vesselDetailsModel.portRegistryName ?? ""}",
+        ),
         infoBlock("Port of Departure",
             "${vesselDetailsModel.departurePortCode ?? ""} - ${vesselDetailsModel.departurePortPortName ?? ""}"),
       ],
@@ -673,113 +753,280 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
       spacing: 16,
       runSpacing: 12,
       children: [
-        infoBlock("Weapon on Board",  (vesselDetailsModel.wepoanofboard == null)
-            ? ""
-            : (vesselDetailsModel.wepoanofboard == "1" ? "Yes" : "No")),
+        infoBlock(
+            "Weapon on Board",
+            (vesselDetailsModel.wepoanofboard == null)
+                ? ""
+                : (vesselDetailsModel.wepoanofboard == "1" ? "Yes" : "No")),
         infoBlock("Make and Model", vesselDetailsModel.makeModel ?? ""),
         infoBlock("Quantity", vesselDetailsModel.quantity ?? ""),
-        infoBlock("Name of Agent",
-            vesselDetailsModel.nameofAgent ?? ""),
+        infoBlock("Name of Agent", vesselDetailsModel.nameofAgent ?? ""),
         infoBlock("IC No. / Passport No.", vesselDetailsModel.icNo ?? ""),
         infoBlock("Designation", vesselDetailsModel.designation ?? ""),
+        SizedBox(
+          width: double.infinity,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Light Dues Invoice",
+                style: AppStyle.sideDescText,
+              ),
+              const SizedBox(height: 2),
+              if (vesselDetailsModel.noDues != "" )
+                Container(
+                  color: AppColors.cardBg,
+                  padding: const EdgeInsets.all(8),
+                  child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        vesselDetailsModel.noDuesFileName??"",
+                        style: AppStyle.defaultTitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                      const SizedBox(width: 14,),
+                      GestureDetector(
+                        child: SvgPicture.asset(
+                          download,
+                          colorFilter: const ColorFilter.mode(
+                              AppColors.primary, BlendMode.srcIn),
+                          height: ScreenDimension.onePercentOfScreenHight *
+                              AppDimensions.defaultIconSize,
+                        ),
+                        onTap: () {
+                          _downloadDocument(
+                              vesselDetailsModel.noDuesFileName!,
+                              vesselDetailsModel.noDues!,
+                              vesselDetailsModel.docFileFolderDcAttachment!);
+                        },
+                      ),
+                  ],
+                                ),
+                ),
+            ],
+          ),
+        ),
       ],
     );
   }
 
-  Widget buildCargoDetails(){
-    return Container(
-      color: AppColors.cardBg,
-      padding: EdgeInsets.all(8),
-      child: Column(
-        children: [
-          portCallItem("Tonnage of Cargo","Containerised","Net Wight", vesselDetailsModel.containerised==null?"AS PER MANIFEST": vesselDetailsModel.containerised.toString(),"UOM",vesselDetailsModel.contUnit??""),
-          const SizedBox(height: 12),
-          Divider(
-            color: Colors.grey[300],
-            thickness: 0.5,
-            height: 1,
+  Widget buildCargoDetails() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (vesselDetailsModel.containerised == null)
+          Text(
+            vesselDetailsModel.containerised == null ? "AS PER MANIFEST" : "",
+            style: AppStyle.defaultTitle,
           ),
-          const SizedBox(height: 12),
-          portCallItem("Tonnage of Cargo","Non-Containerised","Net Wight", vesselDetailsModel.nonContainerised==null?"AS PER MANIFEST": vesselDetailsModel.nonContainerised.toString(),"UOM",vesselDetailsModel.nonConUnit??""),
-          const SizedBox(height: 12),
-          Divider(
-            color: Colors.grey[300],
-            thickness: 0.5,
-            height: 1,
+        Container(
+          color: AppColors.cardBg,
+          padding: EdgeInsets.all(8),
+          child: Column(
+            children: [
+              portCallItem(
+                  "Tonnage of Cargo",
+                  "Containerised",
+                  "Net Wight",
+                  vesselDetailsModel.containerised == null
+                      ? "AS PER MANIFEST"
+                      : vesselDetailsModel.containerised.toString(),
+                  "UOM",
+                  vesselDetailsModel.contUnit ?? ""),
+              const SizedBox(height: 12),
+              Divider(
+                color: Colors.grey[300],
+                thickness: 0.5,
+                height: 1,
+              ),
+              const SizedBox(height: 12),
+              portCallItem(
+                  "Tonnage of Cargo",
+                  "Non-Containerised",
+                  "Net Wight",
+                  vesselDetailsModel.nonContainerised == null
+                      ? "AS PER MANIFEST"
+                      : vesselDetailsModel.nonContainerised.toString(),
+                  "UOM",
+                  vesselDetailsModel.nonConUnit ?? ""),
+              const SizedBox(height: 12),
+              Divider(
+                color: Colors.grey[300],
+                thickness: 0.5,
+                height: 1,
+              ),
+              const SizedBox(height: 12),
+              portCallItem(
+                  "Total Container",
+                  "Empty",
+                  "20",
+                  vesselDetailsModel.containerised == null
+                      ? "AS PER MANIFEST"
+                      : vesselDetailsModel.empty20.toString(),
+                  "40",
+                  vesselDetailsModel.containerised == null
+                      ? "AS PER MANIFEST"
+                      : vesselDetailsModel.empty40.toString()),
+              const SizedBox(height: 12),
+              Divider(
+                color: Colors.grey[300],
+                thickness: 0.5,
+                height: 1,
+              ),
+              const SizedBox(height: 12),
+              portCallItem(
+                  "Total Container",
+                  "Loaded",
+                  "20",
+                  vesselDetailsModel.containerised == null
+                      ? "AS PER MANIFEST"
+                      : vesselDetailsModel.loaded20.toString(),
+                  "40",
+                  vesselDetailsModel.containerised == null
+                      ? "AS PER MANIFEST"
+                      : vesselDetailsModel.loaded40.toString()),
+              const SizedBox(height: 12),
+              Divider(
+                color: Colors.grey[300],
+                thickness: 0.5,
+                height: 1,
+              ),
+              const SizedBox(height: 12),
+              cargoList()
+              //portCallItem("Description of Goods","AS PER MANIFEST","Gross Wight", "AS PER MANIFEST","Remarks","AS PER MANIFEST"),
+            ],
           ),
-          const SizedBox(height: 12),
-          portCallItem("Total Container","Empty","20", vesselDetailsModel.containerised==null?"AS PER MANIFEST":vesselDetailsModel.empty20.toString(),"40",vesselDetailsModel.containerised==null?"AS PER MANIFEST":vesselDetailsModel.empty40.toString()),
-          const SizedBox(height: 12),
-          Divider(
-            color: Colors.grey[300],
-            thickness: 0.5,
-            height: 1,
-          ),
-          const SizedBox(height: 12),
-          portCallItem("Total Container","Loaded","20", vesselDetailsModel.containerised==null?"AS PER MANIFEST":vesselDetailsModel.loaded20.toString(),"40",vesselDetailsModel.containerised==null?"AS PER MANIFEST":vesselDetailsModel.loaded40.toString()),
-          const SizedBox(height: 12),
-          Divider(
-            color: Colors.grey[300],
-            thickness: 0.5,
-            height: 1,
-          ),
-          const SizedBox(height: 12),
-          cargoList()
-          //portCallItem("Description of Goods","AS PER MANIFEST","Gross Wight", "AS PER MANIFEST","Remarks","AS PER MANIFEST"),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget crewList(){
+  Widget crewList() {
     return Column(
-      children: vesselDetailsModel.lstDepartureCrew?.asMap().entries.map((entry) {
-        int index = entry.key;
-        var crew = entry.value;
-        bool isLast = index == vesselDetailsModel.lstDepartureCrew!.length - 1;
-        return Column(
-          children: [
-            buildPassportCardAlternative(crewData:crew ),
-            if (!isLast) ...[
-              const SizedBox(height: 8),
-            ],
-          ],
-        );
-      }).toList() ?? [],
+      children:
+          vesselDetailsModel.lstDepartureCrew?.asMap().entries.map((entry) {
+                int index = entry.key;
+                var crew = entry.value;
+                bool isLast =
+                    index == vesselDetailsModel.lstDepartureCrew!.length - 1;
+                return Column(
+                  children: [
+                    buildPassportCardAlternative(crewData: crew),
+                    if (!isLast) ...[
+                      const SizedBox(height: 8),
+                    ],
+                  ],
+                );
+              }).toList() ??
+              [],
     );
   }
-  Widget cargoList(){
+
+  Widget cargoList() {
     return Column(
       children: vesselDetailsModel.lstGoods?.asMap().entries.map((entry) {
-        int index = entry.key;
-        var goods = entry.value;
-        bool isLast = index == vesselDetailsModel.lstGoods!.length - 1;
-        return Column(
-          children: [
-            portCallItem("Description of Goods",goods.descName??"","Gross Wight", goods.grossWeight??"","Remarks",goods.remarks??""),
-            if (!isLast) ...[
-              const SizedBox(height: 8),
-            ],
-          ],
-        );
-      }).toList() ?? [],
+            int index = entry.key;
+            var goods = entry.value;
+            bool isLast = index == vesselDetailsModel.lstGoods!.length - 1;
+            return Column(
+              children: [
+                portCallItem(
+                    "Description of Goods",
+                    goods.descName ?? "",
+                    "Gross Wight",
+                    goods.grossWeight ?? "",
+                    "Remarks",
+                    goods.remarks ?? ""),
+                if (!isLast) ...[
+                  const SizedBox(height: 8),
+                ],
+              ],
+            );
+          }).toList() ??
+          [],
     );
   }
 
-  Widget crewAndPassenger(){
+  Widget crewAndPassenger() {
     return Column(
       children: [
-        SizedBox(
-            child: crewList()),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                 "Cargo List",
+                  style: AppStyle.subHeading,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 14,),
+              GestureDetector(
+                child: SvgPicture.asset(
+                  download,
+                  colorFilter: const ColorFilter.mode(
+                      AppColors.primary, BlendMode.srcIn),
+                  height: ScreenDimension.onePercentOfScreenHight *
+                      AppDimensions.defaultIconSize,
+                ),
+                onTap: () {
+                  _downloadDocument(
+                      vesselDetailsModel.noDuesFileName!,
+                      vesselDetailsModel.noDues!,
+                      vesselDetailsModel.docFileFolderDcAttachment!);
+                },
+              ),
+            ],
+          ),
+        ),
+        SizedBox(child: crewList()),
         const SizedBox(height: 16),
-
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  "Passenger List",
+                  style: AppStyle.subHeading,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 14,),
+              GestureDetector(
+                child: SvgPicture.asset(
+                  download,
+                  colorFilter: const ColorFilter.mode(
+                      AppColors.primary, BlendMode.srcIn),
+                  height: ScreenDimension.onePercentOfScreenHight *
+                      AppDimensions.defaultIconSize,
+                ),
+                onTap: () {
+                  _downloadDocument(
+                      vesselDetailsModel.noDuesFileName!,
+                      vesselDetailsModel.noDues!,
+                      vesselDetailsModel.docFileFolderDcAttachment!);
+                },
+              ),
+            ],
+          ),
+        ),
         const SizedBox(height: 16),
-
       ],
     );
   }
 
-  Widget portCallItem(String rowTitle1,String rowValue1,String colTitle1,String colValue1,String colTitle2,String colValue2) {
+  Widget portCallItem(String rowTitle1, String rowValue1, String colTitle1,
+      String colValue1, String colTitle2, String colValue2) {
     return SizedBox(
       width: double.infinity,
       child: Column(
@@ -791,13 +1038,8 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
             style: AppStyle.sideDescText,
           ),
           SizedBox(height: 2),
-          Text(
-            rowValue1,
-            style: AppStyle.defaultTitle.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          SizedBox(height: 12),
+          Text(rowValue1, style: AppStyle.defaultTitle),
+          SizedBox(height: 8),
 
           // Three column layout for dates and security level
           Row(
@@ -919,10 +1161,10 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
                               passportNumber,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black87,
@@ -976,68 +1218,49 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
   }
 
   Widget buildPassportCardAlternative({
-  required LstDepartureCrew crewData,
+    required LstDepartureCrew crewData,
     VoidCallback? onTap,
   }) {
     return InkWell(
-      onTap: (){
+      onTap: () {
         Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) =>  DepartureCrewDetails(crew: crewData,)));
+            MaterialPageRoute(
+                builder: (_) => DepartureCrewDetails(
+                      crew: crewData,
+                  folderPath: vesselDetailsModel.docFileFolderDcAttachment??"",
+                    )));
       },
       child: Container(
         color: AppColors.cardBg,
         padding: const EdgeInsets.all(8),
         child: Row(
           children: [
-            // Malaysian flag icon
-            // Container(
-            //   width: 24,
-            //   height: 16,
-            //   decoration: BoxDecoration(
-            //     borderRadius: BorderRadius.circular(3),
-            //     border: Border.all(
-            //       color: Colors.grey[300]!,
-            //       width: 0.5,
-            //     ),
-            //   ),
-            //   child: ClipRRect(
-            //     borderRadius: BorderRadius.circular(2.5),
-            //     child: Container(
-            //       decoration: BoxDecoration(
-            //         gradient: LinearGradient(
-            //           begin: Alignment.topCenter,
-            //           end: Alignment.bottomCenter,
-            //           colors: [
-            //             Colors.red[600]!,
-            //             Colors.white,
-            //             Colors.red[600]!,
-            //           ],
-            //           stops: [0.0, 0.5, 1.0],
-            //         ),
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // SizedBox(width: 12),
-            // Content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     "${crewData.crewListFamilyName ?? ""} ${crewData.crewListGivenName ?? ""}",
-                    style:AppStyle.defaultTitle,
+                    style: AppStyle.defaultTitle,
                   ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
                       Expanded(
-                        child: infoBlock(crewData.crewListNatureOfDoc??"", crewData.crewListNoofIdentityDoc??""),
+                        child: infoBlock(crewData.crewListNatureOfDoc ?? "",
+                            crewData.crewListNoofIdentityDoc ?? ""),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: infoBlock('Expiry Date',  crewData.crewListDateIdentityDate != null ? Utils.formatStringDate(crewData.crewListDateIdentityDate,) : "",),
+                        child: infoBlock(
+                          'Expiry Date',
+                          crewData.crewListDateIdentityDate != null
+                              ? Utils.formatStringUTCDate(
+                                  crewData.crewListDateIdentityDate,
+                                )
+                              : "",
+                        ),
                       ),
                     ],
                   ),
@@ -1083,7 +1306,6 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
       ],
     );
   }
-
 
   // Widget ownerAgentContent() => Wrap(spacing: 16, runSpacing: 12, children: [
   //   infoBlock("Owner Name", vesselDetailsModel.ownerName ?? ""),
@@ -1183,14 +1405,14 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
     return Column(
       children: vesselDetailsModel.lstUploadDetails != null
           ? vesselDetailsModel.lstUploadDetails!.map((document) {
-        return documentRow(
-            document.docTitle ?? "Untitled Document",
-            document.docExpiry ?? "-",
-            document.fileName ?? "",
-            document.saveFileName ?? "",
-            "${vesselDetailsModel.docFileFolderDcAttachment ?? ""}/");
-      }).toList()
-          : [documentRow("No documents available", "", "", "","")],
+              return documentRow(
+                  document.docTitle ?? "Untitled Document",
+                  document.docExpiry ?? "-",
+                  document.fileName ?? "",
+                  document.saveFileName ?? "",
+                  "${vesselDetailsModel.docFileFolderDcAttachment ?? ""}/");
+            }).toList()
+          : [documentRow("No documents available", "", "", "", "")],
     );
   }
 
