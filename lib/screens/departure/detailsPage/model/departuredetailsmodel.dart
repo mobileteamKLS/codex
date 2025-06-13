@@ -344,6 +344,7 @@ class LstDepartureCrew {
   String? crewListPlaceOfBirth;
   String? crewListGender;
   String? crewListNatureOfDoc;
+  String? issueCountryText;
   String? crewListNoofIdentityDoc;
   String? crewListIssueStateDoc;
   dynamic crewListExpiryDateOfDoc;
@@ -382,6 +383,7 @@ class LstDepartureCrew {
     this.crewListPlaceOfBirth,
     this.crewListGender,
     this.crewListNatureOfDoc,
+    this.issueCountryText,
     this.crewListNoofIdentityDoc,
     this.crewListIssueStateDoc,
     this.crewListExpiryDateOfDoc,
@@ -417,6 +419,7 @@ class LstDepartureCrew {
     crewListGivenName: json["CrewListGivenName"],
     crewListRankRating: json["CrewListRankRating"],
     crewListNationality: json["NationalityText"],
+    issueCountryText: json["IssueCountryText"],
     crewListDob: json["CrewListDOB"],
     crewListPlaceOfBirth: json["CrewListPlaceOfBirth"],
     crewListGender: json["Gender"],

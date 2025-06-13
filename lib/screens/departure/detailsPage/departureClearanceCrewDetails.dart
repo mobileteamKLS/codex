@@ -335,7 +335,7 @@ class _DepartureCrewDetailsState extends State<DepartureCrewDetails> {
         infoBlock("Date of Embarkation",widget.crew.crewListDateEmbark != null ? Utils.formatStringUTCDate( widget.crew.crewListDateEmbark,) : "",),
         infoBlock("Date of Disembarkation", widget.crew.crewListDateDisEmbark != null ? Utils.formatStringUTCDate( widget.crew.crewListDateDisEmbark,) : "",),
         infoBlock("Nature of Identity Document", widget.crew.crewListNatureOfDoc ?? ""),
-        infoBlock("Issuing State of Identity Document",   widget.crew.crewListIssueStateDoc ?? ""),
+        infoBlock("Issuing State of Identity Document",   widget.crew.issueCountryText ?? ""),
         infoBlock("No. of Identity Document",  widget.crew.crewListNoofIdentityDoc ?? ""),
         infoBlock("Expiry Date",  widget.crew.crewListDateIdentityDate != null ? Utils.formatStringUTCDate( widget.crew.crewListDateIdentityDate,) : "",),
         SizedBox(

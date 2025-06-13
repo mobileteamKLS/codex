@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:codex_pcs/screens/departure/listPage/departureClearanceList.dart';
 import 'package:codex_pcs/screens/vessel/page/vessel_list.dart';
 import 'package:codex_pcs/widgets/snackbar.dart';
@@ -27,6 +26,7 @@ import '../../login/model/login_response_model.dart';
 import '../../vessel/model/vessel_details_model.dart';
 import 'departureClearanceCrewDetails.dart';
 import 'model/departuredetailsmodel.dart';
+import 'package:excel/excel.dart' as ex;
 
 class DepartureClearanceDetails extends StatefulWidget {
   final String refNo;
@@ -51,6 +51,14 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
   bool isLoading = false;
   DepartureDetailsModel vesselDetailsModel = DepartureDetailsModel();
   TextEditingController commentController = TextEditingController();
+
+  final List<Map<String, dynamic>> _sampleData = [
+    {'Name': 'John Doe', 'Age': 30, 'City': 'New York', 'Salary': 50000},
+    {'Name': 'Jane Smith', 'Age': 25, 'City': 'Los Angeles', 'Salary': 45000},
+    {'Name': 'Mike Johnson', 'Age': 35, 'City': 'Chicago', 'Salary': 55000},
+    {'Name': 'Sarah Wilson', 'Age': 28, 'City': 'Houston', 'Salary': 48000},
+    {'Name': 'David Brown', 'Age': 32, 'City': 'Phoenix', 'Salary': 52000},
+  ];
 
   void _toggleAll() {
     bool expand = !_expanded.every((e) => e);
@@ -937,8 +945,8 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                 portCallItem(
                     "Description of Goods",
                     goods.descName ?? "",
-                    "Gross Wight",
-                    goods.grossWeight ?? "",
+                    "Gross Weight",
+                    "${goods.grossWeight ?? ""} ${goods.grtUnit ?? ""}",
                     "Remarks",
                     goods.remarks ?? ""),
                 if (!isLast) ...[
@@ -977,10 +985,11 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                       AppDimensions.defaultIconSize,
                 ),
                 onTap: () {
-                  _downloadDocument(
-                      vesselDetailsModel.noDuesFileName!,
-                      vesselDetailsModel.noDues!,
-                      vesselDetailsModel.docFileFolderDcAttachment!);
+                  // _downloadDocument(
+                  //     vesselDetailsModel.noDuesFileName!,
+                  //     vesselDetailsModel.noDues!,
+                  //     vesselDetailsModel.docFileFolderDcAttachment!);
+                  generateExcelDocument(true);
                 },
               ),
             ],
@@ -1526,5 +1535,178 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
         );
       },
     );
+  }
+
+  Future<void> generateExcelDocument(bool isCrewList) async {
+    String fileName = 'employee_data_${DateTime.now().millisecondsSinceEpoch}.xlsx';
+    await _createAndSaveExcel(fileName,isCrewList);
+  }
+
+  Future<void> _createAndSaveExcel(String fileName,bool isCrewList) async {
+    try {
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return const AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text('Generating Excel document...'),
+              ],
+            ),
+          );
+        },
+      );
+
+      // Request permissions for Android
+      if (Platform.isAndroid) {
+        final androidInfo = await DeviceInfoPlugin().androidInfo;
+        if (androidInfo.version.sdkInt >= 33) {
+          await Permission.photos.request();
+          await Permission.manageExternalStorage.request();
+        } else {
+          await Permission.storage.request();
+        }
+      }
+
+      // Determine save path based on platform and Android version
+      String? savePath;
+      if (Platform.isAndroid) {
+        final androidInfo = await DeviceInfoPlugin().androidInfo;
+        if (androidInfo.version.sdkInt >= 30) {
+          savePath = await _saveFileWithSAF(fileName);
+        } else {
+          final directory = await getExternalStorageDirectory();
+          savePath = '${directory?.path}/$fileName';
+        }
+      } else if (Platform.isIOS) {
+        final directory = await getApplicationDocumentsDirectory();
+        savePath = '${directory.path}/$fileName';
+      }
+
+      if (savePath == null) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not determine save location')),
+        );
+        return;
+      }
+
+      // Generate Excel file
+      await _performExcelGeneration(savePath,isCrewList);
+
+      Navigator.pop(context); // Close loading dialog
+
+      // Attempt to open the file
+      final result = await OpenFile.open(savePath);
+      if (result.type != ResultType.done) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to open file: ${result.message}')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Excel file generated and opened successfully!')),
+        );
+      }
+    } catch (e) {
+      Navigator.pop(context); // Close loading dialog
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Excel generation failed: ${e.toString()}')),
+      );
+    }
+  }
+
+  Future<void> _performExcelGeneration(String destinationPath,bool isCrewList) async {
+    try {
+      debugPrint('Generating Excel file at: $destinationPath');
+
+      // Create Excel workbook
+      var excel =  ex.Excel.createExcel();
+
+      // Get the default sheet
+      ex.Sheet sheetObject = excel['Sheet1'];
+
+      if(isCrewList){
+        sheetObject.appendRow([
+          ex.TextCellValue("Family Name"),
+          ex.TextCellValue("Given Name"),
+          ex.TextCellValue("Rank/Rating"),
+          ex.TextCellValue("Nationality"),
+          ex.TextCellValue("Date of Birth"),
+          ex.TextCellValue("Place of Birth"),
+          ex.TextCellValue("Gender"),
+          ex.TextCellValue("Date of Embarkation"),
+          ex.TextCellValue("Date of Disembarkation"),
+          ex.TextCellValue("Nature of Identity Document"),
+          ex.TextCellValue("Issuing State of Identity Document"),
+          ex.TextCellValue("No. of Identity Document"),
+          ex.TextCellValue("Expiry Date"),
+          ex.TextCellValue("Seamen Book No"),
+          ex.TextCellValue("Expiry Date1"),
+          ex.TextCellValue("FileName"),
+        ]);
+         for (var crew in vesselDetailsModel.lstDepartureCrew??[]) {
+        sheetObject.appendRow([
+          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
+          ex.TextCellValue("${crew.crewListGivenName ?? ""}"),
+          ex.TextCellValue("${crew.crewListRankRating ?? ""}"),
+          ex.TextCellValue("${crew.crewListNationality ?? ""}"),
+          ex.TextCellValue(crew.crewListDob != null ? Utils.formatStringUTCDate( crew.crewListDob,) : ""),
+          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
+          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
+          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
+          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
+          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
+          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
+          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
+          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
+          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
+          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
+          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
+
+        ]);
+        }
+      }else{
+
+      }
+
+      // Save the Excel file
+      List<int>? fileBytes = excel.save();
+      if (fileBytes != null) {
+        File file = File(destinationPath);
+        await file.writeAsBytes(fileBytes);
+        debugPrint('Excel file saved successfully');
+      } else {
+        throw Exception('Failed to generate Excel file bytes');
+      }
+    } catch (e) {
+      debugPrint('Excel generation error: $e');
+      rethrow;
+    }
+  }
+
+  Future<String?> _saveFileWithSAFExcel(String fileName) async {
+    try {
+      final directory = await getDownloadsDirectory();
+      if (directory != null) {
+        final savePath = '${directory.path}/$fileName';
+        return savePath;
+      }
+
+      final result = await FilePicker.platform.saveFile(
+        dialogTitle: 'Save Excel Document',
+        fileName: fileName,
+        type: FileType.custom,
+        allowedExtensions: ['xlsx'],
+      );
+      return result;
+    } catch (e) {
+      debugPrint('Error saving file with SAF: $e');
+      return null;
+    }
   }
 }
