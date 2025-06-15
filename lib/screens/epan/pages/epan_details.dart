@@ -525,7 +525,7 @@ class _EpanDetailsState extends State<EpanDetails> {
 
   Widget unSecurityContent() {
     return Container(
-      color: AppColors.cardBg,
+      color:(vesselDetailsModel.prohibitedGoodsDetails?.isNotEmpty??false)?AppColors.cardBg:null,
       padding: EdgeInsets.all(8),
       child: Column(
         children: vesselDetailsModel.prohibitedGoodsDetails
@@ -906,30 +906,58 @@ class _EpanDetailsState extends State<EpanDetails> {
     sections.add(buildSection(
         index++, "Cargo / Passenger Details", cargoPassengerContent()));
     sections.add(buildSection(index++, "ISPS Details", ispsDetailsContent()));
+//     int? isvalidIssc = vesselDetailsModel.validIssc;
+//     int? isyourCompliant = vesselDetailsModel.doesyourCompliant;
+//
+//     bool? A = isvalidIssc == null ? null : (isvalidIssc == 1);
+//     bool? B = isyourCompliant == null ? null : (isyourCompliant == 1);
+//
+// // Show cargoPassengerContent when A=false (regardless of B) or when A=null && B=true
+//     bool showCargo = (A == false) || (A == null && B == true);
+//
+// // Show ispsDetailsContent when B=true (regardless of A) or when A=null && B=true
+//     bool showIsps = (B == true) || (A == null && B == true);
+//
+// // But don't show anything when A=true && B=false, A=true && B=null, A=null && B=null, or A=null && B=false
+//     bool showNothing = (A == true && (B == false || B == null)) ||
+//         (A == null && (B == null || B == false));
+//
+//     if (!showNothing) {
+//       if (showCargo) {
+//         sections.add(buildSection(index++, "Measures to be taken for a convention ship that do not carry the International Ship Security Certificate on board.", ispsSecurityCertificateContent()));
+//       }
+//       if (showIsps) {
+//         sections.add(buildSection(index++, "Measures to be taken when an ISPS code complaints ship arrives from a non ISPS complaints port/marine facility.", ispsMeasuresComplaintsContent()));
+//
+//        }
+//     }
+
     int? isvalidIssc = vesselDetailsModel.validIssc;
-    int? isyourCompliant = vesselDetailsModel.doesyourCompliant;
+    int? doesyourCompliantTrue = vesselDetailsModel.doesyourCompliant;
 
     bool? A = isvalidIssc == null ? null : (isvalidIssc == 1);
-    bool? B = isyourCompliant == null ? null : (isyourCompliant == 1);
+    bool? B = doesyourCompliantTrue == null ? null : (doesyourCompliantTrue == 1);
 
-// Show cargoPassengerContent when A=false (regardless of B) or when A=null && B=true
-    bool showCargo = (A == false) || (A == null && B == true);
+// Show certificate when: A=false (regardless of B)
+    bool showCertificate = (A == false);
 
-// Show ispsDetailsContent when B=true (regardless of A) or when A=null && B=true
-    bool showIsps = (B == true) || (A == null && B == true);
+// Show complaint when: (A=true && B=true) OR (A=null && B=true) OR (A=false && B=true)
+    bool showComplaint = (B == true);
 
-// But don't show anything when A=true && B=false, A=true && B=null, A=null && B=null, or A=null && B=false
-    bool showNothing = (A == true && (B == false || B == null)) ||
-        (A == null && (B == null || B == false));
-
-    if (!showNothing) {
-      if (showCargo) {
-        sections.add(buildSection(index++, "Cargo / Passenger Details", cargoPassengerContent()));
-      }
-      if (showIsps) {
-        sections.add(buildSection(index++, "ISPS Details", ispsDetailsContent()));
-      }
+    if (showCertificate) {
+      sections.add(buildSection(
+          index++,
+          "Measures to be taken for a convention ship that do not carry the International Ship Security Certificate on board.",
+          ispsSecurityCertificateContent()));
     }
+
+    if (showComplaint) {
+      sections.add(buildSection(
+          index++,
+          "Measures to be taken when an ISPS code complaints ship arrives from a non ISPS complaints port/marine facility.",
+          ispsMeasuresComplaintsContent()));
+    }
+
     sections.add(buildSection(
         index++,
         "Last 10 Port of Calls - In chronological order (most recent call first)",

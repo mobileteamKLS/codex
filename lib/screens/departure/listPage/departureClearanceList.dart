@@ -1,4 +1,4 @@
-// vessel_list_refactored.dart
+
 import 'package:codex_pcs/screens/departure/listPage/service/cubit/departure_cubit.dart';
 import 'package:codex_pcs/screens/departure/listPage/service/cubit/departure_state.dart';
 import 'package:codex_pcs/screens/vessel/page/vessel_details.dart';

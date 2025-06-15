@@ -76,7 +76,7 @@ class DepartureDetailsModel {
   String? docFileFolderDcAttachment;
   List<LstGood>? lstGoods;
   List<LstDepartureCrew>? lstDepartureCrew;
-  List<dynamic>? lstPassengers;
+  List<LstDeparturePassenger>? lstPassengers;
   List<LstUploadDetail>? lstUploadDetails;
   String? remarksbyPortHealth;
   String? portName;
@@ -243,7 +243,7 @@ class DepartureDetailsModel {
     docFileFolderDcAttachment: json["DocFileFolder_DCAttachment"],
     lstGoods: json["lstGoods"] == null ? [] : List<LstGood>.from(json["lstGoods"]!.map((x) => LstGood.fromJson(x))),
     lstDepartureCrew: json["lstDepartureCrew"] == null ? [] : List<LstDepartureCrew>.from(json["lstDepartureCrew"]!.map((x) => LstDepartureCrew.fromJson(x))),
-    lstPassengers: json["lstPassengers"] == null ? [] : List<dynamic>.from(json["lstPassengers"]!.map((x) => x)),
+    lstPassengers: json["lstPassengers"] == null ? [] : List<LstDeparturePassenger>.from(json["lstPassengers"]!.map((x) =>LstDeparturePassenger.fromJson(x) )),
     lstUploadDetails: json["lstUploadDetails"] == null ? [] : List<LstUploadDetail>.from(json["lstUploadDetails"]!.map((x) => LstUploadDetail.fromJson(x))),
     remarksbyPortHealth: json["RemarksbyPortHealth"],
       portName:json["portNameTextWithComma"]
@@ -621,5 +621,161 @@ class LstUploadDetail {
     "UploadedBy": uploadedBy,
     "Ipaddress": ipaddress,
     "DocExpiry": docExpiry,
+  };
+}
+
+class LstDeparturePassenger {
+  int? passId;
+  String? passFamilyName;
+  String? passGivenName;
+  String? nationality;
+  String? nationalityText;
+  String? passDob;
+  String? gender;
+  String? passTravelDoc;
+  String? passNooftravelDoc;
+  String? passIssueStateDoc;
+  String? passExpiryDateofDoc;
+  String? passPortOfEmbarId;
+  String? embarName;
+  String? embarCode;
+  String? passIssueDateofTraDoc;
+  String? passPortofDisEmbarId;
+  String? disEmbarName;
+  String? disEmbarCode;
+  dynamic transitpass;
+  int? passStatus;
+  dynamic passangerListXml;
+  String? fileName;
+  String? saveFileName;
+  dynamic docTitle;
+  dynamic docExpiry;
+  dynamic multiUploadXml;
+  String? rowNumber;
+  int? passDepartId;
+  int? drid;
+  dynamic pageIndex;
+  dynamic pageSize;
+  String? passType;
+  dynamic visaNo;
+  String? portOfDisembarcation;
+  String? transitPassanger;
+  String? isDeleted;
+
+  LstDeparturePassenger({
+    this.passId,
+    this.passFamilyName,
+    this.passGivenName,
+    this.nationality,
+    this.nationalityText,
+    this.passDob,
+    this.gender,
+    this.passTravelDoc,
+    this.passNooftravelDoc,
+    this.passIssueStateDoc,
+    this.passExpiryDateofDoc,
+    this.passPortOfEmbarId,
+    this.embarName,
+    this.embarCode,
+    this.passIssueDateofTraDoc,
+    this.passPortofDisEmbarId,
+    this.disEmbarName,
+    this.disEmbarCode,
+    this.transitpass,
+    this.passStatus,
+    this.passangerListXml,
+    this.fileName,
+    this.saveFileName,
+    this.docTitle,
+    this.docExpiry,
+    this.multiUploadXml,
+    this.rowNumber,
+    this.passDepartId,
+    this.drid,
+    this.pageIndex,
+    this.pageSize,
+    this.passType,
+    this.visaNo,
+    this.portOfDisembarcation,
+    this.transitPassanger,
+    this.isDeleted,
+  });
+
+  factory LstDeparturePassenger.fromJson(Map<String, dynamic> json) => LstDeparturePassenger(
+    passId: json["PassId"],
+    passFamilyName: json["PassFamilyName"],
+    passGivenName: json["PassGivenName"],
+    nationality: json["Nationality"],
+    nationalityText: json["NationalityText"],
+    passDob: json["PassDOB"],
+    gender: json["Gender"],
+    passTravelDoc: json["PassTravelDoc"],
+    passNooftravelDoc: json["PassNooftravelDoc"],
+    passIssueStateDoc: json["PassIssueStateDoc"],
+    passExpiryDateofDoc: json["PassExpiryDateofDoc"],
+    passPortOfEmbarId: json["PassPortOfEmbarId"],
+    embarName: json["EmbarName"],
+    embarCode: json["EmbarCode"],
+    passIssueDateofTraDoc: json["PassIssueDateofTraDoc"],
+    passPortofDisEmbarId: json["PassPortofDisEmbarID"],
+    disEmbarName: json["DisEmbarName"],
+    disEmbarCode: json["DisEmbarCode"],
+    transitpass: json["Transitpass"],
+    passStatus: json["PassStatus"],
+    passangerListXml: json["PassangerListXml"],
+    fileName: json["FileName"],
+    saveFileName: json["SaveFileName"],
+    docTitle: json["DocTitle"],
+    docExpiry: json["DocExpiry"],
+    multiUploadXml: json["MultiUploadXml"],
+    rowNumber: json["RowNumber"],
+    passDepartId: json["PassDepartID"],
+    drid: json["DRID"],
+    pageIndex: json["PageIndex"],
+    pageSize: json["PageSize"],
+    passType: json["PassType"],
+    visaNo: json["VisaNo"],
+    portOfDisembarcation: json["PortOfDisembarcation"],
+    transitPassanger: json["TransitPassanger"],
+    isDeleted: json["IsDeleted"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "PassId": passId,
+    "PassFamilyName": passFamilyName,
+    "PassGivenName": passGivenName,
+    "Nationality": nationality,
+    "NationalityText": nationalityText,
+    "PassDOB": passDob,
+    "Gender": gender,
+    "PassTravelDoc": passTravelDoc,
+    "PassNooftravelDoc": passNooftravelDoc,
+    "PassIssueStateDoc": passIssueStateDoc,
+    "PassExpiryDateofDoc": passExpiryDateofDoc,
+    "PassPortOfEmbarId": passPortOfEmbarId,
+    "EmbarName": embarName,
+    "EmbarCode": embarCode,
+    "PassIssueDateofTraDoc": passIssueDateofTraDoc,
+    "PassPortofDisEmbarID": passPortofDisEmbarId,
+    "DisEmbarName": disEmbarName,
+    "DisEmbarCode": disEmbarCode,
+    "Transitpass": transitpass,
+    "PassStatus": passStatus,
+    "PassangerListXml": passangerListXml,
+    "FileName": fileName,
+    "SaveFileName": saveFileName,
+    "DocTitle": docTitle,
+    "DocExpiry": docExpiry,
+    "MultiUploadXml": multiUploadXml,
+    "RowNumber": rowNumber,
+    "PassDepartID": passDepartId,
+    "DRID": drid,
+    "PageIndex": pageIndex,
+    "PageSize": pageSize,
+    "PassType": passType,
+    "VisaNo": visaNo,
+    "PortOfDisembarcation": portOfDisembarcation,
+    "TransitPassanger": transitPassanger,
+    "IsDeleted": isDeleted,
   };
 }

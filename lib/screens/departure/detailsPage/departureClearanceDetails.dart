@@ -52,14 +52,6 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
   DepartureDetailsModel vesselDetailsModel = DepartureDetailsModel();
   TextEditingController commentController = TextEditingController();
 
-  final List<Map<String, dynamic>> _sampleData = [
-    {'Name': 'John Doe', 'Age': 30, 'City': 'New York', 'Salary': 50000},
-    {'Name': 'Jane Smith', 'Age': 25, 'City': 'Los Angeles', 'Salary': 45000},
-    {'Name': 'Mike Johnson', 'Age': 35, 'City': 'Chicago', 'Salary': 55000},
-    {'Name': 'Sarah Wilson', 'Age': 28, 'City': 'Houston', 'Salary': 48000},
-    {'Name': 'David Brown', 'Age': 32, 'City': 'Phoenix', 'Salary': 52000},
-  ];
-
   void _toggleAll() {
     bool expand = !_expanded.every((e) => e);
     setState(() {
@@ -103,76 +95,28 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
     }
   }
 
-  void approveDC(String remark, int opType) async {
+  void approveReject(String remark, int opType) async {
     setState(() {
       isLoading = true;
     });
 
     try {
       final response = await ApiService().request(
-        endpoint: "/api_pcs1/DepartureClearance/SetApproval",
+        endpoint: "/api_pcs1/DepartureClearance/SetApprovReject",
         method: "POST",
         body: {
           "IsMY": int.parse(configMaster.clientID),
+          "CountryID": configMaster.countryId,
+          "Status": opType,
+          "OrgBranchId": loginDetailsMaster.organizationBranchId,
           "ORG_ID": loginDetailsMaster.organizationId,
-          "OperationType": opType,
-          "OrgType": "Marine Department",
-          "OrgTypeName": loginDetailsMaster.orgTypeName,
-          "CreatedBy": "150",
-          "BranchId": loginDetailsMaster.organizationBranchId,
-          "PVR_ID": widget.drId,
-          "IPAddress": "",
-          "Comments": remark
-        },
-      );
-
-      if (response is Map<String, dynamic> && response["StatusCode"] == 200) {
-        Utils.prints("Status", response["StatusMessage"]);
-        CustomSnackBar.show(context,
-            message: response["StatusMessage"],
-            backgroundColor: AppColors.successColor,
-            leftIcon: Icons.check_circle);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const DepartureListing()),
-        );
-      } else {
-        Utils.prints("Login failed:", "${response["StatusMessage"]}");
-        CustomSnackBar.show(context,
-            message: response["StatusMessage"], backgroundColor: Colors.red);
-      }
-      setState(() {
-        isLoading = false;
-      });
-    } catch (e) {
-      print("API Call Failed: $e");
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  void rejectDC(String comment, int opType) async {
-    setState(() {
-      isLoading = true;
-    });
-
-    try {
-      final response = await ApiService().request(
-        endpoint: "/api_pcs1/DepartureClearance/SetReject",
-        method: "POST",
-        body: {
-          "IsMY": int.parse(configMaster.clientID),
-          "ORG_ID": loginDetailsMaster.organizationId,
-          "OperationType": opType,
-          "OrgType": "Marine Department",
-          "OrgTypeName": loginDetailsMaster.orgTypeName,
-          "CreatedBy": "150",
-          "BranchId": loginDetailsMaster.organizationBranchId,
-          "PVR_ID": widget.drId,
-          "IPAddress": "",
-          "Comments": comment
+          "CREATED_BY": loginDetailsMaster.userId,
+          "UserName": "Valerian Donggot",
+          "OrgTypeName": loginDetailsMaster.branchName,
+          "DR_ID": widget.drId,
+          "UpdateRemarks": "",
+          "RejectRemark": remark,
+          "EnityRemarks": ""
         },
       );
 
@@ -352,10 +296,9 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
           ],
         ),
         bottomSheet: RoleConditionWidget(
-          condition: (OrganizationService.isMarineDepartment &&
-              widget.isSubmit &&
-              (widget.marineBranchId ==
-                  loginDetailsMaster.organizationBranchId)),
+          condition:
+              (OrganizationService.isMarineDepartment && widget.isSubmit) ||
+                  (OrganizationService.isCustoms && widget.isSubmit),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Material(
@@ -378,7 +321,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                             showRejectWithCommentsBottomSheet(
                               context: context,
                               onSubmit: (comment) {
-                                // approveReject(comment, 2);
+                                approveReject(comment, 3);
                               },
                             );
                           },
@@ -394,7 +337,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                                 "Are you sure you want to Approve ?",
                                 "Approve");
                             if (isTrue!) {
-                              // approveReject("", 1);
+                              approveReject("", 2);
                             }
                           },
                         ),
@@ -781,22 +724,24 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                 style: AppStyle.sideDescText,
               ),
               const SizedBox(height: 2),
-              if (vesselDetailsModel.noDues != "" )
+              if (vesselDetailsModel.noDues != "")
                 Container(
                   color: AppColors.cardBg,
                   padding: const EdgeInsets.all(8),
                   child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        vesselDetailsModel.noDuesFileName??"",
-                        style: AppStyle.defaultTitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          vesselDetailsModel.noDuesFileName ?? "",
+                          style: AppStyle.defaultTitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    ),
-                      const SizedBox(width: 14,),
+                      const SizedBox(
+                        width: 14,
+                      ),
                       GestureDetector(
                         child: SvgPicture.asset(
                           download,
@@ -812,8 +757,8 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                               vesselDetailsModel.docFileFolderDcAttachment!);
                         },
                       ),
-                  ],
-                                ),
+                    ],
+                  ),
                 ),
             ],
           ),
@@ -963,19 +908,21 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
                 child: Text(
-                 "Cargo List",
+                  "Crew List",
                   style: AppStyle.subHeading,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const SizedBox(width: 14,),
+              const SizedBox(
+                width: 14,
+              ),
               GestureDetector(
                 child: SvgPicture.asset(
                   download,
@@ -998,7 +945,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
         SizedBox(child: crewList()),
         const SizedBox(height: 16),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -1010,7 +957,9 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const SizedBox(width: 14,),
+              const SizedBox(
+                width: 14,
+              ),
               GestureDetector(
                 child: SvgPicture.asset(
                   download,
@@ -1237,7 +1186,8 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
             MaterialPageRoute(
                 builder: (_) => DepartureCrewDetails(
                       crew: crewData,
-                  folderPath: vesselDetailsModel.docFileFolderDcAttachment??"",
+                      folderPath:
+                          vesselDetailsModel.docFileFolderDcAttachment ?? "",
                     )));
       },
       child: Container(
@@ -1538,11 +1488,12 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
   }
 
   Future<void> generateExcelDocument(bool isCrewList) async {
-    String fileName = 'employee_data_${DateTime.now().millisecondsSinceEpoch}.xlsx';
-    await _createAndSaveExcel(fileName,isCrewList);
+    String fileName =
+        'employee_data_${DateTime.now().millisecondsSinceEpoch}.xlsx';
+    await _createAndSaveExcel(fileName, isCrewList);
   }
 
-  Future<void> _createAndSaveExcel(String fileName,bool isCrewList) async {
+  Future<void> _createAndSaveExcel(String fileName, bool isCrewList) async {
     try {
       // Show loading dialog
       showDialog(
@@ -1597,7 +1548,7 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
       }
 
       // Generate Excel file
-      await _performExcelGeneration(savePath,isCrewList);
+      await _performExcelGeneration(savePath, isCrewList);
 
       Navigator.pop(context); // Close loading dialog
 
@@ -1609,7 +1560,8 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Excel file generated and opened successfully!')),
+          const SnackBar(
+              content: Text('Excel file generated and opened successfully!')),
         );
       }
     } catch (e) {
@@ -1620,17 +1572,15 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
     }
   }
 
-  Future<void> _performExcelGeneration(String destinationPath,bool isCrewList) async {
+  Future<void> _performExcelGeneration(
+      String destinationPath, bool isCrewList) async {
     try {
       debugPrint('Generating Excel file at: $destinationPath');
+      var excel = ex.Excel.createExcel();
 
-      // Create Excel workbook
-      var excel =  ex.Excel.createExcel();
-
-      // Get the default sheet
       ex.Sheet sheetObject = excel['Sheet1'];
 
-      if(isCrewList){
+      if (isCrewList) {
         sheetObject.appendRow([
           ex.TextCellValue("Family Name"),
           ex.TextCellValue("Given Name"),
@@ -1649,29 +1599,93 @@ class _DepartureClearanceDetailsState extends State<DepartureClearanceDetails> {
           ex.TextCellValue("Expiry Date1"),
           ex.TextCellValue("FileName"),
         ]);
-         for (var crew in vesselDetailsModel.lstDepartureCrew??[]) {
-        sheetObject.appendRow([
-          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
-          ex.TextCellValue("${crew.crewListGivenName ?? ""}"),
-          ex.TextCellValue("${crew.crewListRankRating ?? ""}"),
-          ex.TextCellValue("${crew.crewListNationality ?? ""}"),
-          ex.TextCellValue(crew.crewListDob != null ? Utils.formatStringUTCDate( crew.crewListDob,) : ""),
-          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
-          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
-          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
-          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
-          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
-          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
-          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
-          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
-          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
-          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
-          ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
-
-        ]);
+        for (LstDepartureCrew crew
+            in vesselDetailsModel.lstDepartureCrew ?? []) {
+          sheetObject.appendRow([
+            ex.TextCellValue("${crew.crewListFamilyName ?? ""}"),
+            ex.TextCellValue("${crew.crewListGivenName ?? ""}"),
+            ex.TextCellValue("${crew.crewListRankRating ?? ""}"),
+            ex.TextCellValue("${crew.crewListNationality ?? ""}"),
+            ex.TextCellValue(crew.crewListDob != null
+                ? Utils.formatStringUTCDate(
+                    crew.crewListDob,
+                  )
+                : ""),
+            ex.TextCellValue(
+              crew.crewListPlaceOfBirth != null
+                  ? Utils.formatStringUTCDate(
+                      crew.crewListPlaceOfBirth,
+                    )
+                  : "",
+            ),
+            ex.TextCellValue("${crew.crewListGender ?? ""}"),
+            ex.TextCellValue(crew.crewListDateEmbark != null
+                ? Utils.formatStringUTCDate(
+                    crew.crewListDateEmbark,
+                  )
+                : ""),
+            ex.TextCellValue(crew.crewListDateDisEmbark != null
+                ? Utils.formatStringUTCDate(
+                    crew.crewListDateDisEmbark,
+                  )
+                : ""),
+            ex.TextCellValue(crew.crewListNatureOfDoc ?? ""),
+            ex.TextCellValue("${crew.issueCountryText ?? ""}"),
+            ex.TextCellValue("${crew.crewListNoofIdentityDoc ?? ""}"),
+            ex.TextCellValue("${crew.crewListDateIdentityDate ?? ""}"),
+            ex.TextCellValue("${crew.crewListIssueStateDoc ?? ""}"),
+            ex.TextCellValue("${crew.crewListExpiryDateOfDoc ?? ""}"),
+            ex.TextCellValue("${crew.fileName ?? ""}"),
+          ]);
         }
-      }else{
-
+      } else {
+        sheetObject.appendRow([
+          ex.TextCellValue("Family Name"),
+          ex.TextCellValue("Given Name"),
+          ex.TextCellValue("Nationality"),
+          ex.TextCellValue("Date of Birth"),
+          ex.TextCellValue("Gender"),
+          ex.TextCellValue("Type of Travel Document"),
+          ex.TextCellValue("Sr. No of Travel Document"),
+          ex.TextCellValue("Issuing Country of Travel Document"),
+          ex.TextCellValue("Issuing Date of Travel Document"),
+          ex.TextCellValue("Expiry Date of Travel Document"),
+          ex.TextCellValue("Port of Embarkation"),
+          ex.TextCellValue("Port of Disembarkation"),
+          ex.TextCellValue("Transit Passenger or not"),
+          ex.TextCellValue("File Name"),
+        ]);
+        for (LstDeparturePassenger passenger
+            in vesselDetailsModel.lstPassengers ?? []) {
+          sheetObject.appendRow([
+            ex.TextCellValue(passenger.passFamilyName ?? ""),
+            ex.TextCellValue(passenger.passGivenName ?? ""),
+            ex.TextCellValue(passenger.nationality ?? ""),
+            ex.TextCellValue(passenger.passDob != null
+                ? Utils.formatStringUTCDate(
+                    passenger.passDob,
+                  )
+                : ""),
+            ex.TextCellValue(passenger.gender ?? ""),
+            ex.TextCellValue(passenger.passTravelDoc ?? ""),
+            ex.TextCellValue(passenger.passNooftravelDoc ?? ""),
+            ex.TextCellValue(passenger.passIssueStateDoc ?? ""),
+            ex.TextCellValue(passenger.passIssueDateofTraDoc != null
+                ? Utils.formatStringUTCDate(
+                    passenger.passDob,
+                  )
+                : ""),
+            ex.TextCellValue(passenger.passExpiryDateofDoc != null
+                ? Utils.formatStringUTCDate(
+                    passenger.passExpiryDateofDoc,
+                  )
+                : ""),
+            ex.TextCellValue(passenger.embarName ?? ""),
+            ex.TextCellValue(passenger.disEmbarName ?? ""),
+            ex.TextCellValue("${passenger.transitpass ?? ""}"),
+            ex.TextCellValue(passenger.fileName ?? ""),
+          ]);
+        }
       }
 
       // Save the Excel file

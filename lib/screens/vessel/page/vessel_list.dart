@@ -39,10 +39,7 @@ class _VesselListingState extends State<VesselListing> {
   bool isFilterApplied = false;
   DateTime? selectedDate;
   String slotFilterDate = "Slot Date";
-  final _formKey = GlobalKey<FormState>();
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<VesselListModel> vesselDetailsList = [];
-  List<bool> _isExpandedList = [];
   List<String> selectedFilters = [];
   String? selectedFilter;
   String? selectedFilterTextValue;
@@ -52,9 +49,7 @@ class _VesselListingState extends State<VesselListing> {
   TextEditingController imoNumberController = TextEditingController();
   TextEditingController vesselNameController = TextEditingController();
 
-  late List<Map<String, String>> statusList = [
-
-  ];
+  late List<Map<String, String>> statusList = [];
 
   String vesselId = "";
   String imoName = "";
@@ -66,7 +61,7 @@ class _VesselListingState extends State<VesselListing> {
   @override
   void initState() {
     super.initState();
-    if(OrganizationService.isShippingAgent){
+    if (OrganizationService.isShippingAgent) {
       statusList = [
         {"label": "Created", "value": "Created"},
         {"label": "Submitted", "value": "Submitted"},
@@ -76,8 +71,7 @@ class _VesselListingState extends State<VesselListing> {
         {"label": "Blacklisted", "value": "Suspended"},
         {"label": "Cancelled", "value": "Cancelled"},
       ];
-    }
-    else{
+    } else {
       statusList = [
         {"label": "Submitted", "value": "Submitted"},
         {"label": "Approved", "value": "Approved"},
@@ -121,7 +115,11 @@ class _VesselListingState extends State<VesselListing> {
     _lastScrollPosition = _scrollController.position.pixels;
 
     currentPage++;
-    await getAllVessels(status: selectedFilter,imoName: imoName,vesselId: vesselId,vesselName: vesselName);
+    await getAllVessels(
+        status: selectedFilter,
+        imoName: imoName,
+        vesselId: vesselId,
+        vesselName: vesselName);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
@@ -426,7 +424,10 @@ class _VesselListingState extends State<VesselListing> {
             currentPage = 1;
           });
           getAllVessels(
-              vesselId: vesselId, imoName: imoName, vesselName: vesselName,status: selectedFilter);
+              vesselId: vesselId,
+              imoName: imoName,
+              vesselName: vesselName,
+              status: selectedFilter);
 
           Navigator.pop(context);
         }
@@ -554,10 +555,12 @@ class _VesselListingState extends State<VesselListing> {
                                         1.5),
                             CustomTextField(
                               controller: imoNumberController,
-                              inputFormatters: [ FilteringTextInputFormatter.digitsOnly,LengthLimitingTextInputFormatter(7)],
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(7)
+                              ],
                               labelText: "IMO No.",
                               isValidationRequired: false,
-
                             ),
                             SizedBox(
                                 height:
@@ -609,7 +612,6 @@ class _VesselListingState extends State<VesselListing> {
                               child: ButtonWidgets.buildRoundedGradientButton(
                                 text: 'Search',
                                 press: () {
-
                                   search();
                                 },
                               ),
@@ -728,7 +730,6 @@ class _VesselListingState extends State<VesselListing> {
                                 } else {
                                   selectedFilter = null;
                                   selectedFilterTextValue = null;
-
                                 }
                               });
                             },
@@ -766,7 +767,6 @@ class _VesselListingState extends State<VesselListing> {
                                 setState(() {
                                   selectedFilter = null;
                                   selectedFilterTextValue = null;
-
                                 });
                                 _refreshData();
                                 Navigator.pop(context);
@@ -782,7 +782,11 @@ class _VesselListingState extends State<VesselListing> {
                               press: () {
                                 Navigator.pop(context);
                                 // if (selectedFilter != null) {
-                                  getAllVessels(status: selectedFilter,imoName: imoName,vesselId: vesselId,vesselName: vesselName);
+                                getAllVessels(
+                                    status: selectedFilter,
+                                    imoName: imoName,
+                                    vesselId: vesselId,
+                                    vesselName: vesselName);
                                 // } else {
                                 //   _refreshData();
                                 // }
@@ -800,23 +804,6 @@ class _VesselListingState extends State<VesselListing> {
         );
       },
     );
-  }
-
-  void filterShipments() {
-    setState(() {
-      filteredList =
-          getFilteredShipmentDetails(vesselDetailsList, selectedFilters);
-    });
-  }
-
-  List<VesselListModel> getFilteredShipmentDetails(
-      List<VesselListModel> listShipmentDetails, List<String> selectedFilters) {
-    return listShipmentDetails.where((shipment) {
-      bool matchFound = selectedFilters.any((filter) {
-        return shipment.status.toUpperCase() == filter.toUpperCase();
-      });
-      return matchFound;
-    }).toList();
   }
 
   Widget buildVesselCard(
@@ -919,6 +906,7 @@ class _VesselListingState extends State<VesselListing> {
       ),
     );
   }
+
   Widget buildVesselCardV2(
       {required VesselListModel vesselDetails, required int index}) {
     return Container(
@@ -952,7 +940,7 @@ class _VesselListingState extends State<VesselListing> {
                 ),
                 Container(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: ColorUtils.getStatusColor(vesselDetails.status),
                     borderRadius: BorderRadius.circular(20),
@@ -972,7 +960,8 @@ class _VesselListingState extends State<VesselListing> {
             buildLabelValue('Vessel Flag', vesselDetails.nationality),
             buildLabelValue('IMO No.', vesselDetails.imoNo),
             buildLabelValue('Call Sign', vesselDetails.callsign),
-            buildLabelValue('Port of Registry', vesselDetails.placeOfRegistyName),
+            buildLabelValue(
+                'Port of Registry', vesselDetails.placeOfRegistyName),
             const SizedBox(height: 4),
             Utils.customDivider(
               space: 0,
@@ -987,11 +976,11 @@ class _VesselListingState extends State<VesselListing> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => VesselDetails(
-                          refNo: vesselDetails.vslName,
-                          pvrId: vesselDetails.pvrId,
-                          marineBranchId: vesselDetails.marineBranchId,
-                          isSubmit: (vesselDetails.status == "Submitted"),
-                        )));
+                              refNo: vesselDetails.vslName,
+                              pvrId: vesselDetails.pvrId,
+                              marineBranchId: vesselDetails.marineBranchId,
+                              isSubmit: (vesselDetails.status == "Submitted"),
+                            )));
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
